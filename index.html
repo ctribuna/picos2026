@@ -309,6 +309,25 @@
                 </div>
             </div>
 
+            <!-- Google Earth 3D Interactive Card (Premium Visual Add-on) -->
+            <div class="glass-card p-4 relative overflow-hidden bg-gradient-to-r from-blue-950/20 via-amber-600/5 to-slate-900/40 border border-blue-500/20 flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-500/10 border border-blue-500/25 text-blue-400 p-2.5 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-earth-americas text-base"></i>
+                    </div>
+                    <div>
+                        <span class="text-[9px] uppercase tracking-widest text-amber-500 font-extrabold block">Visualização Premium 3D</span>
+                        <h3 class="text-xs font-bold text-white mt-0.5">Projecto Oficial Google Earth 3D</h3>
+                        <p class="text-[10px] text-slate-400 leading-relaxed mt-0.5">Explore todo o relevo das montanhas, vales e curvas vertiginosas dos Picos de Europa em 3D interativo!</p>
+                    </div>
+                </div>
+                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" 
+                   target="_blank" 
+                   class="w-full bg-gradient-to-r from-blue-600/30 to-blue-500/40 hover:from-blue-600/40 hover:to-blue-500/50 border border-blue-500/35 text-blue-200 py-2.5 rounded-xl text-[10px] font-extrabold tracking-wider uppercase text-center flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] shadow-lg shadow-blue-500/5">
+                    <i class="fa-solid fa-plane-up text-[10px] rotate-45 text-blue-400 animate-pulse"></i> Iniciar Voo Virtual 3D
+                </a>
+            </div>
+
             <!-- Apple Capsule Day Selector Slider -->
             <div class="flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar -mx-4 px-4 sticky top-[60px] z-40 bg-gradient-to-b from-[#05070a] via-[#05070a]/95 to-transparent">
                 <button onclick="showDay(1)" id="btn-d1" class="day-btn day-capsule day-capsule-active px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D1</span><span class="text-[8px] opacity-75 font-bold uppercase mt-0.5">04 JUN</span></button>
@@ -726,7 +745,7 @@
                 date: "05 JUN",
                 weekday: "Sexta-feira",
                 title: "Bragança → Riaño",
-                route: "Bragança → Montesinho → Calabor (ZA-925) → Puebla de Sanabria → Lago de Sanabria → Castrocontrigo (LE-125) → León → CL-626 → Sabero → Riaño",
+                route: "Bragança → Montesinho → Calabor (ZA-925) → Puebla de Sanabria → Lago de Sanabria → Castrocontrigo (LE-125) → Santa María del Páramo → León → CL-626 → Sabero → Riaño",
                 sleep: "Hotel Rural El Sabinar (Riaño) - 240€",
                 distance: "310 km",
                 duration: "6h00 de condução real",
@@ -739,13 +758,14 @@
                     { name: "Puebla de Sanabria", coords: [42.0544, -6.6350], desc: "Paragem no castelo medieval" },
                     { name: "Lago de Sanabria", coords: [42.1215, -6.7118], desc: "Café e foto à beira do lago glaciar" },
                     { name: "Astorga", coords: [42.4593, -6.0560], desc: "Almoço e Palácio Gaudí" },
+                    { name: "Santa María del Páramo", coords: [42.3533, -5.7483], desc: "Visita ao amigo Daniel" },
                     { name: "León", coords: [42.5987, -5.5671], desc: "Paragem rápida para café" },
                     { name: "Riaño", coords: [42.9766, -5.0057], desc: "Dormida: El Sabinar" }
                 ],
                 routePath: [
                     [41.8061, -6.7567], [41.9792, -6.7125], [42.0624, -6.6349], [42.1215, -6.7118],
                     [42.0624, -6.6349], [42.1812, -6.2081], [42.3015, -5.9009], [42.4593, -6.0560],
-                    [42.4631, -5.8812], [42.5987, -5.5671], [42.8681, -5.3212], [42.8361, -5.1481],
+                    [42.3533, -5.7483], [42.5987, -5.5671], [42.8681, -5.3212], [42.8361, -5.1481],
                     [42.9733, -5.0117]
                 ],
                 passes: [
@@ -757,9 +777,10 @@
                     { time: "09:45", desc: "Entrada em Espanha por Calabor (ZA-925). Condução rural e sinuosa." },
                     { time: "10:30", desc: "Café e foto junto ao belíssimo Lago de Sanabria.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Lago+de+Sanabria+Playa+Grande" },
                     { time: "13:00", desc: "Almoço no centro histórico de Astorga (famoso pelo Palácio Gaudí).", mapsLink: "https://www.google.com/maps/search/?api=1&query=Palacio+Episcopal+de+Astorga" },
-                    { time: "15:30", desc: "Paragem rápida para café e esticar as pernas na praça central de León." },
-                    { time: "16:30", desc: "Entrada na fantástica estrada CL-626 por Sabero (belas curvas e vistas)." },
-                    { time: "18:30", desc: "Chegada a Riaño, check-in no Hotel Rural El Sabinar e fotos do 'Fiorde Leonês' ao pôr do sol.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Hotel+Rural+El+Sabinar+Riaño" },
+                    { time: "15:00", desc: "Paragem especial em Santa María del Páramo para visitar o amigo Daniel e beber uma cerveja ou café rápido!", mapsLink: "https://www.google.com/maps/search/?api=1&query=Santa+Maria+del+Paramo" },
+                    { time: "16:00", desc: "Paragem rápida para café e esticar as pernas na praça central de León." },
+                    { time: "17:00", desc: "Entrada na fantástica estrada CL-626 por Sabero (belas curvas e vistas)." },
+                    { time: "18:45", desc: "Chegada a Riaño, check-in no Hotel Rural El Sabinar e fotos do 'Fiorde Leonês' ao pôr do sol.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Hotel+Rural+El+Sabinar+Riaño" },
                     { time: "20:00", desc: "Jantar típico na vila." }
                 ],
                 gastronomy: {
@@ -1201,7 +1222,14 @@
 
                         <!-- MAPA INTERATIVO DO PERCURSO -->
                         <div class="text-xs mt-3">
-                            <strong class="text-slate-400 uppercase text-[8px] block font-bold tracking-wider mb-1">Mapa do Percurso (Navegável)</strong>
+                            <div class="flex justify-between items-center mb-1">
+                                <strong class="text-slate-400 uppercase text-[8px] block font-bold tracking-wider">Mapa do Percurso (Navegável)</strong>
+                                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" 
+                                   target="_blank" 
+                                   class="text-[8px] font-extrabold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 active:scale-95 transition-all">
+                                    <i class="fa-solid fa-earth-americas text-[8.5px]"></i> Voo 3D Google Earth
+                                </a>
+                            </div>
                             <div id="map" class="w-full h-56 rounded-2xl border border-slate-900 shadow-inner z-0 overflow-hidden relative"></div>
                             <span class="text-[9px] text-slate-400 mt-1 block"><i class="fa-solid fa-circle-info text-amber-500/70 mr-1"></i>Toque nos marcadores no mapa para mais informações.</span>
                         </div>
