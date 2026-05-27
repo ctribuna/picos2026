@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Picos 2026 | Roadbook</title>
+    <title>Picos 2026 Roadbook Edition</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome para Ícones -->
@@ -18,10 +18,10 @@
     
     <style>
         :root {
-            --brand-color: #f59e0b; /* Amber 500 */
-            --brand-rgb: 245, 158, 11;
-            --bg-deep: #060911;
-            --bg-card: rgba(18, 24, 43, 0.6);
+            --brand-color: #c27a3e; /* Cobre Metálico Adamus */
+            --brand-gold: #e5c158;  /* Dourado Adamus */
+            --bg-deep: #05070a;      /* Preto Obsidiana Profundo */
+            --bg-card: rgba(14, 18, 30, 0.7);
             --ios-blur: saturate(190%) blur(24px);
         }
 
@@ -29,8 +29,8 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-deep);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.06) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(194, 122, 62, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(229, 193, 88, 0.05) 0px, transparent 50%);
             color: #f8fafc;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
@@ -40,35 +40,42 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Frosted Glassmorphism Premium */
+        /* Frosted Glassmorphism Premium c/ Moldura de Cobre/Cortiça */
         .glass-card {
             background: var(--bg-card);
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(194, 122, 62, 0.15);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4);
             border-radius: 24px;
             transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .glass-card:active {
             transform: scale(0.985);
-            border-color: rgba(245, 158, 11, 0.15);
+            border-color: rgba(229, 193, 88, 0.3);
+        }
+
+        /* Borda especial com padrão de Cortiça */
+        .cork-accent {
+            border: 2px solid #8e6c46;
+            background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 0);
+            background-size: 4px 4px;
         }
 
         .glass-header {
-            background: rgba(6, 9, 17, 0.75);
+            background: rgba(5, 7, 10, 0.8);
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(194, 122, 62, 0.12);
             padding-top: env(safe-area-inset-top);
         }
 
         .glass-footer {
-            background: rgba(6, 9, 17, 0.85);
+            background: rgba(5, 7, 10, 0.9);
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-top: 1px solid rgba(194, 122, 62, 0.12);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
@@ -88,7 +95,7 @@
         }
 
         .ios-tab-active i {
-            filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.45));
+            filter: drop-shadow(0 0 6px rgba(194, 122, 62, 0.5));
         }
 
         /* Tiny dynamic indicator dot under active tab */
@@ -105,19 +112,19 @@
             box-shadow: 0 0 6px var(--brand-color);
         }
 
-        /* Apple Squircle capsule buttons */
+        /* Apple Squircle capsule buttons styled in Copper Biker accent */
         .day-capsule {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(194, 122, 62, 0.04);
+            border: 1px solid rgba(194, 122, 62, 0.08);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .day-capsule-active {
-            background: #ffffff;
-            color: #060911;
+            background: linear-gradient(135deg, var(--brand-color) 0%, #a15926 100%);
+            color: #ffffff;
             font-weight: 800;
-            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
-            border-color: #ffffff;
+            box-shadow: 0 6px 20px rgba(194, 122, 62, 0.25);
+            border-color: var(--brand-color);
             transform: scale(1.03);
         }
 
@@ -143,41 +150,43 @@
         /* Custom Leaflet Dark styling */
         .leaflet-container {
             font-family: 'Inter', sans-serif;
-            background: #060911 !important;
+            background: #05070a !important;
             z-index: 10;
         }
         .leaflet-popup-content-wrapper {
-            background: rgba(12, 17, 34, 0.95) !important;
+            background: rgba(10, 12, 19, 0.95) !important;
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(194, 122, 62, 0.2);
             color: #f8fafc !important;
             border-radius: 16px !important;
             box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55) !important;
             padding: 3px !important;
         }
         .leaflet-popup-tip {
-            background: rgba(12, 17, 34, 0.95) !important;
+            background: rgba(10, 12, 19, 0.95) !important;
+            border-left: 1px solid rgba(194, 122, 62, 0.1);
+            border-bottom: 1px solid rgba(194, 122, 62, 0.1);
         }
         .leaflet-control-zoom {
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(194, 122, 62, 0.15) !important;
             box-shadow: 0 5px 18px rgba(0,0,0,0.35) !important;
             border-radius: 10px !important;
             overflow: hidden;
         }
         .leaflet-control-zoom-in, .leaflet-control-zoom-out {
-            background-color: rgba(18, 25, 47, 0.85) !important;
+            background-color: rgba(14, 18, 30, 0.85) !important;
             color: #f8fafc !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-bottom: 1px solid rgba(194, 122, 62, 0.1) !important;
             backdrop-filter: var(--ios-blur);
         }
 
-        /* Apple-style Custom Checkbox */
+        /* Apple-style Custom Checkbox in Copper Gold Accent */
         .ios-checkbox {
             position: relative;
             width: 22px;
             height: 22px;
-            border: 2px solid rgba(255, 255, 255, 0.18);
+            border: 2px solid rgba(194, 122, 62, 0.35);
             border-radius: 50%;
             display: inline-block;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -186,10 +195,10 @@
         }
 
         input[type="checkbox"]:checked + .ios-checkbox {
-            background: var(--brand-color);
+            background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-gold) 100%);
             border-color: var(--brand-color);
             transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+            box-shadow: 0 0 10px rgba(194, 122, 62, 0.45);
         }
 
         input[type="checkbox"]:checked + .ios-checkbox::after {
@@ -200,7 +209,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #060911;
+            color: #05070a;
             font-size: 10px;
         }
 
@@ -210,7 +219,7 @@
             border: none;
         }
 
-        /* Horizontal Apple-style Temperature Range bar */
+        /* Horizontal Apple-style Temperature Range bar with Adamus Copper/Gold gradient */
         .temp-range-bar {
             height: 4px;
             background: rgba(255, 255, 255, 0.08);
@@ -222,25 +231,33 @@
         .temp-range-fill {
             height: 100%;
             border-radius: 2px;
-            background: linear-gradient(90deg, #38bdf8 0%, #f59e0b 100%);
+            background: linear-gradient(90deg, #c27a3e 0%, #e5c158 100%);
             position: absolute;
         }
     </style>
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col justify-between">
 
-    <!-- TOP FIXED HEADER (Steve Jobs Minimalism: ultra-clean, elegant) -->
+    <!-- TOP FIXED HEADER (Steve Jobs Minimalism: ultra-clean, elegant, styled with Adamus Gin Biker theme) -->
     <header class="sticky top-0 z-50 glass-header px-4 py-3 flex justify-between items-center">
         <div>
-            <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
+            <h1 class="text-base font-black tracking-tight text-white flex items-center gap-1">
                 Picos <span class="text-amber-500 font-extrabold">2026</span>
+                <span class="text-[8px] bg-amber-500/10 text-amber-500 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-bold ml-1 uppercase">ADAMUS</span>
             </h1>
-            <p class="text-[9px] text-slate-400 font-bold tracking-widest uppercase mt-0.5">
-                Roadbook de Viagem
+            <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase mt-0.5">
+                Roadbook 2026 Edition
             </p>
         </div>
         
         <div class="flex items-center gap-1.5">
+            <!-- Sponsor Link Icon Button -->
+            <a href="https://adamus.pt/" 
+               target="_blank" 
+               class="bg-amber-600/15 border border-amber-500/30 text-amber-500 p-2 rounded-full flex items-center justify-center transition-all active:scale-95"
+               title="Adamus Gin Sponsor">
+                <i class="fa-solid fa-glass-water text-xs"></i>
+            </a>
             <!-- GPX Link Icon Button -->
             <a href="https://drive.google.com/file/d/1TM9oYI-RJ_aeEIFG08IQIUKAM03E4NTl/view?usp=drive_link" 
                target="_blank" 
@@ -255,10 +272,17 @@
                title="Discord Chat">
                 <i class="fa-brands fa-discord text-xs"></i>
             </a>
+            <!-- Splitwise Link Icon Button -->
+            <a href="https://secure.splitwise.com/#/groups/96304958" 
+               target="_blank" 
+               class="bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 p-2 rounded-full flex items-center justify-center transition-all active:scale-95"
+               title="Splitwise Expenses">
+                <i class="fa-solid fa-wallet text-xs"></i>
+            </a>
             <!-- SOS Emergency Pill -->
             <a href="tel:112" 
-               class="bg-red-600/10 border border-red-500/30 text-red-400 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all active:scale-95">
-                <i class="fa-solid fa-phone-flip text-[10px]"></i> SOS
+               class="bg-red-600/10 border border-red-500/30 text-red-400 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all active:scale-95">
+                <i class="fa-solid fa-phone-flip text-[9px]"></i> SOS
             </a>
         </div>
     </header>
@@ -270,12 +294,12 @@
         <div id="section-rota" class="space-y-5 animate-ios-pop">
             
             <!-- Global Premium Stat Strip (Merged internally for clean Apple Dashboard feel) -->
-            <div class="grid grid-cols-3 gap-2 bg-slate-950/40 p-3 rounded-2xl border border-slate-900 text-center">
+            <div class="grid grid-cols-3 gap-2 bg-slate-950/40 p-3 rounded-2xl border border-slate-900/60 text-center">
                 <div>
                     <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold mb-0.5">Duração</span>
                     <strong class="text-xs text-white">6 dias / 5 noites</strong>
                 </div>
-                <div class="border-x border-slate-900">
+                <div class="border-x border-slate-900/60">
                     <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold mb-0.5">Total Mota</span>
                     <strong class="text-xs text-white">~1.600 km</strong>
                 </div>
@@ -286,7 +310,7 @@
             </div>
 
             <!-- Apple Capsule Day Selector Slider -->
-            <div class="flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar -mx-4 px-4 sticky top-[60px] z-40 bg-gradient-to-b from-[#060911] via-[#060911]/95 to-transparent">
+            <div class="flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar -mx-4 px-4 sticky top-[60px] z-40 bg-gradient-to-b from-[#05070a] via-[#05070a]/95 to-transparent">
                 <button onclick="showDay(1)" id="btn-d1" class="day-btn day-capsule day-capsule-active px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D1</span><span class="text-[8px] opacity-75 font-bold uppercase mt-0.5">04 JUN</span></button>
                 <button onclick="showDay(2)" id="btn-d2" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D2</span><span class="text-[8px] opacity-50 mt-0.5">05 JUN</span></button>
                 <button onclick="showDay(3)" id="btn-d3" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D3</span><span class="text-[8px] opacity-50 mt-0.5">06 JUN</span></button>
@@ -302,13 +326,29 @@
         <!-- SECÇÃO: LOGÍSTICA -->
         <div id="section-logistica" class="hidden space-y-5 animate-ios-pop">
             <!-- iOS Styled Segmented Control Button -->
-            <div class="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-900">
+            <div class="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-900/60">
                 <button onclick="switchLogisticsSubTab('log-geral')" id="btn-log-geral" class="py-2 text-xs font-bold rounded-lg bg-amber-500 text-black shadow transition-all">Prática & Apoio</button>
                 <button onclick="switchLogisticsSubTab('log-planb')" id="btn-log-planb" class="py-2 text-xs font-bold rounded-lg text-slate-400 transition-all">Planos B & SOS</button>
             </div>
 
             <!-- SUB-SECÇÃO: PRÁTICA E APOIO -->
             <div id="sub-log-geral" class="space-y-5">
+                <!-- Sponsor Banner (Adamus Organic Dry Gin) -->
+                <div class="glass-card p-5 border-l-4 border-amber-500 text-slate-300 relative overflow-hidden flex flex-col gap-3">
+                    <div>
+                        <span class="text-[9px] uppercase tracking-widest text-amber-500 font-bold block mb-0.5">Patrocinador Oficial</span>
+                        <h3 class="text-base font-extrabold text-white leading-tight">Adamus Organic Dry Gin</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed mt-1">
+                            Um gin orgânico super premium português com aromas botânicos singulares, engarrafado com a mítica e marcante tampa de cortiça natural portuguesa.
+                        </p>
+                    </div>
+                    <a href="https://adamus.pt/" 
+                       target="_blank" 
+                       class="bg-gradient-to-r from-amber-600 to-amber-700 text-black py-2.5 rounded-xl text-[10px] font-extrabold tracking-wider uppercase text-center flex items-center justify-center gap-1.5 transition-all active:scale-[0.97]">
+                        <i class="fa-solid fa-glass-water text-[10px]"></i> Visitar Adamus Gin
+                    </a>
+                </div>
+
                 <!-- Documentação Necessária -->
                 <div class="glass-card p-5">
                     <h3 class="text-sm font-bold text-amber-500 mb-3.5 flex items-center gap-2">
@@ -332,6 +372,22 @@
                             <div><strong>Equipamento Obrigatório (ES):</strong> Colete refletor (na mala de depósito) e luvas homologadas obrigatórias.</div>
                         </li>
                     </ul>
+                </div>
+
+                <!-- Despesas & Orçamento (Splitwise) Card -->
+                <div class="glass-card p-5 border-l-4 border-emerald-500">
+                    <h3 class="text-sm font-bold text-emerald-400 mb-3.5 flex items-center gap-2">
+                        <i class="fa-solid fa-scale-balanced"></i> Despesas & Orçamento (Splitwise)
+                    </h3>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-3.5">
+                        Divida de forma instantânea e transparente todos os custos acumulados da viagem (gasolina, portagens, almoços e hotéis) entre os membros do grupo.
+                    </p>
+                    <a href="https://secure.splitwise.com/#/groups/96304958" 
+                       target="_blank" 
+                       class="w-full bg-[#1cc29f] hover:bg-[#159a7e] text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-[0.97] shadow-lg shadow-emerald-600/10">
+                        <i class="fa-solid fa-coins text-base"></i>
+                        <span>Abrir Grupo Splitwise</span>
+                    </a>
                 </div>
 
                 <!-- Combustível & Canister -->
@@ -393,13 +449,13 @@
                         <i class="fa-solid fa-house-medical"></i> Hospitais de Referência
                     </h3>
                     <div class="text-xs space-y-3 text-slate-300">
-                        <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-900">
+                        <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-900/60">
                             <span class="text-xs font-bold text-white block mb-1">Zona Picos de Europa:</span>
                             <strong class="text-slate-200">Hospital Francisco Grande Covián</strong> (Arriondas)<br>
                             <span class="text-slate-400 text-[10px]">A 18 km de Cangas de Onís / Covadonga</span><br>
                             <a href="https://maps.google.com/?q=Hospital+Francisco+Grande+Covián+Arriondas" target="_blank" class="text-amber-500 hover:underline inline-flex items-center gap-1 mt-1.5 font-bold"><i class="fa-solid fa-map-pin"></i> Abrir Direções Maps</a>
                         </div>
-                        <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-900">
+                        <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-900/60">
                             <span class="text-xs font-bold text-white block mb-1">Zona Las Médulas / Ponferrada:</span>
                             <strong class="text-slate-200">Hospital de El Bierzo</strong> (Ponferrada)<br>
                             <span class="text-slate-400 text-[10px]">Paraje de Fuentesnuevas, Ponferrada</span><br>
@@ -444,7 +500,7 @@
                     <p class="text-xs text-slate-300 leading-relaxed mb-3.5">
                         Subir portos a 1600m ou cruzar desfiladeiros estreitos sob chuva torrencial e nevoeiro é desaconselhado devido a queda de pedras, piso escorregadio e visibilidade zero.
                     </p>
-                    <div class="text-[11px] space-y-3 bg-slate-950/40 p-3.5 rounded-xl border border-slate-900 text-slate-300 leading-relaxed">
+                    <div class="text-[11px] space-y-3 bg-slate-950/40 p-3.5 rounded-xl border border-slate-900/60 text-slate-300 leading-relaxed">
                         <div>
                             <strong class="text-amber-500 block mb-0.5">Alternativa ao D3 (San Glorio):</strong>
                             Evite o Puerto de San Glorio e o desfiladeiro da Hermida. Siga de Riaño pela estrada **N-625** diretamente através do **Puerto del Pontón** para descer o **Desfiladero de los Beyos** para Cangas de Onís. Embora ainda seja de montanha, é uma rota mais curta e direta. Se o tempo for extremo em todos os picos, contorne pelo oeste via N-630 / AS-1.
@@ -465,13 +521,13 @@
                         A rota planeada (Las Médulas → Chaves → N2 a Santa Comba Dão → Coimbra) tem **mais de 440 km** maioritariamente em nacionais sinuosas (8h+ condução).
                     </p>
                     <div class="space-y-3 text-[11px]">
-                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900">
+                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900/60">
                             <span class="text-xs font-semibold text-emerald-400 block mb-1">Opção Rápida: A24 (Poupa 2h+)</span>
                             <p class="text-slate-300">
                                 Após a paragem em Chaves (KM 0), entre na autoestrada **A24 em Vila Real ou Peso da Régua** em direção a Viseu. É uma via rápida fantástica, com paisagens sobre o Douro, livre de trânsito local e curvas cansativas.
                             </p>
                         </div>
-                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900">
+                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900/60">
                             <span class="text-xs font-semibold text-emerald-400 block mb-1">Opção Final: IP3 a Coimbra</span>
                             <p class="text-slate-300">
                                 A partir de Viseu, descarte a continuação da N2. Tome o **IP3 diretamente para Coimbra**. É uma via rápida de duas faixas, sem portagens nesta zona, que o coloca no destino final em menos de 50 minutos.
@@ -489,7 +545,7 @@
                     <h2 class="text-base text-amber-500 font-bold">Mota & Bagagem</h2>
                     <p class="text-[10px] text-slate-400">Estado guardado automaticamente no telemóvel.</p>
                 </div>
-                <button onclick="resetChecklist()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-950 border border-slate-900 transition-all active:scale-95">
+                <button onclick="resetChecklist()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-950 border border-slate-900/60 transition-all active:scale-95">
                     <i class="fa-solid fa-rotate-left mr-1"></i>Limpar Tudo
                 </button>
             </div>
@@ -587,17 +643,19 @@
             1: {
                 date: "04 JUN",
                 weekday: "Quinta-feira",
-                title: "Anadia → Bragança",
-                route: "Anadia → Peso da Régua (N222) → Pinhão → Vila Nova de Foz Côa → IP2 → Bragança",
+                title: "Coimbra / Anadia → Bragança",
+                route: "Coimbra → Anadia → Peso da Régua (N222) → Pinhão → IP2 → Bragança",
                 sleep: "Sweet Quintanilha (Bragança) - 218€",
                 distance: "280 km",
                 duration: "5h30 com paragens",
                 badgeColor: "bg-amber-500 text-black",
                 mapCenter: [41.2, -7.6],
                 zoom: 8,
+                coverImage: "d1_cover.png",
                 waypoints: [
-                    { name: "Anadia", coords: [40.4401, -8.4293], desc: "Partida às 09:00" },
-                    { name: "Peso da Régua", coords: [41.1648, -7.7884], desc: "Café à beira-rio (N222)" },
+                    { name: "Coimbra", coords: [40.2033, -8.4101], desc: "Partida oficial às 08:30" },
+                    { name: "Anadia", coords: [40.4401, -8.4293], desc: "Ponto de encontro às 09:00" },
+                    { name: "Peso da Régua", coords: [41.1729, -7.5080], desc: "Café à beira-rio (N222)" },
                     { name: "Pinhão", coords: [41.1903, -7.5407], desc: "Almoço regional no Douro" },
                     { name: "Vila Nova de Foz Côa", coords: [41.0827, -7.1354], desc: "Miradouro de São Salvador" },
                     { name: "Bragança", coords: [41.8061, -6.7567], desc: "Dormida: Sweet Quintanilha" }
@@ -611,17 +669,18 @@
                 warnings: "Possibilidade de calor intenso no vale profundo do Douro (Peso da Régua). Atenção ao vento cruzado no planalto de Trás-os-Montes ao aproximar do IP2.",
                 timeline: [
                     { time: "09:00", desc: "Partida de Anadia. Ponto de encontro e mota atestada." },
-                    { time: "10:30", desc: "Paragem para café na Peso da Régua, contemplando o Rio Douro." },
+                    { time: "10:30", desc: "Paragem para café na Peso da Régua, contemplando o Rio Douro.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Peso+da+Regua+Cais+do+Douro" },
                     { time: "11:00", desc: "Início do icónico troço da N222 de Peso da Régua ao Pinhão (curvas incríveis à beira-rio)." },
                     { time: "12:30", desc: "Almoço de petiscos regionais no Pinhão." },
-                    { time: "14:30", desc: "Subida ao Miradouro de São Salvador do Mundo (Foz Côa) para fotografias fantásticas do desfiladeiro do rio." },
-                    { time: "17:30", desc: "Chegada a Bragança, check-in no hotel Sweet Quintanilha e banho." },
+                    { time: "14:30", desc: "Subida ao Miradouro de São Salvador do Mundo (Foz Côa) para fotografias fantásticas do desfiladeiro do rio.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Miradouro+de+Sao+Salvador+do+Mundo" },
+                    { time: "17:30", desc: "Chegada a Bragança, check-in no hotel Sweet Quintanilha e banho.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Sweet+Quintanilha+Braganca" },
                     { time: "20:00", desc: "Jantar regional de luxo em Bragança." }
                 ],
                 gastronomy: {
                     region: "Trás-os-Montes",
                     dishes: "Posta Mirandesa na brasa, Alheira de Mirandela e cogumelos silvestres salteados.",
-                    restaurant: "Taberna do Javali (Bragança) - Famoso pelas carnes grelhadas e ambiente tradicional. Tel: +351 273 381 371."
+                    restaurant: "Taberna do Javali (Bragança) - Carnes grelhadas excecionais. Tel: +351 273 381 371.",
+                    adamusPairing: "Sugestão ADAMUS: Para abrir o apetite em Trás-os-Montes, harmonize os seus queijos transmontanos com o requintado Adamus Organic Dry Gin servido com tónica premium e uma raspa de limão fresco."
                 }
             },
             2: {
@@ -635,13 +694,14 @@
                 badgeColor: "bg-amber-500 text-black",
                 mapCenter: [42.5, -5.9],
                 zoom: 8,
+                coverImage: "d2_cover.png",
                 waypoints: [
                     { name: "Bragança", coords: [41.8061, -6.7567], desc: "Partida às 08:30" },
-                    { name: "Puebla de Sanabria", coords: [42.0624, -6.6349], desc: "Paragem no castelo medieval" },
+                    { name: "Puebla de Sanabria", coords: [42.0544, -6.6350], desc: "Paragem no castelo medieval" },
                     { name: "Lago de Sanabria", coords: [42.1215, -6.7118], desc: "Café e foto à beira do lago glaciar" },
                     { name: "Astorga", coords: [42.4593, -6.0560], desc: "Almoço e Palácio Gaudí" },
                     { name: "León", coords: [42.5987, -5.5671], desc: "Paragem rápida para café" },
-                    { name: "Riaño", coords: [42.9733, -5.0117], desc: "Dormida: El Sabinar" }
+                    { name: "Riaño", coords: [42.9766, -5.0057], desc: "Dormida: El Sabinar" }
                 ],
                 routePath: [
                     [41.8061, -6.7567], [41.9792, -6.7125], [42.0624, -6.6349], [42.1215, -6.7118],
@@ -656,17 +716,18 @@
                 timeline: [
                     { time: "08:30", desc: "Partida de Bragança em direção à fronteira, atravessando o Parque Natural de Montesinho." },
                     { time: "09:45", desc: "Entrada em Espanha por Calabor (ZA-925). Condução rural e sinuosa." },
-                    { time: "10:30", desc: "Café e foto junto ao belíssimo Lago de Sanabria." },
-                    { time: "13:00", desc: "Almoço no centro histórico de Astorga (famoso pelo Palácio Gaudí)." },
+                    { time: "10:30", desc: "Café e foto junto ao belíssimo Lago de Sanabria.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Lago+de+Sanabria+Playa+Grande" },
+                    { time: "13:00", desc: "Almoço no centro histórico de Astorga (famoso pelo Palácio Gaudí).", mapsLink: "https://www.google.com/maps/search/?api=1&query=Palacio+Episcopal+de+Astorga" },
                     { time: "15:30", desc: "Paragem rápida para café e esticar as pernas na praça central de León." },
                     { time: "16:30", desc: "Entrada na fantástica estrada CL-626 por Sabero (belas curvas e vistas)." },
-                    { time: "18:30", desc: "Chegada a Riaño, check-in no Hotel Rural El Sabinar e fotos do 'Fiorde Leonês' ao pôr do sol." },
+                    { time: "18:30", desc: "Chegada a Riaño, check-in no Hotel Rural El Sabinar e fotos do 'Fiorde Leonês' ao pôr do sol.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Hotel+Rural+El+Sabinar+Riaño" },
                     { time: "20:00", desc: "Jantar típico na vila." }
                 ],
                 gastronomy: {
                     region: "Castela e Leão",
                     dishes: "Lechazo Asado (Cordeiro assado lentamente em forno de lenha) e Cecina de León (carne de vaca curada e fumada de sabor único).",
-                    restaurant: "Restaurante Sainz (Riaño) - Carnes excecionais e vistas deslumbrantes sobre a barragem. Tel: +34 987 74 06 12."
+                    restaurant: "Restaurante Sainz (Riaño) - Carnes excecionais e vistas sobre a barragem. Tel: +34 987 74 06 12.",
+                    adamusPairing: "Sugestão ADAMUS: Em Riaño, após as curvas frias do planalto, relaxe a beber uma dose de Adamus Gin com tónica e folhas frescas de manjericão, harmonizando na perfeição com a saborosa Cecina de León."
                 }
             },
             3: {
@@ -680,13 +741,14 @@
                 badgeColor: "bg-amber-500 text-black",
                 mapCenter: [43.15, -4.85],
                 zoom: 9,
+                coverImage: "d3_cover.png",
                 waypoints: [
-                    { name: "Riaño", coords: [42.9733, -5.0117], desc: "Partida às 09:00" },
-                    { name: "Puerto San Glorio", coords: [43.0631, -4.7642], desc: "Cume (1609m) e Mirador de Llesba" },
-                    { name: "Potes", coords: [43.1536, -4.6238], desc: "Almoço e vila motard" },
-                    { name: "Desfiladero de La Hermida", coords: [43.2558, -4.6111], desc: "Desfiladeiro calcário estreito de 21 km" },
+                    { name: "Riaño", coords: [42.9766, -5.0057], desc: "Partida às 09:00" },
+                    { name: "Puerto San Glorio", coords: [43.0669, -4.7659], desc: "Cume (1609m) e Mirador de Llesba" },
+                    { name: "Potes", coords: [43.1536, -4.6237], desc: "Almoço e vila motard" },
+                    { name: "Desfiladero de La Hermida", coords: [43.2471, -4.5934], desc: "Desfiladeiro calcário estreito de 21 km" },
                     { name: "Arenas de Cabrales", coords: [43.3015, -4.8184], desc: "Capital do Queijo Cabrales" },
-                    { name: "Covadonga", coords: [43.3156, -5.0543], desc: "Dormida: Hoteles La Pasera" }
+                    { name: "Covadonga", coords: [43.3124, -5.0594], desc: "Dormida: Hoteles La Pasera" }
                 ],
                 routePath: [
                     [42.9733, -5.0117], [43.0181, -4.8462], [43.0631, -4.7642], [43.1092, -4.6812],
@@ -699,18 +761,19 @@
                 warnings: "San Glorio pode apresentar neblina densa no topo e oscilações bruscas de temperatura (pode estar 8°C no topo e 24°C em Potes). O Desfiladero de la Hermida é muito estreito e tem humidade permanente e perigo de pedras caídas.",
                 timeline: [
                     { time: "09:00", desc: "Partida de Riaño. Certifique-se de que tem combustível." },
-                    { time: "10:00", desc: "Paragem no cume de San Glorio. Desvio de 1km para o Mirador de Llesba (Monumento ao Urso) - vista brutal!" },
-                    { time: "10:30", desc: "Paragem no Mirador del Corzo (Monumento ao Veado) para a foto clássica." },
-                    { time: "11:30", desc: "Chegada a Potes. Excelente ambiente motard para café e passeio pedestre." },
+                    { time: "10:00", desc: "Paragem no cume de San Glorio. Desvio de 1km para o Mirador de Llesba (Monumento ao Urso) - vista brutal!", mapsLink: "https://www.google.com/maps/search/?api=1&query=Mirador+de+Llesba+Puerto+de+San+Glorio" },
+                    { time: "10:30", desc: "Paragem no Mirador del Corzo (Monumento ao Veado) para a foto clássica.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Mirador+del+Corzo+Puerto+de+San+Glorio" },
+                    { time: "11:30", desc: "Chegada a Potes. Excelente ambiente motard para café e passeio pedestre.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Potes+Cantabria" },
                     { time: "12:30", desc: "Almoço de tapas em Potes." },
                     { time: "14:00", desc: "Travessia fantástica do Desfiladero de La Hermida (21 km de desfiladeiro profundo de calcário)." },
-                    { time: "16:00", desc: "Chegada à zona de Covadonga e check-in nos Hoteles La Pasera." },
-                    { time: "18:00", desc: "Visita ao Santuário de Covadonga (A Santa Cueva na rocha e a Basílica rosa)." }
+                    { time: "16:00", desc: "Chegada à zona de Covadonga e check-in nos Hoteles La Pasera.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Hoteles+La+Pasera+Cangas+de+Onis" },
+                    { time: "18:00", desc: "Visita ao Santuário de Covadonga (A Santa Cueva na rocha e a Basílica rosa).", mapsLink: "https://www.google.com/maps/search/?api=1&query=Santuario+de+Covadonga" }
                 ],
                 gastronomy: {
                     region: "Astúrias",
                     dishes: "Cachopo Asturiano (dois bifes grandes recheados com presunto e queijo, panados e fritos) servido com batatas e Sidra Natural vertida.",
-                    restaurant: "La Pasera Restaurant - O próprio restaurante do complexo hoteleiro serve excelente cachopo caseiro e sidra tradicional. Tel: +34 985 84 60 41."
+                    restaurant: "La Pasera Restaurant - O restaurante do complexo hoteleiro serve excelente gastronomia. Tel: +34 985 84 60 41.",
+                    adamusPairing: "Sugestão ADAMUS: Depois de enfrentar as curvas técnicas e frias de San Glorio, relaxe no hotel saboreando o requinte do Adamus Dry Gin servido com tónica premium e bagas de zimbro esmagadas."
                 }
             },
             4: {
@@ -724,12 +787,13 @@
                 badgeColor: "bg-amber-500 text-black",
                 mapCenter: [43.30, -4.95],
                 zoom: 10,
+                coverImage: "d4_cover.png",
                 waypoints: [
-                    { name: "Covadonga (Hotel)", coords: [43.3156, -5.0543], desc: "Partida muito cedo às 06:45" },
-                    { name: "Lagos de Covadonga (Enol)", coords: [43.2721, -4.9877], desc: "Subida de mota própria antes das 07:30" },
+                    { name: "Covadonga (Hotel)", coords: [43.3124, -5.0594], desc: "Partida muito cedo às 06:45" },
+                    { name: "Lagos de Covadonga (Enol)", coords: [43.2714, -4.9940], desc: "Subida de mota própria antes das 07:30" },
                     { name: "Cangas de Onís", coords: [43.3514, -5.1278], desc: "Almoço e Ponte Romana" },
                     { name: "Pozo de la Oración", coords: [43.2981, -4.8422], desc: "Vista para o Naranjo de Bulnes" },
-                    { name: "Sotres", coords: [43.2325, -4.7478], desc: "Aldeia mais alta dos Picos de Europa" }
+                    { name: "Sotres", coords: [43.2326, -4.7469], desc: "Aldeia mais alta dos Picos de Europa" }
                 ],
                 routePath: [
                     [43.3156, -5.0543], [43.2721, -4.9877], [43.3156, -5.0543], [43.3514, -5.1278],
@@ -743,17 +807,18 @@
                 timeline: [
                     { time: "06:45", desc: "Partida do hotel em direção aos Lagos. Subida com atenção ao piso frio." },
                     { time: "07:15", desc: "Passagem pelo posto de controlo (subida livre de mota antes das 07:30)." },
-                    { time: "07:45", desc: "Chegada ao topo. Caminhada entre o Lago Enol e o Lago Ercina com névoa matinal mágica." },
+                    { time: "07:45", desc: "Chegada ao topo. Caminhada entre o Lago Enol e o Lago Ercina com névoa matinal mágica.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Lago+Enol+Asturias" },
                     { time: "11:00", desc: "Descida lenta dos lagos com atenção a vacas a pastar nas bermas." },
-                    { time: "12:30", desc: "Almoço em Cangas de Onís e foto com a icónica Ponte Romana com a Cruz da Vitória." },
-                    { time: "15:00", desc: "Passeio à tarde rumo a Sotres (a aldeia mais alta dos Picos de Europa, belíssimas curvas)." },
-                    { time: "15:45", desc: "Paragem no Miradouro do Pozo de la Oración para fotografar o Pico Urriellu (Naranjo de Bulnes)." },
+                    { time: "12:30", desc: "Almoço em Cangas de Onís e foto com a icónica Ponte Romana com a Cruz da Vitória.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Puente+Romano+Cangas+de+Onis" },
+                    { time: "15:00", desc: "Passeio à tarde rumo a Sotres (a aldeia mais alta dos Picos de Europa, belíssimas curvas).", mapsLink: "https://www.google.com/maps/search/?api=1&query=Sotres+Cabrales" },
+                    { time: "15:45", desc: "Paragem no Miradouro do Pozo de la Oración para fotografar o Pico Urriellu (Naranjo de Bulnes).", mapsLink: "https://www.google.com/maps/search/?api=1&query=Mirador+del+Pozo+de+la+Oracion" },
                     { time: "18:00", desc: "Regresso a Covadonga para descansar." }
                 ],
                 gastronomy: {
                     region: "Astúrias Alta Montanha",
                     dishes: "Fabada Asturiana (feijoada rica tradicional com enchidos locais - compango) e Queijo de Cabrales (queijo azul artesanal fortíssimo).",
-                    restaurant: "El Cenador de los Canónigos (Cangas de Onís) - Fantástica cozinha asturiana tradicional num edifício senhorial lindíssimo. Tel: +34 985 84 94 45."
+                    restaurant: "El Cenador de los Canónigos (Cangas de Onís) - Fantástica cozinha asturiana tradicional. Tel: +34 985 84 94 45.",
+                    adamusPairing: "Sugestão ADAMUS: O queijo de Cabrales é famoso pela sua força e picante. O contraste perfeito é um gin tónico Adamus Organic Dry muito fresco servido com uma rodela fina de tangerina doce."
                 }
             },
             5: {
@@ -767,14 +832,15 @@
                 badgeColor: "bg-amber-500 text-black",
                 mapCenter: [42.9, -5.9],
                 zoom: 8,
+                coverImage: "d5_cover.png",
                 waypoints: [
-                    { name: "Covadonga", coords: [43.3156, -5.0543], desc: "Partida às 08:30" },
-                    { name: "Desfiladero Beyos", coords: [43.2081, -5.0482], desc: "Desfiladeiro vertical estreito (N-625)" },
+                    { name: "Covadonga", coords: [43.3124, -5.0594], desc: "Partida às 08:30" },
+                    { name: "Desfiladero Beyos", coords: [43.1867, -5.0766], desc: "Desfiladeiro vertical estreito (N-625)" },
                     { name: "Puerto del Pontón", coords: [43.1160, -5.0142], desc: "Passagem a 1280m" },
                     { name: "Astorga", coords: [42.4593, -6.0560], desc: "Almoço e ligação" },
                     { name: "Cruz de Ferro", coords: [42.4912, -6.3456], desc: "Passagem do Caminho de Santiago a 1505m" },
                     { name: "El Acebo", coords: [42.5181, -6.4182], desc: "Aldeia de xisto tradicional" },
-                    { name: "Las Médulas", coords: [42.5350, -6.7644], desc: "Mirador de Orellán e Hotel Calzada" }
+                    { name: "Las Médulas", coords: [42.4571, -6.7688], desc: "Mirador de Orellán e Hotel Calzada" }
                 ],
                 routePath: [
                     [43.3156, -5.0543], [43.3514, -5.1278], [43.2081, -5.0482], [43.1381, -5.0381],
@@ -789,19 +855,20 @@
                 warnings: "O Desfiladero de los Beyos é estreito e tem frequentes detritos de rochas caídas. A estrada LE-142 (Foncebadón) é partilhada com peregrinos do Caminho de Santiago que caminham nas bermas. Cuidado redobrado nas curvas ciegas!",
                 timeline: [
                     { time: "08:30", desc: "Partida de Covadonga e entrada no imponente Desfiladero de los Beyos." },
-                    { time: "09:45", desc: "Passagem pelo Puerto del Pontón (1280m). Vistas magníficas da montanha." },
+                    { time: "09:45", desc: "Passagem pelo Puerto del Pontón (1280m). Vistas magníficas da montanha.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Puerto+del+Ponton" },
                     { time: "11:00", desc: "Passagem e paragem rápida em Cistierna para café." },
                     { time: "13:00", desc: "Almoço nas imediações de Astorga." },
                     { time: "15:00", desc: "Início do troço icónico da LE-142 (Cruz de Ferro)." },
-                    { time: "15:45", desc: "Paragem no cume da Cruz de Ferro (1505m). Atire uma pequena pedra de costas à cruz para cumprir a lenda do peregrino." },
-                    { time: "16:30", desc: "Café na belíssima aldeia de xisto de El Acebo e descida técnica para Ponferrada." },
-                    { time: "18:00", desc: "Chegada ao Hotel Calzada em Las Médulas e check-in." },
-                    { time: "19:30", desc: "Subida de mota ao Mirador de Orellán para contemplar as colinas vermelhas das minas romanas ao pôr do sol." }
+                    { time: "15:45", desc: "Paragem no cume da Cruz de Ferro (1505m). Atire uma pequena pedra de costas à cruz para cumprir a lenda do peregrino.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Cruz+de+Ferro+Foncebadon" },
+                    { time: "16:30", desc: "Café na belíssima aldeia de xisto de El Acebo e descida técnica para Ponferrada.", mapsLink: "https://www.google.com/maps/search/?api=1&query=El+Acebo+de+San+Miguel" },
+                    { time: "18:00", desc: "Chegada ao Hotel Calzada em Las Médulas e check-in.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Hotel+Calzada+Las+Medulas" },
+                    { time: "19:30", desc: "Subida de mota ao Mirador de Orellán para contemplar as colinas vermelhas das minas romanas ao pôr do sol.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Mirador+de+Orellan+Las+Medulas" }
                 ],
                 gastronomy: {
                     region: "El Bierzo",
                     dishes: "Botillo del Bierzo (enchido grande recheado com costela de porco picada, cozido com batatas e couve) e Empanada Berciana com mexilhão ou carne.",
-                    restaurant: "Restaurante Orellán (Las Médulas) - Cozinha caseira tradicional com vistas incríveis e pratos de caça soberbos. Tel: +34 987 42 01 24."
+                    restaurant: "Restaurante Orellán (Las Médulas) - Cozinha caseira tradicional com vistas incríveis. Tel: +34 987 42 01 24.",
+                    adamusPairing: "Sugestão ADAMUS: No magnífico pôr do sol sobre as colinas vermelhas de Las Médulas, contemple a paisagem a degustar o sofisticado Adamus Gin com tónica e uma pétala de hibisco seca."
                 }
             },
             6: {
@@ -815,13 +882,14 @@
                 badgeColor: "bg-amber-500 text-black",
                 mapCenter: [41.2, -7.5],
                 zoom: 8,
+                coverImage: "d6_cover.png",
                 waypoints: [
-                    { name: "Las Médulas", coords: [42.5350, -6.7644], desc: "Partida rumo a Portugal às 08:00" },
+                    { name: "Las Médulas", coords: [42.4571, -6.7688], desc: "Partida rumo a Portugal às 08:00" },
                     { name: "A Pobra de Trives", coords: [42.3402, -7.2519], desc: "Passagem sinuosa pelo Sil (OU-536)" },
-                    { name: "Chaves", coords: [41.7431, -7.4722], desc: "Foto mítica no Km 0 da N2" },
-                    { name: "Peso da Régua", coords: [41.1648, -7.7884], desc: "Almoço and Douro" },
+                    { name: "Chaves", coords: [41.7161, -7.4819], desc: "Foto mítica no Km 0 da N2" },
+                    { name: "Peso da Régua", coords: [41.1648, -7.7884], desc: "Almoço e Douro" },
                     { name: "Viseu", coords: [40.6566, -7.9125], desc: "Café rápido" },
-                    { name: "Coimbra", coords: [40.2033, -8.4103], desc: "Fim da viagem de sonho" }
+                    { name: "Coimbra", coords: [40.2033, -8.4101], desc: "Fim da viagem de sonho" }
                 ],
                 routePath: [
                     [42.5350, -6.7644], [42.4168, -6.9839], [42.3402, -7.2519], [42.3781, -7.4125],
@@ -836,18 +904,19 @@
                 warnings: "Etapa final extremamente longa e fisicamente muito exigente. A N2 de Chaves a Santa Comba Dão tem muitas curvas e trânsito local. Em caso de fadiga ou atraso, utilize a autoestrada A24 a partir de Vila Real ou Régua.",
                 timeline: [
                     { time: "08:00", desc: "Partida de Las Médulas. Início do regresso." },
-                    { time: "09:30", desc: "Passagem pelo espetacular desfiladeiro do rio Sil na Galiza pela OU-536." },
-                    { time: "11:30", desc: "Fronteira e chegada a Chaves. Foto obrigatória no Km 0 da Estrada Nacional 2 (N2)!" },
-                    { time: "12:45", desc: "Almoço na Peso da Régua ou Lamego." },
+                    { time: "09:30", desc: "Passagem pelo espetacular desfiladeiro do rio Sil na Galiza pela OU-536.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Desfiladeiro+do+Rio+Sil+OU-536" },
+                    { time: "11:30", desc: "Fronteira e chegada a Chaves. Foto obrigatória no Km 0 da Estrada Nacional 2 (N2)!", mapsLink: "https://www.google.com/maps/search/?api=1&query=Marco+Km+0+Estrada+Nacional+2+Chaves" },
+                    { time: "12:45", desc: "Almoço na Peso da Régua ou Lamego.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Peso+da+Regua+N2" },
                     { time: "14:15", desc: "Continuação da N2 em direção a Viseu." },
-                    { time: "16:45", desc: "Paragem em Viseu para café rápido e esticar pernas." },
+                    { time: "16:45", desc: "Paragem em Viseu para café rápido e esticar pernas.", mapsLink: "https://www.google.com/maps/search/?api=1&query=Viseu+N2" },
                     { time: "18:00", desc: "Chegada a Santa Comba Dão (fim do percurso N2) e entrada no IP3 rápido." },
                     { time: "19:00", desc: "Chegada a Coimbra. Fim de uma viagem inesquecível!" }
                 ],
                 gastronomy: {
                     region: "Norte de Portugal & N2",
                     dishes: "Pastel de Chaves (massa folhada recheada com carne picada) ou Presunto de Chaves na brasa com pão de centeio.",
-                    restaurant: "Restaurante Carvalho (Chaves) - Ponto de paragem obrigatório de motards portugueses pela posta e gastronomia tradicional. Tel: +351 276 321 727."
+                    restaurant: "Restaurante Carvalho (Chaves) - Ponto de paragem obrigatório de motards portugueses. Tel: +351 276 321 727.",
+                    adamusPairing: "Sugestão ADAMUS: Chegados de volta a Portugal, celebre o sucesso da grande viagem Picos 2026 Roadbook Edition brindando em grupo com o inconfundível Adamus Organic Dry Gin!"
                 }
             }
         };
@@ -886,7 +955,7 @@
             "sanglorio": { name: "Puerto San Glorio (1609m)", lat: 43.0631, lon: -4.7642, hist: { tempMax: 13, tempMin: 5, rain: 45, desc: "Alta montanha. Vento forte e risco frequente de nevoeiro/chuva." } },
             "covadonga": { name: "Covadonga / Lagos (Astúrias)", lat: 43.3156, lon: -5.0543, hist: { tempMax: 17, tempMin: 10, rain: 50, desc: "Clima Atlântico húmido. Chuviscos e nevoeiro nos lagos." } },
             "lasmedulas": { name: "Las Médulas / Ponferrada (Bierzo)", lat: 42.5350, lon: -6.7644, hist: { tempMax: 26, tempMin: 12, rain: 20, desc: "Microclima quente e abrigado. Geralmente seco." } },
-            "chaves": { name: "Chaves / N2 (Portugal)", lat: 41.7431, lon: -7.4722, hist: { tempMax: 25, tempMin: 13, rain: 30, desc: "Transição continental transmontana. Sol." } }
+            "chaves": { name: "Chaves / N2 (Portugal)", lat: 41.7431, lon: -7.4722, hist: { tempMax: 25, tempMin: 13, rain: 30, desc: "Sol." } }
         };
 
         // DYNAMIC TABS NAVIGATION WITH AUTO-RESIZE FOR LEAFLET (Loop 2 Fix)
@@ -987,8 +1056,15 @@
                                 <!-- Marker -->
                                 <div class="absolute -left-[21px] mt-0.5 w-2.5 h-2.5 rounded-full bg-amber-500 border border-slate-950 shadow-sm shadow-amber-500/50"></div>
                                 <div class="text-xs">
-                                    <span class="font-bold text-amber-500">${item.time}</span>
-                                    <p class="text-slate-300 mt-0.5">${item.desc}</p>
+                                    <div class="flex justify-between items-center mb-0.5">
+                                        <span class="font-bold text-amber-500">${item.time}</span>
+                                        ${item.mapsLink ? `
+                                            <a href="${item.mapsLink}" target="_blank" class="text-[8px] font-extrabold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 active:scale-95 transition-all">
+                                                <i class="fa-solid fa-map-pin text-[7px]"></i> Google Maps
+                                            </a>
+                                        ` : ''}
+                                    </div>
+                                    <p class="text-slate-300">${item.desc}</p>
                                 </div>
                             </div>
                         `).join('')}
@@ -998,8 +1074,8 @@
 
             // Build Gastronomy regional cards (Loop 2 Redesign: Exquisite plate plaques with tactile direct calling)
             let gastronomyHtml = `
-                <div class="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
-                    <div class="flex justify-between items-center mb-2.5">
+                <div class="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 space-y-3">
+                    <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-amber-500 uppercase tracking-widest"><i class="fa-solid fa-utensils mr-1.5"></i> Gastronomia Regional</span>
                         <span class="text-[9px] bg-amber-500/15 text-amber-500 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Sabores da Viagem</span>
                     </div>
@@ -1007,7 +1083,7 @@
                         <p><strong>Região:</strong> <span class="text-white font-semibold">${d.gastronomy.region}</span></p>
                         <p><strong>Pratos Típicos:</strong> ${d.gastronomy.dishes}</p>
                         
-                        <div class="p-3 bg-slate-950/45 rounded-xl border border-slate-900 mt-2 flex flex-col justify-between gap-3">
+                        <div class="p-3 bg-slate-950/45 rounded-xl border border-slate-900 flex flex-col justify-between gap-3">
                             <div>
                                 <span class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="fa-solid fa-store text-amber-500 mr-1"></i> Taberna Recomendada:</span>
                                 <p class="text-slate-200 text-xs font-bold leading-normal">${d.gastronomy.restaurant.split(" - ")[0]}</p>
@@ -1019,13 +1095,37 @@
                                 <i class="fa-solid fa-phone text-[9px]"></i> Reservar Mesa
                             </a>
                         </div>
+
+                        <!-- Adamus Gin Gastronomy Botanical Pairing (Premium Sponsor integration) -->
+                        <div class="p-3 bg-amber-600/10 border border-amber-500/20 rounded-xl mt-2 space-y-1">
+                            <span class="text-[9px] uppercase font-extrabold text-amber-500 flex items-center gap-1"><i class="fa-solid fa-wine-glass"></i> Harmonização Adamus Gin</span>
+                            <p class="text-[10px] leading-relaxed text-amber-100">${d.gastronomy.adamusPairing}</p>
+                        </div>
                     </div>
                 </div>
             `;
 
+            // Render Featured Mascot Image Cover for featured highlights
+            let mascotCoverHtml = '';
+            if (d.coverImage) {
+                mascotCoverHtml = `
+                    <div class="flex justify-center mb-4">
+                        <div class="w-48 h-48 md:w-56 md:h-56 relative rounded-2xl overflow-hidden border-2 border-[#8e6c46]/30 shadow-xl shadow-black/50">
+                            <img src="${d.coverImage}" alt="Capa Adamus - Roadbook 2026 Edition" class="w-full h-full object-cover" />
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950/90 to-transparent p-2.5 text-center">
+                                <span class="text-[7px] tracking-widest uppercase font-extrabold text-amber-500 px-2 py-0.5 bg-black/60 rounded-full border border-amber-500/20">Roadbook 2026 Edition</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             // Build final day layout including the map container
             document.getElementById('day-content').innerHTML = `
                 <div class="space-y-5 animate-ios-pop">
+                    <!-- Featured Mascot Image Cover -->
+                    ${mascotCoverHtml}
+
                     <!-- Day Overview Card -->
                     <div class="glass-card p-4 space-y-4">
                         <div class="flex justify-between items-start">
@@ -1037,7 +1137,7 @@
                         </div>
                         
                         <!-- Mini Info row -->
-                        <div class="grid grid-cols-2 gap-3 py-2.5 border-y border-slate-900 text-xs">
+                        <div class="grid grid-cols-2 gap-3 py-2.5 border-y border-slate-900/60 text-xs">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid fa-road text-amber-500 text-sm"></i>
                                 <div>
@@ -1358,7 +1458,7 @@
                             </div>
 
                             ${hasHighRainRisk ? `
-                                <div class="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-[9px] text-red-400 flex items-center gap-1.5 font-semibold">
+                                <div class="p-2.5 rounded-lg bg-red-500/10 border border-red-500/25 text-[10px] text-red-400 flex items-center gap-1.5 font-semibold">
                                     <i class="fa-solid fa-triangle-exclamation"></i>
                                     <span>Probabilidade de chuva elevada nesta etapa! Prepare o fato de chuva.</span>
                                 </div>
@@ -1366,7 +1466,7 @@
                         `;
                         container.appendChild(card);
                     } else {
-                        // Fallback to historical if offline
+                        // Fallback to individual location card if offline or error
                         const hist = locations[res.key].hist;
                         const card = document.createElement('div');
                         card.className = 'glass-card p-4 border-l-4 border-amber-500 space-y-2';
