@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Picos 2026 | Roadbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@300;400;600&display=swap');
+        :root { --brand: #f59e0b; }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f1f5f9; }
+        h1, h2, h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+        .tab-active { border-bottom: 3px solid var(--brand); color: var(--brand); font-weight: 700; }
+        .card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .day-badge { background: var(--brand); color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</head>
+<body class="bg-slate-950">
+
+    <!-- Header Fixo -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md">
+        <div class="p-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl text-amber-500">Picos de Europa <span class="text-white">2026</span></h1>
+                <p class="text-[10px] text-slate-400">4-9 JUN | ANADIA - PICOS - COIMBRA</p>
+            </div>
+            <a href="https://drive.google.com/file/d/1TM9oYI-RJ_aeEIFG08IQIUKAM03E4NTl/view?usp=drive_link" 
+               target="_blank" class="bg-amber-600 text-black px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-2">
+                <i class="fa-solid fa-map"></i> GPX
+            </a>
+        </div>
+        
+        <!-- Tabs Principais -->
+        <div class="flex border-t border-slate-800 text-[11px] uppercase tracking-wider">
+            <button onclick="switchMainTab('rota')" id="tab-rota" class="flex-1 py-3 tab-active">Roteiro</button>
+            <button onclick="switchMainTab('logistica')" id="tab-logistica" class="flex-1 py-3 border-b-2 border-transparent">Logística</button>
+            <button onclick="switchMainTab('checklist')" id="tab-checklist" class="flex-1 py-3 border-b-2 border-transparent">Checklist</button>
+        </div>
+    </header>
+
+    <main id="content-area" class="p-4 mb-24">
+        
+        <!-- SECÇÃO: ROTEIRO -->
+        <div id="section-rota" class="space-y-6">
+            <!-- Navegação de Dias -->
+            <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                <button onclick="showDay(1)" class="day-btn bg-amber-500 text-black px-4 py-2 rounded-md font-bold text-sm">D1</button>
+                <button onclick="showDay(2)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D2</button>
+                <button onclick="showDay(3)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D3</button>
+                <button onclick="showDay(4)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D4</button>
+                <button onclick="showDay(5)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D5</button>
+                <button onclick="showDay(6)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D6</button>
+            </div>
+
+            <!-- Conteúdo dos Dias -->
+            <div id="day-content">
+                <!-- Dia 1 (Padrão) -->
+                <div id="d1" class="day-detail">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="day-badge">4 JUN</span>
+                        <h2 class="text-lg">Anadia → Bragança</h2>
+                    </div>
+                    <div class="card p-4 space-y-3">
+                        <div class="flex gap-3 text-sm">
+                            <i class="fa-solid fa-route text-amber-500 mt-1"></i>
+                            <div><strong>Rota:</strong> N222 (Peso da Régua) e IP2. O melhor do Douro.</div>
+                        </div>
+                        <div class="flex gap-3 text-sm">
+                            <i class="fa-solid fa-bed text-blue-400 mt-1"></i>
+                            <div><strong>Dormida:</strong> Sweet Quintanilha (Bragança) - 218€</div>
+                        </div>
+                        <div class="flex gap-3 text-sm text-gray-400">
+                            <i class="fa-solid fa-clock mt-1"></i>
+                            <div>Est: 260km | 5h00 com paragens</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Outros dias são injetados pelo JS para manter o código limpo -->
+            </div>
+        </div>
+
+        <!-- SECÇÃO: LOGÍSTICA -->
+        <div id="section-logistica" class="hidden space-y-4">
+            <h2 class="text-amber-500 mb-4">Informação Útil</h2>
+            <div class="card p-4">
+                <h3 class="text-sm font-bold mb-2">Documentação Espanha</h3>
+                <ul class="text-xs space-y-2 text-slate-300">
+                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Carta de Condução + DUA</li>
+                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Carta Verde do Seguro (Válida em ES)</li>
+                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Cartão Europeu Saúde (CESD)</li>
+                </ul>
+            </div>
+            <div class="card p-4 border-l-4 border-red-500">
+                <h3 class="text-sm font-bold mb-2">Contactos Emergência</h3>
+                <p class="text-xs">Geral: 112</p>
+                <p class="text-xs">Guardia Civil Trafico: +34 062</p>
+            </div>
+        </div>
+
+        <!-- SECÇÃO: CHECKLIST -->
+        <div id="section-checklist" class="hidden space-y-4">
+            <h2 class="text-amber-500 mb-4">Mota & Equipamento</h2>
+            <div class="space-y-2 text-sm">
+                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Bidão Reserva 2L (Cheio)</label>
+                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Fato de Chuva (Acessível)</label>
+                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Kit Reparação Furos</label>
+                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Segunda chave da mota</label>
+                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Powerbank + Cabos</label>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Menu Inferior (Ações Rápidas) -->
+    <footer class="fixed bottom-0 w-full bg-slate-900 border-t border-slate-800 safe-area-bottom">
+        <div class="grid grid-cols-4 py-3">
+            <a href="tel:112" class="text-center">
+                <i class="fa-solid fa-phone text-red-500 block text-lg"></i>
+                <span class="text-[9px] uppercase">Emergência</span>
+            </a>
+            <button onclick="window.open('https://www.google.com/maps/search/gasolinera/')" class="text-center">
+                <i class="fa-solid fa-gas-pump text-blue-400 block text-lg"></i>
+                <span class="text-[9px] uppercase">Bombas</span>
+            </a>
+            <button onclick="window.open('https://www.windy.com')" class="text-center">
+                <i class="fa-solid fa-cloud-sun text-amber-400 block text-lg"></i>
+                <span class="text-[9px] uppercase">Tempo</span>
+            </a>
+            <button onclick="alert('Hoteles La Pasera: +34 985 84 60 41')" class="text-center">
+                <i class="fa-solid fa-hotel text-green-400 block text-lg"></i>
+                <span class="text-[9px] uppercase">Hotel</span>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        const days = {
+            1: { date: "4 JUN", title: "Anadia → Bragança", route: "N222 (Douro) e IP2", sleep: "Sweet Quintanilha - 218€", desc: "Curvas do Douro e jantar em Bragança.", info: "Est: 260km | 5h" },
+            2: { date: "5 JUN", title: "Bragança → Riaño", route: "N-621 / Sanabria", sleep: "Hotel Rural El Sabinar - 240€", desc: "Passagem pelo Lago de Sanabria. Paisagem épica de Riaño.", info: "Est: 240km | 4h30" },
+            3: { date: "6 JUN", title: "Riaño → Covadonga", route: "San Glorio + Hermida", sleep: "Hoteles La Pasera - 630€", desc: "O dia das curvas. San Glorio é o ponto mais alto.", info: "Est: 160km | 4h" },
+            4: { date: "7 JUN", title: "Lagos de Covadonga", route: "Lagos / Cangas de Onís", sleep: "Hoteles La Pasera (Base)", desc: "Subir aos lagos antes das 07:30. Tarde em Cangas.", info: "Dia de Exploração" },
+            5: { date: "8 JUN", title: "Covadonga → Médulas", route: "Desfiladero Beyos", sleep: "Hotel Calzada - 225€", desc: "N-625 e pôr do sol em Las Médulas.", info: "Est: 230km | 4h30" },
+            6: { date: "9 JUN", title: "Las Médulas → Coimbra", route: "N2 (Chaves - S.C. Dão)", sleep: "Regresso a Casa", desc: "O grande estirão da N2. Alternativa: A24 em Vila Real.", info: "Est: 550km | 8h+" }
+        };
+
+        function showDay(num) {
+            const d = days[num];
+            document.getElementById('day-content').innerHTML = `
+                <div class="day-detail animate-in fade-in duration-300">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="day-badge">${d.date}</span>
+                        <h2 class="text-lg">${d.title}</h2>
+                    </div>
+                    <div class="card p-4 space-y-3">
+                        <div class="flex gap-3 text-sm">
+                            <i class="fa-solid fa-route text-amber-500 mt-1"></i>
+                            <div><strong>Rota:</strong> ${d.route}</div>
+                        </div>
+                        <div class="flex gap-3 text-sm">
+                            <i class="fa-solid fa-bed text-blue-400 mt-1"></i>
+                            <div><strong>Dormida:</strong> ${d.sleep}</div>
+                        </div>
+                        <div class="flex gap-3 text-sm text-gray-200">
+                            <i class="fa-solid fa-circle-info mt-1 text-amber-500"></i>
+                            <div>${d.desc}</div>
+                        </div>
+                        <div class="flex gap-3 text-[10px] text-slate-400 uppercase pt-2 border-t border-slate-700">
+                            <i class="fa-solid fa-clock mt-1"></i>
+                            <div>${d.info}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.querySelectorAll('.day-btn').forEach((btn, idx) => {
+                btn.className = (idx + 1 === num) ? "day-btn bg-amber-500 text-black px-4 py-2 rounded-md font-bold text-sm" : "day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm";
+            });
+        }
+
+        function switchMainTab(tab) {
+            document.getElementById('section-rota').classList.add('hidden');
+            document.getElementById('section-logistica').classList.add('hidden');
+            document.getElementById('section-checklist').classList.add('hidden');
+            document.getElementById('section-' + tab).classList.remove('hidden');
+            
+            document.getElementById('tab-rota').classList.remove('tab-active');
+            document.getElementById('tab-logistica').classList.remove('tab-active');
+            document.getElementById('tab-checklist').classList.remove('tab-active');
+            document.getElementById('tab-' + tab).classList.add('tab-active');
+        }
+    </script>
+</body>
+</html>
