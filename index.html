@@ -2,193 +2,1461 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Picos 2026 | Roadbook</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet.js para Mapas Interativos -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@300;400;600&display=swap');
-        :root { --brand: #f59e0b; }
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f1f5f9; }
-        h1, h2, h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
-        .tab-active { border-bottom: 3px solid var(--brand); color: var(--brand); font-weight: 700; }
-        .card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .day-badge { background: var(--brand); color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
-        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        :root {
+            --brand-color: #f59e0b; /* Amber 500 */
+            --brand-rgb: 245, 158, 11;
+            --bg-deep: #060911;
+            --bg-card: rgba(18, 24, 43, 0.6);
+            --ios-blur: saturate(190%) blur(24px);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.06) 0px, transparent 50%);
+            color: #f8fafc;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Frosted Glassmorphism Premium */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .glass-card:active {
+            transform: scale(0.985);
+            border-color: rgba(245, 158, 11, 0.15);
+        }
+
+        .glass-header {
+            background: rgba(6, 9, 17, 0.75);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .glass-footer {
+            background: rgba(6, 9, 17, 0.85);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* iOS Bottom Navigation styling */
+        .ios-tab {
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ios-tab-active {
+            color: var(--brand-color);
+            font-weight: 700;
+            transform: translateY(-2px);
+        }
+
+        .ios-tab-active i {
+            filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.45));
+        }
+
+        /* Tiny dynamic indicator dot under active tab */
+        .ios-tab-active::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--brand-color);
+            box-shadow: 0 0 6px var(--brand-color);
+        }
+
+        /* Apple Squircle capsule buttons */
+        .day-capsule {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .day-capsule-active {
+            background: #ffffff;
+            color: #060911;
+            font-weight: 800;
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+            border-color: #ffffff;
+            transform: scale(1.03);
+        }
+
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Animations */
+        @keyframes iosPop {
+            0% { transform: scale(0.96); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-ios-pop {
+            animation: iosPop 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Custom Leaflet Dark styling */
+        .leaflet-container {
+            font-family: 'Inter', sans-serif;
+            background: #060911 !important;
+            z-index: 10;
+        }
+        .leaflet-popup-content-wrapper {
+            background: rgba(12, 17, 34, 0.95) !important;
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f8fafc !important;
+            border-radius: 16px !important;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55) !important;
+            padding: 3px !important;
+        }
+        .leaflet-popup-tip {
+            background: rgba(12, 17, 34, 0.95) !important;
+        }
+        .leaflet-control-zoom {
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.35) !important;
+            border-radius: 10px !important;
+            overflow: hidden;
+        }
+        .leaflet-control-zoom-in, .leaflet-control-zoom-out {
+            background-color: rgba(18, 25, 47, 0.85) !important;
+            color: #f8fafc !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: var(--ios-blur);
+        }
+
+        /* Apple-style Custom Checkbox */
+        .ios-checkbox {
+            position: relative;
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(255, 255, 255, 0.18);
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            background: transparent;
+            flex-shrink: 0;
+        }
+
+        input[type="checkbox"]:checked + .ios-checkbox {
+            background: var(--brand-color);
+            border-color: var(--brand-color);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+        }
+
+        input[type="checkbox"]:checked + .ios-checkbox::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #060911;
+            font-size: 10px;
+        }
+
+        /* Custom SVG map icon class */
+        .custom-div-icon {
+            background: transparent;
+            border: none;
+        }
+
+        /* Horizontal Apple-style Temperature Range bar */
+        .temp-range-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        .temp-range-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #38bdf8 0%, #f59e0b 100%);
+            position: absolute;
+        }
     </style>
 </head>
-<body class="bg-slate-950">
+<body class="min-h-screen text-slate-100 flex flex-col justify-between">
 
-    <!-- Header Fixo -->
-    <header class="sticky top-0 z-50 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md">
-        <div class="p-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl text-amber-500">Picos de Europa <span class="text-white">2026</span></h1>
-                <p class="text-[10px] text-slate-400">4-9 JUN | ANADIA - PICOS - COIMBRA</p>
-            </div>
-            <a href="https://drive.google.com/file/d/1TM9oYI-RJ_aeEIFG08IQIUKAM03E4NTl/view?usp=drive_link" 
-               target="_blank" class="bg-amber-600 text-black px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-2">
-                <i class="fa-solid fa-map"></i> GPX
-            </a>
+    <!-- TOP FIXED HEADER (Steve Jobs Minimalism: ultra-clean, elegant) -->
+    <header class="sticky top-0 z-50 glass-header px-4 py-3 flex justify-between items-center">
+        <div>
+            <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
+                Picos <span class="text-amber-500 font-extrabold">2026</span>
+            </h1>
+            <p class="text-[9px] text-slate-400 font-bold tracking-widest uppercase mt-0.5">
+                Roadbook de Viagem
+            </p>
         </div>
         
-        <!-- Tabs Principais -->
-        <div class="flex border-t border-slate-800 text-[11px] uppercase tracking-wider">
-            <button onclick="switchMainTab('rota')" id="tab-rota" class="flex-1 py-3 tab-active">Roteiro</button>
-            <button onclick="switchMainTab('logistica')" id="tab-logistica" class="flex-1 py-3 border-b-2 border-transparent">Logística</button>
-            <button onclick="switchMainTab('checklist')" id="tab-checklist" class="flex-1 py-3 border-b-2 border-transparent">Checklist</button>
+        <div class="flex items-center gap-1.5">
+            <!-- GPX Link Icon Button -->
+            <a href="https://drive.google.com/file/d/1TM9oYI-RJ_aeEIFG08IQIUKAM03E4NTl/view?usp=drive_link" 
+               target="_blank" 
+               class="bg-slate-900 border border-slate-800 text-slate-200 p-2 rounded-full flex items-center justify-center transition-all active:scale-95"
+               title="GPX Map">
+                <i class="fa-solid fa-map-location-dot text-amber-500 text-xs"></i>
+            </a>
+            <!-- Discord Link Icon Button -->
+            <a href="https://discord.com/channels/1247291979310567544/1247291979751096400" 
+               target="_blank" 
+               class="bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 p-2 rounded-full flex items-center justify-center transition-all active:scale-95"
+               title="Discord Chat">
+                <i class="fa-brands fa-discord text-xs"></i>
+            </a>
+            <!-- SOS Emergency Pill -->
+            <a href="tel:112" 
+               class="bg-red-600/10 border border-red-500/30 text-red-400 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all active:scale-95">
+                <i class="fa-solid fa-phone-flip text-[10px]"></i> SOS
+            </a>
         </div>
     </header>
 
-    <main id="content-area" class="p-4 mb-24">
+    <!-- MAIN CONTENT AREA -->
+    <main id="content-area" class="flex-grow p-4 space-y-6 pb-20">
         
         <!-- SECÇÃO: ROTEIRO -->
-        <div id="section-rota" class="space-y-6">
-            <!-- Navegação de Dias -->
-            <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="showDay(1)" class="day-btn bg-amber-500 text-black px-4 py-2 rounded-md font-bold text-sm">D1</button>
-                <button onclick="showDay(2)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D2</button>
-                <button onclick="showDay(3)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D3</button>
-                <button onclick="showDay(4)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D4</button>
-                <button onclick="showDay(5)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D5</button>
-                <button onclick="showDay(6)" class="day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm">D6</button>
+        <div id="section-rota" class="space-y-5 animate-ios-pop">
+            
+            <!-- Global Premium Stat Strip (Merged internally for clean Apple Dashboard feel) -->
+            <div class="grid grid-cols-3 gap-2 bg-slate-950/40 p-3 rounded-2xl border border-slate-900 text-center">
+                <div>
+                    <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold mb-0.5">Duração</span>
+                    <strong class="text-xs text-white">6 dias / 5 noites</strong>
+                </div>
+                <div class="border-x border-slate-900">
+                    <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold mb-0.5">Total Mota</span>
+                    <strong class="text-xs text-white">~1.600 km</strong>
+                </div>
+                <div>
+                    <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold mb-0.5">Hotéis</span>
+                    <strong class="text-xs text-emerald-400">1.283€</strong>
+                </div>
             </div>
 
-            <!-- Conteúdo dos Dias -->
-            <div id="day-content">
-                <!-- Dia 1 (Padrão) -->
-                <div id="d1" class="day-detail">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="day-badge">4 JUN</span>
-                        <h2 class="text-lg">Anadia → Bragança</h2>
-                    </div>
-                    <div class="card p-4 space-y-3">
-                        <div class="flex gap-3 text-sm">
-                            <i class="fa-solid fa-route text-amber-500 mt-1"></i>
-                            <div><strong>Rota:</strong> N222 (Peso da Régua) e IP2. O melhor do Douro.</div>
-                        </div>
-                        <div class="flex gap-3 text-sm">
-                            <i class="fa-solid fa-bed text-blue-400 mt-1"></i>
-                            <div><strong>Dormida:</strong> Sweet Quintanilha (Bragança) - 218€</div>
-                        </div>
-                        <div class="flex gap-3 text-sm text-gray-400">
-                            <i class="fa-solid fa-clock mt-1"></i>
-                            <div>Est: 260km | 5h00 com paragens</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Outros dias são injetados pelo JS para manter o código limpo -->
+            <!-- Apple Capsule Day Selector Slider -->
+            <div class="flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar -mx-4 px-4 sticky top-[60px] z-40 bg-gradient-to-b from-[#060911] via-[#060911]/95 to-transparent">
+                <button onclick="showDay(1)" id="btn-d1" class="day-btn day-capsule day-capsule-active px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D1</span><span class="text-[8px] opacity-75 font-bold uppercase mt-0.5">04 JUN</span></button>
+                <button onclick="showDay(2)" id="btn-d2" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D2</span><span class="text-[8px] opacity-50 mt-0.5">05 JUN</span></button>
+                <button onclick="showDay(3)" id="btn-d3" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D3</span><span class="text-[8px] opacity-50 mt-0.5">06 JUN</span></button>
+                <button onclick="showDay(4)" id="btn-d4" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D4</span><span class="text-[8px] opacity-50 mt-0.5">07 JUN</span></button>
+                <button onclick="showDay(5)" id="btn-d5" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D5</span><span class="text-[8px] opacity-50 mt-0.5">08 JUN</span></button>
+                <button onclick="showDay(6)" id="btn-d6" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D6</span><span class="text-[8px] opacity-50 mt-0.5">09 JUN</span></button>
             </div>
+
+            <!-- Detalhe do Dia Injetado pelo JS -->
+            <div id="day-content" class="space-y-5"></div>
         </div>
 
         <!-- SECÇÃO: LOGÍSTICA -->
-        <div id="section-logistica" class="hidden space-y-4">
-            <h2 class="text-amber-500 mb-4">Informação Útil</h2>
-            <div class="card p-4">
-                <h3 class="text-sm font-bold mb-2">Documentação Espanha</h3>
-                <ul class="text-xs space-y-2 text-slate-300">
-                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Carta de Condução + DUA</li>
-                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Carta Verde do Seguro (Válida em ES)</li>
-                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Cartão Europeu Saúde (CESD)</li>
-                </ul>
+        <div id="section-logistica" class="hidden space-y-5 animate-ios-pop">
+            <!-- iOS Styled Segmented Control Button -->
+            <div class="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-900">
+                <button onclick="switchLogisticsSubTab('log-geral')" id="btn-log-geral" class="py-2 text-xs font-bold rounded-lg bg-amber-500 text-black shadow transition-all">Prática & Apoio</button>
+                <button onclick="switchLogisticsSubTab('log-planb')" id="btn-log-planb" class="py-2 text-xs font-bold rounded-lg text-slate-400 transition-all">Planos B & SOS</button>
             </div>
-            <div class="card p-4 border-l-4 border-red-500">
-                <h3 class="text-sm font-bold mb-2">Contactos Emergência</h3>
-                <p class="text-xs">Geral: 112</p>
-                <p class="text-xs">Guardia Civil Trafico: +34 062</p>
+
+            <!-- SUB-SECÇÃO: PRÁTICA E APOIO -->
+            <div id="sub-log-geral" class="space-y-5">
+                <!-- Documentação Necessária -->
+                <div class="glass-card p-5">
+                    <h3 class="text-sm font-bold text-amber-500 mb-3.5 flex items-center gap-2">
+                        <i class="fa-solid fa-passport"></i> Documentos & Regras
+                    </h3>
+                    <ul class="text-xs space-y-3 text-slate-300">
+                        <li class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
+                            <div><strong>Carta Condução e DUA:</strong> Originais físicos em bom estado.</div>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
+                            <div><strong>Carta Verde de Seguro:</strong> Confirmar validade ativa em Espanha (símbolo 'E').</div>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
+                            <div><strong>Cartão Europeu de Saúde (CESD):</strong> Obrigatório para assistência gratuita em hospitais públicos.</div>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 text-sm"></i>
+                            <div><strong>Equipamento Obrigatório (ES):</strong> Colete refletor (na mala de depósito) e luvas homologadas obrigatórias.</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Combustível & Canister -->
+                <div class="glass-card p-5 border-l-4 border-amber-500">
+                    <h3 class="text-sm font-bold text-amber-500 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-gas-pump"></i> Combustível em Zonas Críticas
+                    </h3>
+                    <p class="text-xs text-slate-300 mb-3.5 leading-relaxed">
+                        A montanha tem poucos postos de abastecimento ativos. O seu bidão <strong>Hünersdorff de 2L</strong> homologado é a sua reserva estratégica vital.
+                    </p>
+                    <div class="text-[11px] space-y-2.5 text-slate-400 bg-slate-950/40 p-3.5 rounded-xl border border-slate-900">
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-amber-500 mt-0.5"></i>
+                            <div><strong>Riaño:</strong> Bomba Repsol na entrada da vila (essencial abastecer à noite).</div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-amber-500 mt-0.5"></i>
+                            <div><strong>Potes:</strong> Estação Repsol à saída (chave para abastecer antes de subir o San Glorio).</div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-amber-500 mt-0.5"></i>
+                            <div><strong>Cangas / Arenas:</strong> Bombas Repsol e Cepsa ativas no vale.</div>
+                        </div>
+                        <div class="text-amber-500/90 font-bold border-t border-slate-800/80 pt-2 flex items-start gap-1.5">
+                            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                            <span>Sem Bombas: Troço San Glorio, Desfiladeiros Beyos/Hermida e subida aos Lagos de Covadonga.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estacionamento nos Sítios Turísticos -->
+                <div class="glass-card p-5">
+                    <h3 class="text-sm font-bold text-amber-500 mb-3.5 flex items-center gap-2">
+                        <i class="fa-solid fa-square-parking"></i> Estacionamento de Mota
+                    </h3>
+                    <div class="text-xs space-y-3.5 text-slate-300">
+                        <div>
+                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-circle text-amber-500 text-[8px] mr-1.5"></i>Santuário de Covadonga</strong>
+                            Estacionamento gratuito para motos logo acima da Basílica (muito perto da entrada do túnel da Santa Cueva).
+                        </div>
+                        <div>
+                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-circle text-amber-500 text-[8px] mr-1.5"></i>Lagos de Covadonga</strong>
+                            Bermas assinaladas ao pé do Lago Enol e Ercina. Só é permitido subir de mota antes das 07:30 da manhã!
+                        </div>
+                        <div>
+                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-circle text-amber-500 text-[8px] mr-1.5"></i>Cangas de Onís & Potes</strong>
+                            <strong>Cangas:</strong> Parque especial ao lado do Posto de Turismo. <strong>Potes:</strong> Zona reservada na Plaza Jesús de Monasterio (centro).
+                        </div>
+                        <div>
+                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-circle text-amber-500 text-[8px] mr-1.5"></i>Las Médulas</strong>
+                            Parque público na entrada. No <strong>Mirador de Orellán</strong>, há uma berma pavimentada larga ao pé da entrada pedonal.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hospitais e Assistência Médica -->
+                <div class="glass-card p-5 border-l-4 border-red-500">
+                    <h3 class="text-sm font-bold text-red-400 mb-3.5 flex items-center gap-2">
+                        <i class="fa-solid fa-house-medical"></i> Hospitais de Referência
+                    </h3>
+                    <div class="text-xs space-y-3 text-slate-300">
+                        <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-900">
+                            <span class="text-xs font-bold text-white block mb-1">Zona Picos de Europa:</span>
+                            <strong class="text-slate-200">Hospital Francisco Grande Covián</strong> (Arriondas)<br>
+                            <span class="text-slate-400 text-[10px]">A 18 km de Cangas de Onís / Covadonga</span><br>
+                            <a href="https://maps.google.com/?q=Hospital+Francisco+Grande+Covián+Arriondas" target="_blank" class="text-amber-500 hover:underline inline-flex items-center gap-1 mt-1.5 font-bold"><i class="fa-solid fa-map-pin"></i> Abrir Direções Maps</a>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-900">
+                            <span class="text-xs font-bold text-white block mb-1">Zona Las Médulas / Ponferrada:</span>
+                            <strong class="text-slate-200">Hospital de El Bierzo</strong> (Ponferrada)<br>
+                            <span class="text-slate-400 text-[10px]">Paraje de Fuentesnuevas, Ponferrada</span><br>
+                            <a href="https://maps.google.com/?q=Hospital+de+El+Bierzo+Ponferrada" target="_blank" class="text-amber-500 hover:underline inline-flex items-center gap-1 mt-1.5 font-bold"><i class="fa-solid fa-map-pin"></i> Abrir Direções Maps</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-SECÇÃO: PLANOS B & SOS -->
+            <div id="sub-log-planb" class="hidden space-y-5">
+                <!-- SOS Quick Contacts Card -->
+                <div class="glass-card p-5 border-2 border-red-500/20 bg-red-500/5">
+                    <h3 class="text-sm font-bold text-red-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Emergência & Comunicação
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3 text-center">
+                            <a href="tel:112" class="bg-red-600 hover:bg-red-700 text-white p-3 rounded-xl font-bold text-xs flex flex-col items-center gap-1.5 transition-all active:scale-[0.97]">
+                                <i class="fa-solid fa-phone-volume text-lg"></i>
+                                <span>112 Geral (SOS)</span>
+                            </a>
+                            <a href="tel:+34062" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-100 p-3 rounded-xl font-bold text-xs flex flex-col items-center gap-1.5 transition-all active:scale-[0.97]">
+                                <i class="fa-solid fa-shield-halved text-lg text-amber-500"></i>
+                                <span>062 Guardia Civil</span>
+                            </a>
+                        </div>
+                        <a href="https://discord.com/channels/1247291979310567544/1247291979751096400" 
+                           target="_blank" 
+                           class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white p-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-[0.97] shadow-lg shadow-indigo-600/20">
+                            <i class="fa-brands fa-discord text-base"></i>
+                            <span>Abrir Chat do Discord (Viagem)</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Alternativa em Caso de Chuva Forte nos Portos -->
+                <div class="glass-card p-5">
+                    <h3 class="text-sm font-bold text-white mb-2.5 flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-showers-heavy text-amber-500"></i> Chuva Forte nos Portos
+                    </h3>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-3.5">
+                        Subir portos a 1600m ou cruzar desfiladeiros estreitos sob chuva torrencial e nevoeiro é desaconselhado devido a queda de pedras, piso escorregadio e visibilidade zero.
+                    </p>
+                    <div class="text-[11px] space-y-3 bg-slate-950/40 p-3.5 rounded-xl border border-slate-900 text-slate-300 leading-relaxed">
+                        <div>
+                            <strong class="text-amber-500 block mb-0.5">Alternativa ao D3 (San Glorio):</strong>
+                            Evite o Puerto de San Glorio e o desfiladeiro da Hermida. Siga de Riaño pela estrada **N-625** diretamente através do **Puerto del Pontón** para descer o **Desfiladero de los Beyos** para Cangas de Onís. Embora ainda seja de montanha, é uma rota mais curta e direta. Se o tempo for extremo em todos os picos, contorne pelo oeste via N-630 / AS-1.
+                        </div>
+                        <div class="pt-2.5 border-t border-slate-850">
+                            <strong class="text-amber-500 block mb-0.5">Alternativa aos Lagos de Covadonga (D4):</strong>
+                            Se houver nevoeiro cerrado, desista da subida. Substitua a rota por uma visita à **Basílica e Santa Cueva** (abrigadas), explore **Cangas de Onís** e almoce nas caves tradicionais ou visite o funicular subterrâneo de **Bulnes** para almoçar numa aldeia isolada de montanha.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Encurtamentos do Longo Dia 6 de Regresso -->
+                <div class="glass-card p-5">
+                    <h3 class="text-sm font-bold text-white mb-2.5 flex items-center gap-2">
+                        <i class="fa-solid fa-forward text-amber-500"></i> Atalhos de Regresso (D6)
+                    </h3>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                        A rota planeada (Las Médulas → Chaves → N2 a Santa Comba Dão → Coimbra) tem **mais de 440 km** maioritariamente em nacionais sinuosas (8h+ condução).
+                    </p>
+                    <div class="space-y-3 text-[11px]">
+                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900">
+                            <span class="text-xs font-semibold text-emerald-400 block mb-1">Opção Rápida: A24 (Poupa 2h+)</span>
+                            <p class="text-slate-300">
+                                Após a paragem em Chaves (KM 0), entre na autoestrada **A24 em Vila Real ou Peso da Régua** em direção a Viseu. É uma via rápida fantástica, com paisagens sobre o Douro, livre de trânsito local e curvas cansativas.
+                            </p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900">
+                            <span class="text-xs font-semibold text-emerald-400 block mb-1">Opção Final: IP3 a Coimbra</span>
+                            <p class="text-slate-300">
+                                A partir de Viseu, descarte a continuação da N2. Tome o **IP3 diretamente para Coimbra**. É uma via rápida de duas faixas, sem portagens nesta zona, que o coloca no destino final em menos de 50 minutos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- SECÇÃO: CHECKLIST -->
-        <div id="section-checklist" class="hidden space-y-4">
-            <h2 class="text-amber-500 mb-4">Mota & Equipamento</h2>
-            <div class="space-y-2 text-sm">
-                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Bidão Reserva 2L (Cheio)</label>
-                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Fato de Chuva (Acessível)</label>
-                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Kit Reparação Furos</label>
-                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Segunda chave da mota</label>
-                <label class="flex items-center gap-3 p-3 card"><input type="checkbox"> Powerbank + Cabos</label>
+        <div id="section-checklist" class="hidden space-y-5 animate-ios-pop">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-base text-amber-500 font-bold">Mota & Bagagem</h2>
+                    <p class="text-[10px] text-slate-400">Estado guardado automaticamente no telemóvel.</p>
+                </div>
+                <button onclick="resetChecklist()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-950 border border-slate-900 transition-all active:scale-95">
+                    <i class="fa-solid fa-rotate-left mr-1"></i>Limpar Tudo
+                </button>
             </div>
+
+            <!-- Lista de Itens do Checklist -->
+            <div class="space-y-4">
+                <!-- Documentos -->
+                <div class="glass-card p-4">
+                    <h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-id-card"></i> Documentação Obrigatória</h3>
+                    <div class="space-y-2.5" id="checklist-docs"></div>
+                </div>
+
+                <!-- Equipamento Mota -->
+                <div class="glass-card p-4">
+                    <h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-wrench"></i> Ferramentas e Emergência</h3>
+                    <div class="space-y-2.5" id="checklist-mota"></div>
+                </div>
+
+                <!-- Roupa e Térmicos -->
+                <div class="glass-card p-4">
+                    <h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-shirt"></i> Roupa & Térmico/Chuva</h3>
+                    <div class="space-y-2.5" id="checklist-roupa"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECÇÃO: METEOROLOGIA -->
+        <div id="section-meteorologia" class="hidden space-y-5 animate-ios-pop">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-base text-sky-400 font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-cloud-sun"></i> Clima & Alertas
+                    </h2>
+                    <p class="text-[10px] text-slate-400">Previsões reais via Open-Meteo API.</p>
+                </div>
+                
+                <!-- Toggle Mode: Live Forecast vs Historical -->
+                <div class="flex items-center bg-slate-950 p-1 rounded-full border border-slate-900 scale-95 origin-right">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="weather-mode-toggle" onchange="toggleWeatherMode()" class="sr-only peer">
+                        <div class="w-20 h-6 bg-slate-900 rounded-full flex items-center justify-between px-2 text-[8px] font-bold text-slate-500 relative transition-all peer-checked:text-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-800 after:rounded-full after:h-5 after:w-9 after:transition-all peer-checked:after:translate-x-9 peer-checked:after:bg-amber-500">
+                            <span class="z-10">MÉDIAS</span>
+                            <span class="z-10">LIVE</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Loader de Previsão -->
+            <div id="weather-loader" class="glass-card p-12 flex flex-col items-center justify-center gap-3 text-slate-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-amber-500"></i>
+                <span class="text-xs font-semibold">A carregar previsões meteorológicas...</span>
+            </div>
+
+            <!-- Grid de Previsões por Destino -->
+            <div id="weather-grid" class="space-y-4 hidden"></div>
         </div>
 
     </main>
 
-    <!-- Menu Inferior (Ações Rápidas) -->
-    <footer class="fixed bottom-0 w-full bg-slate-900 border-t border-slate-800 safe-area-bottom">
-        <div class="grid grid-cols-4 py-3">
-            <a href="tel:112" class="text-center">
-                <i class="fa-solid fa-phone text-red-500 block text-lg"></i>
-                <span class="text-[9px] uppercase">Emergência</span>
-            </a>
-            <button onclick="window.open('https://www.google.com/maps/search/gasolinera/')" class="text-center">
-                <i class="fa-solid fa-gas-pump text-blue-400 block text-lg"></i>
-                <span class="text-[9px] uppercase">Bombas</span>
-            </a>
-            <button onclick="window.open('https://www.windy.com')" class="text-center">
-                <i class="fa-solid fa-cloud-sun text-amber-400 block text-lg"></i>
-                <span class="text-[9px] uppercase">Tempo</span>
-            </a>
-            <button onclick="alert('Hoteles La Pasera: +34 985 84 60 41')" class="text-center">
-                <i class="fa-solid fa-hotel text-green-400 block text-lg"></i>
-                <span class="text-[9px] uppercase">Hotel</span>
-            </a>
+    <!-- NATIVE iOS-STYLE FIXED BOTTOM TAB BAR (Steve Jobs Premium Ergonomics) -->
+    <footer class="fixed bottom-0 left-0 right-0 z-50 glass-footer border-t border-slate-900/50 shadow-2xl">
+        <div class="flex justify-around py-2 max-w-lg mx-auto">
+            <!-- Tab Roteiro -->
+            <button onclick="switchMainTab('rota')" id="tab-btn-rota" class="ios-tab ios-tab-active flex-1 flex flex-col items-center gap-1.5 py-1 transition-all">
+                <i class="fa-solid fa-route text-lg"></i>
+                <span>Roteiro</span>
+            </button>
+            <!-- Tab Logística -->
+            <button onclick="switchMainTab('logistica')" id="tab-btn-logistica" class="ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all">
+                <i class="fa-solid fa-circle-info text-lg"></i>
+                <span>Logística</span>
+            </button>
+            <!-- Tab Checklist -->
+            <button onclick="switchMainTab('checklist')" id="tab-btn-checklist" class="ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all">
+                <i class="fa-solid fa-list-check text-lg"></i>
+                <span>Checklist</span>
+            </button>
+            <!-- Tab Clima -->
+            <button onclick="switchMainTab('meteorologia')" id="tab-btn-meteorologia" class="ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all">
+                <i class="fa-solid fa-cloud-sun text-lg"></i>
+                <span>Clima</span>
+            </button>
         </div>
     </footer>
 
+    <!-- JAVASCRIPT: LÓGICA E CONTEÚDO -->
     <script>
+        // GLOBAL MAP INSTANCE
+        let activeMapInstance = null;
+        let currentDayNum = 1;
+
+        // BASE DE DADOS COMPLETA DO ROTEIRO COM COORDENADAS E WAYPOINTS PARA O MAPA
         const days = {
-            1: { date: "4 JUN", title: "Anadia → Bragança", route: "N222 (Douro) e IP2", sleep: "Sweet Quintanilha - 218€", desc: "Curvas do Douro e jantar em Bragança.", info: "Est: 260km | 5h" },
-            2: { date: "5 JUN", title: "Bragança → Riaño", route: "N-621 / Sanabria", sleep: "Hotel Rural El Sabinar - 240€", desc: "Passagem pelo Lago de Sanabria. Paisagem épica de Riaño.", info: "Est: 240km | 4h30" },
-            3: { date: "6 JUN", title: "Riaño → Covadonga", route: "San Glorio + Hermida", sleep: "Hoteles La Pasera - 630€", desc: "O dia das curvas. San Glorio é o ponto mais alto.", info: "Est: 160km | 4h" },
-            4: { date: "7 JUN", title: "Lagos de Covadonga", route: "Lagos / Cangas de Onís", sleep: "Hoteles La Pasera (Base)", desc: "Subir aos lagos antes das 07:30. Tarde em Cangas.", info: "Dia de Exploração" },
-            5: { date: "8 JUN", title: "Covadonga → Médulas", route: "Desfiladero Beyos", sleep: "Hotel Calzada - 225€", desc: "N-625 e pôr do sol em Las Médulas.", info: "Est: 230km | 4h30" },
-            6: { date: "9 JUN", title: "Las Médulas → Coimbra", route: "N2 (Chaves - S.C. Dão)", sleep: "Regresso a Casa", desc: "O grande estirão da N2. Alternativa: A24 em Vila Real.", info: "Est: 550km | 8h+" }
+            1: {
+                date: "04 JUN",
+                weekday: "Quinta-feira",
+                title: "Anadia → Bragança",
+                route: "Anadia → Peso da Régua (N222) → Pinhão → Vila Nova de Foz Côa → IP2 → Bragança",
+                sleep: "Sweet Quintanilha (Bragança) - 218€",
+                distance: "280 km",
+                duration: "5h30 com paragens",
+                badgeColor: "bg-amber-500 text-black",
+                mapCenter: [41.2, -7.6],
+                zoom: 8,
+                waypoints: [
+                    { name: "Anadia", coords: [40.4401, -8.4293], desc: "Partida às 09:00" },
+                    { name: "Peso da Régua", coords: [41.1648, -7.7884], desc: "Café à beira-rio (N222)" },
+                    { name: "Pinhão", coords: [41.1903, -7.5407], desc: "Almoço regional no Douro" },
+                    { name: "Vila Nova de Foz Côa", coords: [41.0827, -7.1354], desc: "Miradouro de São Salvador" },
+                    { name: "Bragança", coords: [41.8061, -6.7567], desc: "Dormida: Sweet Quintanilha" }
+                ],
+                routePath: [
+                    [40.4401, -8.4293], [40.3776, -8.4503], [40.3986, -8.2300], [40.6566, -7.9125],
+                    [40.8986, -7.9300], [41.0986, -7.8100], [41.1648, -7.7884], [41.1903, -7.5407],
+                    [41.0827, -7.1354], [41.1731, -7.0519], [41.5381, -6.9609], [41.8061, -6.7567]
+                ],
+                passes: [],
+                warnings: "Possibilidade de calor intenso no vale profundo do Douro (Peso da Régua). Atenção ao vento cruzado no planalto de Trás-os-Montes ao aproximar do IP2.",
+                timeline: [
+                    { time: "09:00", desc: "Partida de Anadia. Ponto de encontro e mota atestada." },
+                    { time: "10:30", desc: "Paragem para café na Peso da Régua, contemplando o Rio Douro." },
+                    { time: "11:00", desc: "Início do icónico troço da N222 de Peso da Régua ao Pinhão (curvas incríveis à beira-rio)." },
+                    { time: "12:30", desc: "Almoço de petiscos regionais no Pinhão." },
+                    { time: "14:30", desc: "Subida ao Miradouro de São Salvador do Mundo (Foz Côa) para fotografias fantásticas do desfiladeiro do rio." },
+                    { time: "17:30", desc: "Chegada a Bragança, check-in no hotel Sweet Quintanilha e banho." },
+                    { time: "20:00", desc: "Jantar regional de luxo em Bragança." }
+                ],
+                gastronomy: {
+                    region: "Trás-os-Montes",
+                    dishes: "Posta Mirandesa na brasa, Alheira de Mirandela e cogumelos silvestres salteados.",
+                    restaurant: "Taberna do Javali (Bragança) - Famoso pelas carnes grelhadas e ambiente tradicional. Tel: +351 273 381 371."
+                }
+            },
+            2: {
+                date: "05 JUN",
+                weekday: "Sexta-feira",
+                title: "Bragança → Riaño",
+                route: "Bragança → Montesinho → Calabor (ZA-925) → Puebla de Sanabria → Lago de Sanabria → Castrocontrigo (LE-125) → León → CL-626 → Sabero → Riaño",
+                sleep: "Hotel Rural El Sabinar (Riaño) - 240€",
+                distance: "310 km",
+                duration: "6h00 de condução real",
+                badgeColor: "bg-amber-500 text-black",
+                mapCenter: [42.5, -5.9],
+                zoom: 8,
+                waypoints: [
+                    { name: "Bragança", coords: [41.8061, -6.7567], desc: "Partida às 08:30" },
+                    { name: "Puebla de Sanabria", coords: [42.0624, -6.6349], desc: "Paragem no castelo medieval" },
+                    { name: "Lago de Sanabria", coords: [42.1215, -6.7118], desc: "Café e foto à beira do lago glaciar" },
+                    { name: "Astorga", coords: [42.4593, -6.0560], desc: "Almoço e Palácio Gaudí" },
+                    { name: "León", coords: [42.5987, -5.5671], desc: "Paragem rápida para café" },
+                    { name: "Riaño", coords: [42.9733, -5.0117], desc: "Dormida: El Sabinar" }
+                ],
+                routePath: [
+                    [41.8061, -6.7567], [41.9792, -6.7125], [42.0624, -6.6349], [42.1215, -6.7118],
+                    [42.0624, -6.6349], [42.1812, -6.2081], [42.3015, -5.9009], [42.4593, -6.0560],
+                    [42.4631, -5.8812], [42.5987, -5.5671], [42.8681, -5.3212], [42.8361, -5.1481],
+                    [42.9733, -5.0117]
+                ],
+                passes: [
+                    { name: "CL-626 Montanha Leonesa", alt: "1.100m", diff: "Fácil-Média", desc: "Piso em muito bom estado com curvas largas e rápidas de montanha." }
+                ],
+                warnings: "Troço de fronteira pela ZA-925 tem piso ligeiramente degradado e possível maquinaria agrícola na via. Atenção a animais soltos (veados e javalis) na Sierra de la Culebra. Abasteça OBRIGATORIAMENTE a mota em Puebla de Sanabria ou León.",
+                timeline: [
+                    { time: "08:30", desc: "Partida de Bragança em direção à fronteira, atravessando o Parque Natural de Montesinho." },
+                    { time: "09:45", desc: "Entrada em Espanha por Calabor (ZA-925). Condução rural e sinuosa." },
+                    { time: "10:30", desc: "Café e foto junto ao belíssimo Lago de Sanabria." },
+                    { time: "13:00", desc: "Almoço no centro histórico de Astorga (famoso pelo Palácio Gaudí)." },
+                    { time: "15:30", desc: "Paragem rápida para café e esticar as pernas na praça central de León." },
+                    { time: "16:30", desc: "Entrada na fantástica estrada CL-626 por Sabero (belas curvas e vistas)." },
+                    { time: "18:30", desc: "Chegada a Riaño, check-in no Hotel Rural El Sabinar e fotos do 'Fiorde Leonês' ao pôr do sol." },
+                    { time: "20:00", desc: "Jantar típico na vila." }
+                ],
+                gastronomy: {
+                    region: "Castela e Leão",
+                    dishes: "Lechazo Asado (Cordeiro assado lentamente em forno de lenha) e Cecina de León (carne de vaca curada e fumada de sabor único).",
+                    restaurant: "Restaurante Sainz (Riaño) - Carnes excecionais e vistas deslumbrantes sobre a barragem. Tel: +34 987 74 06 12."
+                }
+            },
+            3: {
+                date: "06 JUN",
+                weekday: "Sábado",
+                title: "Riaño → Covadonga",
+                route: "Riaño → N-621 → Puerto de San Glorio (1609m) → Potes → Desfiladero de La Hermida → Panes → AS-114 → Arenas de Cabrales → Covadonga",
+                sleep: "Hoteles La Pasera (Covadonga) - 2 Noites (630€ total)",
+                distance: "160 km",
+                duration: "4h30 com muitas paragens",
+                badgeColor: "bg-amber-500 text-black",
+                mapCenter: [43.15, -4.85],
+                zoom: 9,
+                waypoints: [
+                    { name: "Riaño", coords: [42.9733, -5.0117], desc: "Partida às 09:00" },
+                    { name: "Puerto San Glorio", coords: [43.0631, -4.7642], desc: "Cume (1609m) e Mirador de Llesba" },
+                    { name: "Potes", coords: [43.1536, -4.6238], desc: "Almoço e vila motard" },
+                    { name: "Desfiladero de La Hermida", coords: [43.2558, -4.6111], desc: "Desfiladeiro calcário estreito de 21 km" },
+                    { name: "Arenas de Cabrales", coords: [43.3015, -4.8184], desc: "Capital do Queijo Cabrales" },
+                    { name: "Covadonga", coords: [43.3156, -5.0543], desc: "Dormida: Hoteles La Pasera" }
+                ],
+                routePath: [
+                    [42.9733, -5.0117], [43.0181, -4.8462], [43.0631, -4.7642], [43.1092, -4.6812],
+                    [43.1536, -4.6238], [43.2558, -4.6111], [43.3281, -4.5821], [43.3015, -4.8184],
+                    [43.3150, -4.8450], [43.3514, -5.1278], [43.3156, -5.0543]
+                ],
+                passes: [
+                    { name: "Puerto de San Glorio (N-621)", alt: "1.609m", diff: "Média-Alta", desc: "O pico lendário dos Picos de Europa. Curvas fechadas consecutivas, piso soberbo e vistas vertiginosas." }
+                ],
+                warnings: "San Glorio pode apresentar neblina densa no topo e oscilações bruscas de temperatura (pode estar 8°C no topo e 24°C em Potes). O Desfiladero de la Hermida é muito estreito e tem humidade permanente e perigo de pedras caídas.",
+                timeline: [
+                    { time: "09:00", desc: "Partida de Riaño. Certifique-se de que tem combustível." },
+                    { time: "10:00", desc: "Paragem no cume de San Glorio. Desvio de 1km para o Mirador de Llesba (Monumento ao Urso) - vista brutal!" },
+                    { time: "10:30", desc: "Paragem no Mirador del Corzo (Monumento ao Veado) para a foto clássica." },
+                    { time: "11:30", desc: "Chegada a Potes. Excelente ambiente motard para café e passeio pedestre." },
+                    { time: "12:30", desc: "Almoço de tapas em Potes." },
+                    { time: "14:00", desc: "Travessia fantástica do Desfiladero de La Hermida (21 km de desfiladeiro profundo de calcário)." },
+                    { time: "16:00", desc: "Chegada à zona de Covadonga e check-in nos Hoteles La Pasera." },
+                    { time: "18:00", desc: "Visita ao Santuário de Covadonga (A Santa Cueva na rocha e a Basílica rosa)." }
+                ],
+                gastronomy: {
+                    region: "Astúrias",
+                    dishes: "Cachopo Asturiano (dois bifes grandes recheados com presunto e queijo, panados e fritos) servido com batatas e Sidra Natural vertida.",
+                    restaurant: "La Pasera Restaurant - O próprio restaurante do complexo hoteleiro serve excelente cachopo caseiro e sidra tradicional. Tel: +34 985 84 60 41."
+                }
+            },
+            4: {
+                date: "07 JUN",
+                weekday: "Domingo",
+                title: "Lagos de Covadonga & Sotres",
+                route: "Covadonga → Lagos de Covadonga (AS-567) → Cangas de Onís → Arenas de Cabrales → Sotres → Covadonga",
+                sleep: "Hoteles La Pasera (Base)",
+                distance: "90 km",
+                duration: "Dia inteiro de exploração",
+                badgeColor: "bg-amber-500 text-black",
+                mapCenter: [43.30, -4.95],
+                zoom: 10,
+                waypoints: [
+                    { name: "Covadonga (Hotel)", coords: [43.3156, -5.0543], desc: "Partida muito cedo às 06:45" },
+                    { name: "Lagos de Covadonga (Enol)", coords: [43.2721, -4.9877], desc: "Subida de mota própria antes das 07:30" },
+                    { name: "Cangas de Onís", coords: [43.3514, -5.1278], desc: "Almoço e Ponte Romana" },
+                    { name: "Pozo de la Oración", coords: [43.2981, -4.8422], desc: "Vista para o Naranjo de Bulnes" },
+                    { name: "Sotres", coords: [43.2325, -4.7478], desc: "Aldeia mais alta dos Picos de Europa" }
+                ],
+                routePath: [
+                    [43.3156, -5.0543], [43.2721, -4.9877], [43.3156, -5.0543], [43.3514, -5.1278],
+                    [43.3015, -4.8184], [43.2981, -4.8422], [43.2581, -4.8322], [43.2325, -4.7478],
+                    [43.3015, -4.8184], [43.3514, -5.1278], [43.3156, -5.0543]
+                ],
+                passes: [
+                    { name: "Subida aos Lagos de Covadonga", alt: "1.134m", diff: "Média-Alta", desc: "Subida técnica e muito inclinada com curvas espetaculares. Animais soltos na via constante." }
+                ],
+                warnings: "REGULAMENTO ESTRITO: Acesso aos Lagos de mota própria é bloqueado a partir das 07:30. Deve subir antes das 07:15 para garantir acesso de mota! Caso contrário, terá de pagar bilhete de autocarro turístico no vale.",
+                timeline: [
+                    { time: "06:45", desc: "Partida do hotel em direção aos Lagos. Subida com atenção ao piso frio." },
+                    { time: "07:15", desc: "Passagem pelo posto de controlo (subida livre de mota antes das 07:30)." },
+                    { time: "07:45", desc: "Chegada ao topo. Caminhada entre o Lago Enol e o Lago Ercina com névoa matinal mágica." },
+                    { time: "11:00", desc: "Descida lenta dos lagos com atenção a vacas a pastar nas bermas." },
+                    { time: "12:30", desc: "Almoço em Cangas de Onís e foto com a icónica Ponte Romana com a Cruz da Vitória." },
+                    { time: "15:00", desc: "Passeio à tarde rumo a Sotres (a aldeia mais alta dos Picos de Europa, belíssimas curvas)." },
+                    { time: "15:45", desc: "Paragem no Miradouro do Pozo de la Oración para fotografar o Pico Urriellu (Naranjo de Bulnes)." },
+                    { time: "18:00", desc: "Regresso a Covadonga para descansar." }
+                ],
+                gastronomy: {
+                    region: "Astúrias Alta Montanha",
+                    dishes: "Fabada Asturiana (feijoada rica tradicional com enchidos locais - compango) e Queijo de Cabrales (queijo azul artesanal fortíssimo).",
+                    restaurant: "El Cenador de los Canónigos (Cangas de Onís) - Fantástica cozinha asturiana tradicional num edifício senhorial lindíssimo. Tel: +34 985 84 94 45."
+                }
+            },
+            5: {
+                date: "08 JUN",
+                weekday: "Segunda-feira",
+                title: "Covadonga → Ponferrada / Las Médulas",
+                route: "Covadonga → Desfiladero de los Beyos (N-625) → Puerto del Pontón → Riaño → Astorga → LE-142 (Cruz de Ferro) → Ponferrada → Las Médulas",
+                sleep: "Hotel Calzada (Las Médulas) - 225€",
+                distance: "320 km",
+                duration: "6h30 de viagem panorâmica",
+                badgeColor: "bg-amber-500 text-black",
+                mapCenter: [42.9, -5.9],
+                zoom: 8,
+                waypoints: [
+                    { name: "Covadonga", coords: [43.3156, -5.0543], desc: "Partida às 08:30" },
+                    { name: "Desfiladero Beyos", coords: [43.2081, -5.0482], desc: "Desfiladeiro vertical estreito (N-625)" },
+                    { name: "Puerto del Pontón", coords: [43.1160, -5.0142], desc: "Passagem a 1280m" },
+                    { name: "Astorga", coords: [42.4593, -6.0560], desc: "Almoço e ligação" },
+                    { name: "Cruz de Ferro", coords: [42.4912, -6.3456], desc: "Passagem do Caminho de Santiago a 1505m" },
+                    { name: "El Acebo", coords: [42.5181, -6.4182], desc: "Aldeia de xisto tradicional" },
+                    { name: "Las Médulas", coords: [42.5350, -6.7644], desc: "Mirador de Orellán e Hotel Calzada" }
+                ],
+                routePath: [
+                    [43.3156, -5.0543], [43.3514, -5.1278], [43.2081, -5.0482], [43.1381, -5.0381],
+                    [43.1160, -5.0142], [42.9733, -5.0117], [42.8028, -5.1245], [42.5209, -5.4150],
+                    [42.4593, -6.0560], [42.4812, -6.2812], [42.4912, -6.3456], [42.5181, -6.4182],
+                    [42.5458, -6.5936], [42.4915, -6.7212], [42.5350, -6.7644]
+                ],
+                passes: [
+                    { name: "Puerto del Pontón (N-625)", alt: "1.280m", diff: "Fácil-Média", desc: "Piso irrepreensível, curvas de raio constante e paisagem florestal deslumbrante." },
+                    { name: "Puerto de Foncebadón / Cruz de Ferro", alt: "1.505m", diff: "Média", desc: "A lendária estrada LE-142 do Caminho de Santiago. Passagem mística com descida técnica soberba." }
+                ],
+                warnings: "O Desfiladero de los Beyos é estreito e tem frequentes detritos de rochas caídas. A estrada LE-142 (Foncebadón) é partilhada com peregrinos do Caminho de Santiago que caminham nas bermas. Cuidado redobrado nas curvas ciegas!",
+                timeline: [
+                    { time: "08:30", desc: "Partida de Covadonga e entrada no imponente Desfiladero de los Beyos." },
+                    { time: "09:45", desc: "Passagem pelo Puerto del Pontón (1280m). Vistas magníficas da montanha." },
+                    { time: "11:00", desc: "Passagem e paragem rápida em Cistierna para café." },
+                    { time: "13:00", desc: "Almoço nas imediações de Astorga." },
+                    { time: "15:00", desc: "Início do troço icónico da LE-142 (Cruz de Ferro)." },
+                    { time: "15:45", desc: "Paragem no cume da Cruz de Ferro (1505m). Atire uma pequena pedra de costas à cruz para cumprir a lenda do peregrino." },
+                    { time: "16:30", desc: "Café na belíssima aldeia de xisto de El Acebo e descida técnica para Ponferrada." },
+                    { time: "18:00", desc: "Chegada ao Hotel Calzada em Las Médulas e check-in." },
+                    { time: "19:30", desc: "Subida de mota ao Mirador de Orellán para contemplar as colinas vermelhas das minas romanas ao pôr do sol." }
+                ],
+                gastronomy: {
+                    region: "El Bierzo",
+                    dishes: "Botillo del Bierzo (enchido grande recheado com costela de porco picada, cozido com batatas e couve) e Empanada Berciana com mexilhão ou carne.",
+                    restaurant: "Restaurante Orellán (Las Médulas) - Cozinha caseira tradicional com vistas incríveis e pratos de caça soberbos. Tel: +34 987 42 01 24."
+                }
+            },
+            6: {
+                date: "09 JUN",
+                weekday: "Terça-feira",
+                title: "Las Médulas → Coimbra",
+                route: "Las Médulas → O Barco (N-536) → A Pobra de Trives (OU-536) → Verín → Chaves → Estrada Nacional 2 (N2) a Santa Comba Dão → Coimbra",
+                sleep: "Regresso a Casa",
+                distance: "440 km",
+                duration: "8h00+ de condução (Nacional)",
+                badgeColor: "bg-amber-500 text-black",
+                mapCenter: [41.2, -7.5],
+                zoom: 8,
+                waypoints: [
+                    { name: "Las Médulas", coords: [42.5350, -6.7644], desc: "Partida rumo a Portugal às 08:00" },
+                    { name: "A Pobra de Trives", coords: [42.3402, -7.2519], desc: "Passagem sinuosa pelo Sil (OU-536)" },
+                    { name: "Chaves", coords: [41.7431, -7.4722], desc: "Foto mítica no Km 0 da N2" },
+                    { name: "Peso da Régua", coords: [41.1648, -7.7884], desc: "Almoço and Douro" },
+                    { name: "Viseu", coords: [40.6566, -7.9125], desc: "Café rápido" },
+                    { name: "Coimbra", coords: [40.2033, -8.4103], desc: "Fim da viagem de sonho" }
+                ],
+                routePath: [
+                    [42.5350, -6.7644], [42.4168, -6.9839], [42.3402, -7.2519], [42.3781, -7.4125],
+                    [42.2709, -7.6512], [42.0648, -7.7212], [41.9392, -7.4363], [41.7431, -7.4722],
+                    [41.4981, -7.6412], [41.3009, -7.7412], [41.1648, -7.7884], [41.0986, -7.8100],
+                    [40.8986, -7.9300], [40.6566, -7.9125], [40.5186, -8.0812], [40.3986, -8.1328],
+                    [40.2681, -8.2812], [40.2033, -8.4103]
+                ],
+                passes: [
+                    { name: "Desfiladeiro do Rio Sil (OU-536)", alt: "900m", diff: "Média-Alta", desc: "Curvas muito sinuosas de montanha rochosa profunda com vistas arrebatadoras sobre os vinhedos do Sil." }
+                ],
+                warnings: "Etapa final extremamente longa e fisicamente muito exigente. A N2 de Chaves a Santa Comba Dão tem muitas curvas e trânsito local. Em caso de fadiga ou atraso, utilize a autoestrada A24 a partir de Vila Real ou Régua.",
+                timeline: [
+                    { time: "08:00", desc: "Partida de Las Médulas. Início do regresso." },
+                    { time: "09:30", desc: "Passagem pelo espetacular desfiladeiro do rio Sil na Galiza pela OU-536." },
+                    { time: "11:30", desc: "Fronteira e chegada a Chaves. Foto obrigatória no Km 0 da Estrada Nacional 2 (N2)!" },
+                    { time: "12:45", desc: "Almoço na Peso da Régua ou Lamego." },
+                    { time: "14:15", desc: "Continuação da N2 em direção a Viseu." },
+                    { time: "16:45", desc: "Paragem em Viseu para café rápido e esticar pernas." },
+                    { time: "18:00", desc: "Chegada a Santa Comba Dão (fim do percurso N2) e entrada no IP3 rápido." },
+                    { time: "19:00", desc: "Chegada a Coimbra. Fim de uma viagem inesquecível!" }
+                ],
+                gastronomy: {
+                    region: "Norte de Portugal & N2",
+                    dishes: "Pastel de Chaves (massa folhada recheada com carne picada) ou Presunto de Chaves na brasa com pão de centeio.",
+                    restaurant: "Restaurante Carvalho (Chaves) - Ponto de paragem obrigatório de motards portugueses pela posta e gastronomia tradicional. Tel: +351 276 321 727."
+                }
+            }
         };
 
+        // CHECKLIST DATABASE
+        const checklistData = {
+            docs: [
+                { id: "chk-cnh", text: "Carta de Condução original e física" },
+                { id: "chk-dua", text: "Documento Único Automóvel (DUA)" },
+                { id: "chk-seg", text: "Carta Verde do Seguro (Confirmar 'E' de Espanha)" },
+                { id: "chk-ces", text: "Cartão Europeu de Saúde (CESD) válido" },
+                { id: "chk-ass", text: "Contacto da Assistência em Viagem da seguradora gravado" }
+            ],
+            mota: [
+                { id: "chk-bid", text: "Bidão de Combustível Reserva 2L (Cheio)" },
+                { id: "chk-fur", text: "Kit de Reparação de Furos + Botijas CO2" },
+                { id: "chk-cha", text: "Segunda chave da Mota (guardada no casaco/bagagem)" },
+                { id: "chk-fer", text: "Kit de ferramentas básicas da mota + Fita Americana" },
+                { id: "chk-ole", text: "Pequeno frasco de óleo de motor para reposição rápida" },
+                { id: "chk-man", text: "Cabo de embraiagem extra ou manetes sobressalentes" }
+            ],
+            roupa: [
+                { id: "chk-chu", text: "Fato de Chuva impermeável completo (acessível)" },
+                { id: "chk-ter", text: "Roupa térmica de montanha (camadas interiores e corta-vento)" },
+                { id: "chk-col", text: "Colete refletor obrigatório em Espanha (acessível)" },
+                { id: "chk-luv", text: "2 pares de luvas homologadas (um par quente, um de verão)" },
+                { id: "chk-pow", text: "Powerbank de alta capacidade + cabos para telemóvel/GPS" },
+                { id: "chk-ocu", text: "Óculos de sol ou viseira escura de substituição" }
+            ]
+        };
+
+        // WEATHER GEOLOCATIONS (Open-Meteo)
+        const locations = {
+            "braganca": { name: "Bragança (Portugal)", lat: 41.8061, lon: -6.7567, hist: { tempMax: 24, tempMin: 12, rain: 25, desc: "Clima ameno, céu limpo com nuvens." } },
+            "riano": { name: "Riaño (León, ES)", lat: 42.9733, lon: -5.0117, hist: { tempMax: 18, tempMin: 8, rain: 35, desc: "Clima de montanha, noites frias e manhãs húmidas." } },
+            "sanglorio": { name: "Puerto San Glorio (1609m)", lat: 43.0631, lon: -4.7642, hist: { tempMax: 13, tempMin: 5, rain: 45, desc: "Alta montanha. Vento forte e risco frequente de nevoeiro/chuva." } },
+            "covadonga": { name: "Covadonga / Lagos (Astúrias)", lat: 43.3156, lon: -5.0543, hist: { tempMax: 17, tempMin: 10, rain: 50, desc: "Clima Atlântico húmido. Chuviscos e nevoeiro nos lagos." } },
+            "lasmedulas": { name: "Las Médulas / Ponferrada (Bierzo)", lat: 42.5350, lon: -6.7644, hist: { tempMax: 26, tempMin: 12, rain: 20, desc: "Microclima quente e abrigado. Geralmente seco." } },
+            "chaves": { name: "Chaves / N2 (Portugal)", lat: 41.7431, lon: -7.4722, hist: { tempMax: 25, tempMin: 13, rain: 30, desc: "Transição continental transmontana. Sol." } }
+        };
+
+        // DYNAMIC TABS NAVIGATION WITH AUTO-RESIZE FOR LEAFLET (Loop 2 Fix)
+        function switchMainTab(tab) {
+            // Hide all sections
+            document.getElementById('section-rota').classList.add('hidden');
+            document.getElementById('section-logistica').classList.add('hidden');
+            document.getElementById('section-checklist').classList.add('hidden');
+            document.getElementById('section-meteorologia').classList.add('hidden');
+            
+            // Show target section
+            document.getElementById('section-' + tab).classList.remove('hidden');
+            
+            // Toggle active states on tab buttons (Bottom Bar)
+            document.getElementById('tab-btn-rota').className = "ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
+            document.getElementById('tab-btn-logistica').className = "ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
+            document.getElementById('tab-btn-checklist').className = "ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
+            document.getElementById('tab-btn-meteorologia').className = "ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
+            
+            document.getElementById('tab-btn-' + tab).className = "ios-tab ios-tab-active flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
+
+            // Loop 2 Engineering Masterpiece: Invalidate Leaflet size and recenter to bypass layout-shift grey glitches
+            if (tab === 'rota' && activeMapInstance) {
+                setTimeout(() => {
+                    activeMapInstance.invalidateSize();
+                    const d = days[currentDayNum];
+                    if (d && d.mapCenter) {
+                        activeMapInstance.setView(d.mapCenter, d.zoom);
+                    }
+                }, 180);
+            }
+
+            // If meteorology tab is opened, fetch live forecasts
+            if (tab === 'meteorologia') {
+                fetchWeatherForecasts();
+            }
+        }
+
+        // LOGISTICS SUB-TABS NAVIGATION
+        function switchLogisticsSubTab(subTab) {
+            document.getElementById('sub-log-geral').classList.add('hidden');
+            document.getElementById('sub-log-planb').classList.add('hidden');
+            document.getElementById('sub-' + subTab).classList.remove('hidden');
+
+            document.getElementById('btn-log-geral').className = "py-2 text-xs font-bold rounded-lg text-slate-400 transition-all";
+            document.getElementById('btn-log-planb').className = "py-2 text-xs font-bold rounded-lg text-slate-400 transition-all";
+
+            if (subTab === 'log-geral') {
+                document.getElementById('btn-log-geral').className = "py-2 text-xs font-bold rounded-lg bg-amber-500 text-black shadow transition-all";
+            } else {
+                document.getElementById('btn-log-planb').className = "py-2 text-xs font-bold rounded-lg bg-amber-500 text-black shadow transition-all";
+            }
+        }
+
+        // DAY SELECTOR FOR ROTEIRO
         function showDay(num) {
+            currentDayNum = num;
             const d = days[num];
-            document.getElementById('day-content').innerHTML = `
-                <div class="day-detail animate-in fade-in duration-300">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="day-badge">${d.date}</span>
-                        <h2 class="text-lg">${d.title}</h2>
+            
+            // Clean active map instance before rendering new day to prevent canvas leaks
+            if (activeMapInstance) {
+                try {
+                    activeMapInstance.remove();
+                    activeMapInstance = null;
+                } catch (e) {
+                    console.error("Error removing map instance:", e);
+                }
+            }
+
+            // Build Mountain Passes content
+            let passesHtml = '';
+            if (d.passes && d.passes.length > 0) {
+                passesHtml = `
+                    <div class="mt-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                        <span class="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-2.5"><i class="fa-solid fa-mountain mr-1"></i> Portos de Montanha / Passagens</span>
+                        <div class="space-y-3">
+                            ${d.passes.map(p => `
+                                <div class="text-xs">
+                                    <div class="flex justify-between items-center font-semibold text-white">
+                                        <span>${p.name}</span>
+                                        <span class="bg-amber-500/20 text-amber-500 text-[9px] px-2 py-0.5 rounded font-bold uppercase">${p.alt}</span>
+                                    </div>
+                                    <p class="text-slate-400 text-[10px] mt-1 leading-relaxed">Dificuldade: <span class="text-white font-medium">${p.diff}</span> • ${p.desc}</p>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
-                    <div class="card p-4 space-y-3">
-                        <div class="flex gap-3 text-sm">
-                            <i class="fa-solid fa-route text-amber-500 mt-1"></i>
-                            <div><strong>Rota:</strong> ${d.route}</div>
-                        </div>
-                        <div class="flex gap-3 text-sm">
-                            <i class="fa-solid fa-bed text-blue-400 mt-1"></i>
-                            <div><strong>Dormida:</strong> ${d.sleep}</div>
-                        </div>
-                        <div class="flex gap-3 text-sm text-gray-200">
-                            <i class="fa-solid fa-circle-info mt-1 text-amber-500"></i>
-                            <div>${d.desc}</div>
-                        </div>
-                        <div class="flex gap-3 text-[10px] text-slate-400 uppercase pt-2 border-t border-slate-700">
-                            <i class="fa-solid fa-clock mt-1"></i>
-                            <div>${d.info}</div>
+                `;
+            }
+
+            // Build Timeline/Schedule content
+            let timelineHtml = `
+                <div class="p-4 rounded-2xl bg-slate-950/30 border border-slate-900/60">
+                    <span class="text-xs font-bold text-white uppercase tracking-widest block mb-3.5"><i class="fa-solid fa-clock-rotate-left mr-1.5 text-amber-500"></i> Horários Sugeridos & Etapas</span>
+                    <div class="relative border-l border-slate-800 pl-4 space-y-4">
+                        ${d.timeline.map((item, idx) => `
+                            <div class="relative">
+                                <!-- Marker -->
+                                <div class="absolute -left-[21px] mt-0.5 w-2.5 h-2.5 rounded-full bg-amber-500 border border-slate-950 shadow-sm shadow-amber-500/50"></div>
+                                <div class="text-xs">
+                                    <span class="font-bold text-amber-500">${item.time}</span>
+                                    <p class="text-slate-300 mt-0.5">${item.desc}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Build Gastronomy regional cards (Loop 2 Redesign: Exquisite plate plaques with tactile direct calling)
+            let gastronomyHtml = `
+                <div class="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                    <div class="flex justify-between items-center mb-2.5">
+                        <span class="text-xs font-bold text-amber-500 uppercase tracking-widest"><i class="fa-solid fa-utensils mr-1.5"></i> Gastronomia Regional</span>
+                        <span class="text-[9px] bg-amber-500/15 text-amber-500 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Sabores da Viagem</span>
+                    </div>
+                    <div class="text-xs space-y-3 text-slate-300 leading-relaxed">
+                        <p><strong>Região:</strong> <span class="text-white font-semibold">${d.gastronomy.region}</span></p>
+                        <p><strong>Pratos Típicos:</strong> ${d.gastronomy.dishes}</p>
+                        
+                        <div class="p-3 bg-slate-950/45 rounded-xl border border-slate-900 mt-2 flex flex-col justify-between gap-3">
+                            <div>
+                                <span class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="fa-solid fa-store text-amber-500 mr-1"></i> Taberna Recomendada:</span>
+                                <p class="text-slate-200 text-xs font-bold leading-normal">${d.gastronomy.restaurant.split(" - ")[0]}</p>
+                                <p class="text-slate-400 text-[10px] mt-0.5">${d.gastronomy.restaurant.split(" - ")[1] ? d.gastronomy.restaurant.split(" - ")[1].split(". Tel:")[0] : ''}</p>
+                            </div>
+                            
+                            <!-- Tactical direct calling pill -->
+                            <a href="tel:${d.gastronomy.restaurant.split("Tel: ")[1]}" class="bg-amber-500/10 hover:bg-amber-500/25 border border-amber-500/30 text-amber-500 py-2 rounded-xl text-[10px] font-extrabold tracking-wider uppercase text-center flex items-center justify-center gap-1.5 transition-all active:scale-[0.97]">
+                                <i class="fa-solid fa-phone text-[9px]"></i> Reservar Mesa
+                            </a>
                         </div>
                     </div>
                 </div>
             `;
+
+            // Build final day layout including the map container
+            document.getElementById('day-content').innerHTML = `
+                <div class="space-y-5 animate-ios-pop">
+                    <!-- Day Overview Card -->
+                    <div class="glass-card p-4 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[9px] text-amber-500 font-bold uppercase tracking-wider">${d.weekday}</span>
+                                <h2 class="text-base font-extrabold text-white mt-0.5">${d.title}</h2>
+                            </div>
+                            <span class="day-badge px-2.5 py-1 rounded bg-amber-500 text-black font-extrabold text-[10px] shadow-sm">${d.date}</span>
+                        </div>
+                        
+                        <!-- Mini Info row -->
+                        <div class="grid grid-cols-2 gap-3 py-2.5 border-y border-slate-900 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-road text-amber-500 text-sm"></i>
+                                <div>
+                                    <span class="text-slate-400 text-[8px] block uppercase font-bold tracking-wider">Distância</span>
+                                    <strong class="text-white">${d.distance}</strong>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-clock text-amber-500 text-sm"></i>
+                                <div>
+                                    <span class="text-slate-400 text-[8px] block uppercase font-bold tracking-wider">Tempo</span>
+                                    <strong class="text-white">${d.duration}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Route -->
+                        <div class="text-xs leading-relaxed">
+                            <strong class="text-slate-400 uppercase text-[8px] block font-bold tracking-wider mb-1">Itinerário Sugerido</strong>
+                            <p class="text-slate-200"><i class="fa-solid fa-route text-amber-500 mr-1.5"></i>${d.route}</p>
+                        </div>
+
+                        <!-- MAPA INTERATIVO DO PERCURSO -->
+                        <div class="text-xs mt-3">
+                            <strong class="text-slate-400 uppercase text-[8px] block font-bold tracking-wider mb-1">Mapa do Percurso (Navegável)</strong>
+                            <div id="map" class="w-full h-56 rounded-2xl border border-slate-900 shadow-inner z-0 overflow-hidden relative"></div>
+                            <span class="text-[9px] text-slate-400 mt-1 block"><i class="fa-solid fa-circle-info text-amber-500/70 mr-1"></i>Toque nos marcadores no mapa para mais informações.</span>
+                        </div>
+
+                        <!-- Sleep -->
+                        <div class="text-xs bg-slate-950/30 p-3 rounded-2xl border border-slate-900 flex items-center justify-between mt-1">
+                            <div>
+                                <strong class="text-slate-400 uppercase text-[8px] block font-bold tracking-wider mb-1">Dormida Reservada</strong>
+                                <span class="text-slate-200 font-medium flex items-center gap-1.5"><i class="fa-solid fa-bed text-sky-400"></i>${d.sleep.split(" - ")[0]}</span>
+                            </div>
+                            <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/25">${d.sleep.split(" - ")[1] || "Grátis"}</span>
+                        </div>
+                    </div>
+
+                    <!-- Horários & Etapas -->
+                    ${timelineHtml}
+
+                    <!-- Portos de Montanha (se aplicável) -->
+                    ${passesHtml}
+
+                    <!-- Gastronomia Local -->
+                    ${gastronomyHtml}
+
+                    <!-- Avisos Críticos de Segurança -->
+                    <div class="glass-card p-4 border-l-4 border-red-500 bg-red-500/5">
+                        <span class="text-xs font-bold text-red-400 uppercase tracking-widest block mb-1.5"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Avisos Importantes & Perigos</span>
+                        <p class="text-xs text-slate-300 leading-relaxed">${d.warnings}</p>
+                    </div>
+                </div>
+            `;
+
+            // Initialize Leaflet Map with customized glowing markers and dark design tileset
+            if (d.mapCenter && d.zoom) {
+                setTimeout(() => {
+                    try {
+                        activeMapInstance = L.map('map', {
+                            zoomControl: true,
+                            scrollWheelZoom: false, // Prevent zoom on scroll (annoying on mobile)
+                            dragging: true,
+                            tap: false
+                        }).setView(d.mapCenter, d.zoom);
+
+                        // Load dark premium tiles matching the glassmorphism theme
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                            attribution: '&copy; OpenStreetMap &copy; CARTO'
+                        }).addTo(activeMapInstance);
+
+                        // Add waypoints markers with custom glowing pulse SVG icon
+                        d.waypoints.forEach(wp => {
+                            const customIcon = L.divIcon({
+                                className: 'custom-div-icon',
+                                html: `<div class="relative flex items-center justify-center w-8 h-8">
+                                         <div class="absolute w-4.5 h-4.5 rounded-full bg-amber-500 border-2 border-white shadow-lg animate-ping opacity-70"></div>
+                                         <div class="relative w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-slate-950 shadow-md shadow-amber-500/50"></div>
+                                       </div>`,
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 15]
+                            });
+
+                            let marker = L.marker(wp.coords, { icon: customIcon }).addTo(activeMapInstance);
+                            marker.bindPopup(`
+                                <div class="text-xs font-sans text-slate-200">
+                                    <strong class="text-amber-500 block mb-0.5">${wp.name}</strong>
+                                    <span class="text-[10px] leading-relaxed text-slate-300">${wp.desc}</span>
+                                </div>
+                            `);
+                        });
+
+                        // Draw Route Line in amber road style
+                        if (d.routePath && d.routePath.length > 0) {
+                            L.polyline(d.routePath, {
+                                color: '#f59e0b', // Amber 500
+                                weight: 4,
+                                opacity: 0.85,
+                                dashArray: '2, 6'
+                            }).addTo(activeMapInstance);
+                        }
+                    } catch (err) {
+                        console.error("Leaflet rendering error:", err);
+                        document.getElementById('map').innerHTML = `
+                            <div class="absolute inset-0 flex flex-col items-center justify-center p-4 bg-slate-950 text-slate-400 text-center gap-1.5">
+                                <i class="fa-solid fa-circle-exclamation text-amber-500 text-xl"></i>
+                                <span class="text-[11px] font-semibold">Não foi possível carregar o mapa interativo.</span>
+                                <span class="text-[9px] text-slate-500">Ligue-se à internet ou utilize o GPX indicado acima.</span>
+                            </div>
+                        `;
+                    }
+                }, 150);
+            }
+
+            // Active Day Capsule Selector styling toggle (Spring animations)
             document.querySelectorAll('.day-btn').forEach((btn, idx) => {
-                btn.className = (idx + 1 === num) ? "day-btn bg-amber-500 text-black px-4 py-2 rounded-md font-bold text-sm" : "day-btn bg-slate-800 px-4 py-2 rounded-md font-bold text-sm";
+                if (idx + 1 === num) {
+                    btn.className = "day-btn day-capsule day-capsule-active px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all";
+                } else {
+                    btn.className = "day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all";
+                }
             });
         }
 
-        function switchMainTab(tab) {
-            document.getElementById('section-rota').classList.add('hidden');
-            document.getElementById('section-logistica').classList.add('hidden');
-            document.getElementById('section-checklist').classList.add('hidden');
-            document.getElementById('section-' + tab).classList.remove('hidden');
-            
-            document.getElementById('tab-rota').classList.remove('tab-active');
-            document.getElementById('tab-logistica').classList.remove('tab-active');
-            document.getElementById('tab-checklist').classList.remove('tab-active');
-            document.getElementById('tab-' + tab).classList.add('tab-active');
+        // LOCALSTORAGE INTEGRATION FOR CHECKLIST
+        function loadChecklist() {
+            const renderCategory = (categoryKey, targetElementId) => {
+                const items = checklistData[categoryKey];
+                const listContainer = document.getElementById(targetElementId);
+                listContainer.innerHTML = '';
+
+                items.forEach(item => {
+                    const savedState = localStorage.getItem(item.id) === 'true';
+                    
+                    const label = document.createElement('label');
+                    label.className = `flex items-center gap-3.5 p-3.5 rounded-xl bg-slate-950/30 border border-slate-900 cursor-pointer active:scale-[0.98] transition-all ${savedState ? 'border-amber-500/20 bg-amber-500/5' : ''}`;
+                    label.id = `label-${item.id}`;
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = savedState;
+                    checkbox.className = 'hidden'; // Hide default HTML checkbox to show iOS circle checkmark
+                    checkbox.addEventListener('change', (e) => {
+                        localStorage.setItem(item.id, e.target.checked);
+                        if (e.target.checked) {
+                            label.classList.add('border-amber-500/20', 'bg-amber-500/5');
+                        } else {
+                            label.classList.remove('border-amber-500/20', 'bg-amber-500/5');
+                        }
+                    });
+
+                    const customCheck = document.createElement('span');
+                    customCheck.className = 'ios-checkbox';
+
+                    const span = document.createElement('span');
+                    span.className = savedState ? 'text-slate-300 font-semibold' : 'text-slate-300';
+                    span.textContent = item.text;
+
+                    label.appendChild(checkbox);
+                    label.appendChild(customCheck);
+                    label.appendChild(span);
+                    listContainer.appendChild(label);
+                });
+            };
+
+            renderCategory('docs', 'checklist-docs');
+            renderCategory('mota', 'checklist-mota');
+            renderCategory('roupa', 'checklist-roupa');
         }
+
+        function resetChecklist() {
+            if (confirm('Deseja repor todos os itens do checklist para não marcados?')) {
+                Object.keys(checklistData).forEach(cat => {
+                    checklistData[cat].forEach(item => {
+                        localStorage.setItem(item.id, 'false');
+                    });
+                });
+                loadChecklist();
+            }
+        }
+
+        // WEATHER API LOGIC (OPEN-METEO)
+        let isWeatherLiveMode = false;
+
+        function toggleWeatherMode() {
+            const toggleCheckbox = document.getElementById('weather-mode-toggle');
+            isWeatherLiveMode = toggleCheckbox.checked;
+            
+            if (isWeatherLiveMode) {
+                fetchWeatherForecasts();
+            } else {
+                renderHistoricalWeather();
+            }
+        }
+
+        function getWeatherIconAndDesc(code) {
+            // WMO Weather interpretation codes
+            if (code === 0) return { icon: 'fa-sun text-amber-400', desc: 'Sol limpo' };
+            if ([1, 2, 3].includes(code)) return { icon: 'fa-cloud-sun text-slate-300', desc: 'Pouco nublado' };
+            if ([45, 48].includes(code)) return { icon: 'fa-smog text-slate-400', desc: 'Nevoeiro denso' };
+            if ([51, 53, 55].includes(code)) return { icon: 'fa-cloud-rain text-sky-400', desc: 'Chuviscos' };
+            if ([61, 63, 65].includes(code)) return { icon: 'fa-cloud-showers-heavy text-blue-500', desc: 'Chuva' };
+            if ([80, 81, 82].includes(code)) return { icon: 'fa-cloud-showers-water text-blue-400', desc: 'Aguaceiros' };
+            if ([95, 96, 99].includes(code)) return { icon: 'fa-cloud-bolt text-red-400', desc: 'Trovoada ativa' };
+            return { icon: 'fa-cloud text-slate-300', desc: 'Nublado' };
+        }
+
+        async function fetchWeatherForecasts() {
+            if (!isWeatherLiveMode) {
+                renderHistoricalWeather();
+                return;
+            }
+
+            document.getElementById('weather-loader').classList.remove('hidden');
+            document.getElementById('weather-grid').classList.add('hidden');
+
+            const container = document.getElementById('weather-grid');
+            container.innerHTML = '';
+
+            try {
+                // Fetch data for all locations asynchronously
+                const promises = Object.keys(locations).map(async key => {
+                    const loc = locations[key];
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&hourly=temperature_2m,precipitation_probability,weathercode&timezone=Europe/Madrid&forecast_days=3`;
+                    
+                    try {
+                        const res = await fetch(url);
+                        if (!res.ok) throw new Error('API Error');
+                        const data = await res.json();
+                        
+                        // Extract today's 09:00 (idx 9) and 21:00 (idx 21) or equivalent hourly forecast
+                        const tempMorning = data.hourly.temperature_2m[9] !== undefined ? Math.round(data.hourly.temperature_2m[9]) : 15;
+                        const tempEvening = data.hourly.temperature_2m[21] !== undefined ? Math.round(data.hourly.temperature_2m[21]) : 11;
+                        
+                        const rainMorning = data.hourly.precipitation_probability[9] !== undefined ? data.hourly.precipitation_probability[9] : 20;
+                        const rainEvening = data.hourly.precipitation_probability[21] !== undefined ? data.hourly.precipitation_probability[21] : 20;
+
+                        const codeMorning = data.hourly.weathercode[9] !== undefined ? data.hourly.weathercode[9] : 1;
+                        const codeEvening = data.hourly.weathercode[21] !== undefined ? data.hourly.weathercode[21] : 1;
+
+                        return {
+                            key,
+                            name: loc.name,
+                            success: true,
+                            morning: { temp: tempMorning, rain: rainMorning, code: codeMorning },
+                            evening: { temp: tempEvening, rain: rainEvening, code: codeEvening }
+                        };
+                    } catch (e) {
+                        return { key, name: loc.name, success: false };
+                    }
+                });
+
+                const results = await Promise.all(promises);
+
+                results.forEach(res => {
+                    if (res.success) {
+                        const morn = getWeatherIconAndDesc(res.morning.code);
+                        const eve = getWeatherIconAndDesc(res.evening.code);
+                        const hasHighRainRisk = res.morning.rain > 45 || res.evening.rain > 45;
+
+                        // Loop 2 Redesign: Premium Apple Weather style vertical linear forecast card
+                        // Calculates a virtual 10-day styled thermal range indicator bar!
+                        const minVal = Math.min(res.morning.temp, res.evening.temp);
+                        const maxVal = Math.max(res.morning.temp, res.evening.temp);
+                        const leftPercent = Math.max(0, Math.min(80, (minVal - 2) * 4)); // relative positioning
+                        const widthPercent = Math.max(10, Math.min(100 - leftPercent, (maxVal - minVal + 2) * 5));
+
+                        const card = document.createElement('div');
+                        card.className = 'glass-card p-4.5 space-y-3.5';
+                        card.innerHTML = `
+                            <!-- Card Header -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-location-crosshairs text-sky-400"></i> ${res.name}</span>
+                                <span class="text-[8px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-sky-500/20">Previsão 12h</span>
+                            </div>
+                            
+                            <!-- Apple Weather range design row -->
+                            <div class="flex items-center justify-between gap-4 text-xs">
+                                <!-- Min Temp -->
+                                <div class="w-10 text-slate-400 text-left font-medium flex flex-col">
+                                    <span class="text-[8px] uppercase tracking-wider opacity-60">MIN</span>
+                                    <span class="text-xs text-sky-300 font-bold">${minVal}°C</span>
+                                </div>
+
+                                <!-- Linear gradient range progress bar -->
+                                <div class="flex-grow flex flex-col items-center">
+                                    <div class="temp-range-bar">
+                                        <div class="temp-range-fill" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Max Temp -->
+                                <div class="w-10 text-right font-medium flex flex-col">
+                                    <span class="text-[8px] uppercase tracking-wider opacity-60">MAX</span>
+                                    <span class="text-xs text-amber-500 font-bold">${maxVal}°C</span>
+                                </div>
+                            </div>
+
+                            <!-- Detail breakdowns (Morning vs Night) -->
+                            <div class="grid grid-cols-2 gap-3 text-xs pt-1 border-t border-slate-900/60">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid ${morn.icon} text-base opacity-90"></i>
+                                    <div>
+                                        <span class="text-[8px] text-slate-400 uppercase tracking-widest block font-semibold">Manhã</span>
+                                        <span class="text-[11px] text-slate-200 font-bold">${res.morning.temp}°C • ${morn.desc}</span>
+                                        <span class="text-[9px] text-slate-400 block"><i class="fa-solid fa-umbrella text-sky-400/80 mr-1"></i>${res.morning.rain}% chuva</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid ${eve.icon} text-base opacity-90"></i>
+                                    <div>
+                                        <span class="text-[8px] text-slate-400 uppercase tracking-widest block font-semibold">Noite</span>
+                                        <span class="text-[11px] text-slate-200 font-bold">${res.evening.temp}°C • ${eve.desc}</span>
+                                        <span class="text-[9px] text-slate-400 block"><i class="fa-solid fa-umbrella text-sky-400/80 mr-1"></i>${res.evening.rain}% chuva</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${hasHighRainRisk ? `
+                                <div class="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-[9px] text-red-400 flex items-center gap-1.5 font-semibold">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    <span>Probabilidade de chuva elevada nesta etapa! Prepare o fato de chuva.</span>
+                                </div>
+                            ` : ''}
+                        `;
+                        container.appendChild(card);
+                    } else {
+                        // Fallback to historical if offline
+                        const hist = locations[res.key].hist;
+                        const card = document.createElement('div');
+                        card.className = 'glass-card p-4 border-l-4 border-amber-500 space-y-2';
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-white"><i class="fa-solid fa-location-dot text-amber-500 mr-1.5"></i> ${res.name}</span>
+                                <span class="text-[8px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full font-bold uppercase">Sem Rede</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">Erro de ligação. A apresentar médias históricas:</p>
+                            <div class="grid grid-cols-3 gap-2 text-[9px] bg-slate-950/40 p-2 rounded-lg text-slate-400">
+                                <div>Max: <strong class="text-white">${hist.tempMax}°C</strong></div>
+                                <div>Min: <strong class="text-white">${hist.tempMin}°C</strong></div>
+                                <div>Chuva: <strong class="text-white">${hist.rain}%</strong></div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
+
+            } catch (err) {
+                console.error(err);
+            } finally {
+                document.getElementById('weather-loader').classList.add('hidden');
+                document.getElementById('weather-grid').classList.remove('hidden');
+            }
+        }
+
+        function renderHistoricalWeather() {
+            document.getElementById('weather-loader').classList.add('hidden');
+            document.getElementById('weather-grid').classList.remove('hidden');
+
+            const container = document.getElementById('weather-grid');
+            container.innerHTML = '';
+
+            Object.keys(locations).forEach(key => {
+                const loc = locations[key];
+                
+                // Calculates a virtual 10-day styled thermal range indicator bar for historical values
+                const minVal = loc.hist.tempMin;
+                const maxVal = loc.hist.tempMax;
+                const leftPercent = Math.max(0, Math.min(80, (minVal - 2) * 4));
+                const widthPercent = Math.max(10, Math.min(100 - leftPercent, (maxVal - minVal + 2) * 5));
+
+                const card = document.createElement('div');
+                card.className = 'glass-card p-4.5 space-y-3';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-mountain text-amber-500"></i> ${loc.name}</span>
+                        <span class="text-[8px] bg-amber-500/10 text-amber-500 px-2.5 py-0.5 rounded-full font-bold uppercase border border-amber-500/20">Média Junho</span>
+                    </div>
+                    
+                    <p class="text-[10px] text-slate-300 leading-normal mb-1"><i class="fa-solid fa-info-circle text-amber-500/80 mr-1.5"></i> ${loc.hist.desc}</p>
+                    
+                    <div class="flex items-center justify-between gap-4 text-xs pt-1">
+                        <!-- Min Temp -->
+                        <div class="w-10 text-slate-400 text-left font-medium flex flex-col">
+                            <span class="text-[8px] uppercase tracking-wider opacity-60">MIN</span>
+                            <span class="text-xs text-sky-300 font-bold">${minVal}°C</span>
+                        </div>
+
+                        <!-- Linear range bar -->
+                        <div class="flex-grow flex flex-col items-center">
+                            <div class="temp-range-bar">
+                                <div class="temp-range-fill" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Max Temp -->
+                        <div class="w-10 text-right font-medium flex flex-col">
+                            <span class="text-[8px] uppercase tracking-wider opacity-60">MAX</span>
+                            <span class="text-xs text-amber-500 font-bold">${maxVal}°C</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-900/60 flex items-center gap-1.5">
+                        <i class="fa-solid fa-umbrella text-blue-400"></i> Probabilidade de precipitação média histórica: <strong class="text-slate-200">${loc.hist.rain}%</strong>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ONLOAD INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            // Render first day on load
+            showDay(1);
+            
+            // Load and initialize persistent checklist
+            loadChecklist();
+        });
     </script>
 </body>
 </html>
