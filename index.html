@@ -14,119 +14,167 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --brand-color: #c27a3e; /* Cobre Metálico Adamus */
-            --brand-gold: #e5c158;  /* Dourado Adamus */
-            --bg-deep: #05070a;      /* Preto Obsidiana Profundo */
-            --bg-card: rgba(14, 18, 30, 0.7);
-            --ios-blur: saturate(190%) blur(24px);
+            --copper: #a8632f;       /* Cobre — acento principal */
+            --copper-soft: #8a4f23;  /* Cobre escuro */
+            --bg: #efe6d2;           /* Papel cortiça quente */
+            --bg-elev: #f5edd9;      /* Superfície cartão (mais clara que o fundo) */
+            --bg-elev-2: #ebe1ca;    /* Hover/active */
+            --line: #d4c4a3;         /* Régua fina */
+            --line-strong: #b39d75;
+            --ink: #1c1814;          /* Tinta — preto-castanho */
+            --ink-dim: #4a3d2e;
+            --ink-mute: #8a7860;
+            --danger: #7a2e2a;       /* Oxblood / vinho */
+            --ok: #4a5a3a;           /* Verde-musgo */
+            --paper-tex: rgba(28, 24, 20, 0.025);
         }
 
+        * { -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-deep);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(194, 122, 62, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(229, 193, 88, 0.05) 0px, transparent 50%);
-            color: #f8fafc;
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(ellipse 800px 400px at 50% -10%, rgba(168,99,47,0.06), transparent 60%),
+                radial-gradient(circle at 1px 1px, var(--paper-tex) 1px, transparent 0);
+            background-size: auto, 3px 3px;
+            color: var(--ink);
+            font-size: 14px;
+            line-height: 1.55;
+            font-feature-settings: "ss01", "cv11";
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
 
-        h1, h2, h3, .brand-font {
-            font-family: 'Outfit', sans-serif;
+        h1, h2, h3, h4, .display {
+            font-family: 'Fraunces', 'Georgia', serif;
+            font-weight: 500;
+            letter-spacing: -0.012em;
+            font-feature-settings: "ss01", "ss02";
         }
 
-        /* Frosted Glassmorphism Premium c/ Moldura de Cobre/Cortiça */
-        .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid rgba(194, 122, 62, 0.15);
-            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4);
-            border-radius: 24px;
-            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        .mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum"; }
+
+        .eyebrow {
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--ink-mute);
+            font-weight: 600;
         }
 
-        .glass-card:active {
-            transform: scale(0.985);
-            border-color: rgba(229, 193, 88, 0.3);
+        /* Régua com losango central — assinatura editorial 90s */
+        .ornament {
+            display: flex; align-items: center; gap: 10px;
+            color: var(--line-strong);
+        }
+        .ornament::before, .ornament::after {
+            content: ""; flex: 1; height: 1px; background: var(--line);
+        }
+        .ornament-glyph {
+            font-family: 'Fraunces', serif;
+            font-size: 9px;
+            color: var(--copper);
+            letter-spacing: 0.3em;
         }
 
-        /* Borda especial com padrão de Cortiça */
-        .cork-accent {
-            border: 2px solid #8e6c46;
-            background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 0);
-            background-size: 4px 4px;
+        /* Cartão — papel sobre papel */
+        .card {
+            background: var(--bg-elev);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            transition: border-color 0.2s ease;
+        }
+        .card-inset {
+            background: rgba(28, 24, 20, 0.04);
+            border: 1px solid var(--line);
+            border-radius: 3px;
         }
 
-        .glass-header {
-            background: rgba(5, 7, 10, 0.8);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border-bottom: 1px solid rgba(194, 122, 62, 0.12);
+        .rule { border-top: 1px solid var(--line); }
+        .rule-thin { border-top: 1px solid var(--line); }
+
+        /* Header & footer */
+        .app-header {
+            background: rgba(239, 230, 210, 0.92);
+            backdrop-filter: saturate(140%) blur(10px);
+            -webkit-backdrop-filter: saturate(140%) blur(10px);
+            border-bottom: 1px solid var(--line);
             padding-top: env(safe-area-inset-top);
         }
-
-        .glass-footer {
-            background: rgba(5, 7, 10, 0.9);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border-top: 1px solid rgba(194, 122, 62, 0.12);
+        .app-footer {
+            background: rgba(239, 230, 210, 0.96);
+            backdrop-filter: saturate(140%) blur(10px);
+            -webkit-backdrop-filter: saturate(140%) blur(10px);
+            border-top: 1px solid var(--line);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* iOS Bottom Navigation styling */
-        .ios-tab {
-            color: #64748b;
-            font-size: 10px;
-            font-weight: 600;
-            position: relative;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Tabs */
+        .tab {
+            color: var(--ink-mute);
+            font-size: 10.5px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: color 0.2s ease;
+        }
+        .tab-active { color: var(--copper); font-weight: 600; }
+        .tab-active::after {
+            content: ""; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 22px; height: 2px; background: var(--copper);
         }
 
-        .ios-tab-active {
-            color: var(--brand-color);
-            font-weight: 700;
-            transform: translateY(-2px);
+        /* Day pill — selo postal */
+        .day-pill {
+            background: transparent;
+            border: 1px solid var(--line);
+            color: var(--ink-dim);
+            transition: all 0.18s ease;
         }
+        .day-pill-active {
+            background: var(--ink);
+            border-color: var(--ink);
+            color: var(--bg);
+        }
+        .day-pill-active .pill-date { color: rgba(239,230,210,0.7); }
 
-        .ios-tab-active i {
-            filter: drop-shadow(0 0 6px rgba(194, 122, 62, 0.5));
-        }
+        /* Cores utilitárias */
+        .text-copper { color: var(--copper); }
+        .text-ink { color: var(--ink); }
+        .text-dim { color: var(--ink-dim); }
+        .text-mute { color: var(--ink-mute); }
+        .bg-copper { background: var(--copper); color: var(--bg); }
+        .border-copper { border-color: var(--copper); }
 
-        /* Tiny dynamic indicator dot under active tab */
-        .ios-tab-active::after {
-            content: "";
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background-color: var(--brand-color);
-            box-shadow: 0 0 6px var(--brand-color);
+        /* SOS — oxblood */
+        .sos-pill {
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            background: transparent;
         }
+        .sos-pill:active { background: var(--danger); color: var(--bg); }
 
-        /* Apple Squircle capsule buttons styled in Copper Biker accent */
-        .day-capsule {
-            background: rgba(194, 122, 62, 0.04);
-            border: 1px solid rgba(194, 122, 62, 0.08);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Icon button */
+        .icon-btn {
+            width: 32px; height: 32px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            color: var(--ink-dim);
+            background: var(--bg-elev);
+            transition: all 0.18s ease;
         }
+        .icon-btn:active { transform: scale(0.94); border-color: var(--copper); color: var(--copper); }
 
-        .day-capsule-active {
-            background: linear-gradient(135deg, var(--brand-color) 0%, #a15926 100%);
-            color: #ffffff;
-            font-weight: 800;
-            box-shadow: 0 6px 20px rgba(194, 122, 62, 0.25);
-            border-color: var(--brand-color);
-            transform: scale(1.03);
-        }
+        /* Hide scrollbars */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .fade-in { opacity: 1; }
 
         /* Hide scrollbars but keep functionality */
         .no-scrollbar::-webkit-scrollbar {
@@ -147,82 +195,73 @@
             animation: iosPop 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Custom Leaflet Dark styling */
+        /* Leaflet — papel sépia */
         .leaflet-container {
             font-family: 'Inter', sans-serif;
-            background: #05070a !important;
+            background: #e0d3b3 !important;
             z-index: 10;
         }
+        .leaflet-container .leaflet-tile {
+            filter: sepia(0.35) saturate(0.7) brightness(0.95) contrast(0.92);
+        }
         .leaflet-popup-content-wrapper {
-            background: rgba(10, 12, 19, 0.95) !important;
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid rgba(194, 122, 62, 0.2);
-            color: #f8fafc !important;
-            border-radius: 16px !important;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55) !important;
-            padding: 3px !important;
+            background: var(--bg-elev) !important;
+            border: 1px solid var(--line) !important;
+            color: var(--ink) !important;
+            border-radius: 4px !important;
+            box-shadow: 0 4px 12px rgba(28,24,20,0.15) !important;
+            padding: 4px !important;
         }
-        .leaflet-popup-tip {
-            background: rgba(10, 12, 19, 0.95) !important;
-            border-left: 1px solid rgba(194, 122, 62, 0.1);
-            border-bottom: 1px solid rgba(194, 122, 62, 0.1);
-        }
+        .leaflet-popup-tip { background: var(--bg-elev) !important; }
         .leaflet-control-zoom {
-            border: 1px solid rgba(194, 122, 62, 0.15) !important;
-            box-shadow: 0 5px 18px rgba(0,0,0,0.35) !important;
-            border-radius: 10px !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 3px !important;
             overflow: hidden;
+            box-shadow: 0 2px 6px rgba(28,24,20,0.1) !important;
         }
         .leaflet-control-zoom-in, .leaflet-control-zoom-out {
-            background-color: rgba(14, 18, 30, 0.85) !important;
-            color: #f8fafc !important;
-            border-bottom: 1px solid rgba(194, 122, 62, 0.1) !important;
-            backdrop-filter: var(--ios-blur);
+            background-color: var(--bg-elev) !important;
+            color: var(--ink) !important;
+            border-bottom: 1px solid var(--line) !important;
+        }
+        .leaflet-control-attribution {
+            background: rgba(245,237,217,0.85) !important;
+            color: var(--ink-mute) !important;
+            font-size: 9px !important;
         }
 
-        /* Apple-style Custom Checkbox in Copper Gold Accent */
-        .ios-checkbox {
+        /* Checkbox — quadrado, refinado */
+        .check-box {
             position: relative;
-            width: 22px;
-            height: 22px;
-            border: 2px solid rgba(194, 122, 62, 0.35);
-            border-radius: 50%;
+            width: 18px; height: 18px;
+            border: 1.5px solid var(--line-strong);
+            border-radius: 3px;
             display: inline-block;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            background: transparent;
+            transition: all 0.18s ease;
+            background: var(--bg);
             flex-shrink: 0;
         }
-
-        input[type="checkbox"]:checked + .ios-checkbox {
-            background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-gold) 100%);
-            border-color: var(--brand-color);
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(194, 122, 62, 0.45);
+        input[type="checkbox"]:checked + .check-box {
+            background: var(--copper);
+            border-color: var(--copper);
         }
-
-        input[type="checkbox"]:checked + .ios-checkbox::after {
+        input[type="checkbox"]:checked + .check-box::after {
             content: "\f00c";
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            color: #05070a;
-            font-size: 10px;
+            color: var(--bg);
+            font-size: 9px;
         }
 
-        /* Custom SVG map icon class */
-        .custom-div-icon {
-            background: transparent;
-            border: none;
-        }
+        .custom-div-icon { background: transparent; border: none; }
 
-        /* Horizontal Apple-style Temperature Range bar with Adamus Copper/Gold gradient */
+        /* Barra de temperatura */
         .temp-range-bar {
-            height: 4px;
-            background: rgba(255, 255, 255, 0.08);
+            height: 3px;
+            background: var(--line);
             border-radius: 2px;
             position: relative;
             overflow: hidden;
@@ -231,467 +270,391 @@
         .temp-range-fill {
             height: 100%;
             border-radius: 2px;
-            background: linear-gradient(90deg, #c27a3e 0%, #e5c158 100%);
+            background: var(--copper);
             position: absolute;
         }
+
+        /* Toggle */
+        .switch-track {
+            width: 44px; height: 24px;
+            background: var(--line);
+            border-radius: 12px;
+            position: relative;
+            transition: background 0.2s ease;
+        }
+        .switch-track::after {
+            content: ""; position: absolute;
+            top: 3px; left: 3px;
+            width: 18px; height: 18px;
+            background: var(--bg);
+            border: 1px solid var(--line-strong);
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        input:checked + .switch-track { background: var(--copper); }
+        input:checked + .switch-track::after { transform: translateX(20px); background: var(--bg); border-color: var(--copper); }
     </style>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col justify-between">
+<body class="min-h-screen flex flex-col justify-between">
 
-    <!-- TOP FIXED HEADER (Steve Jobs Minimalism: ultra-clean, elegant, styled with Adamus Gin Biker theme) -->
-    <header class="sticky top-0 z-50 glass-header px-4 py-3 flex justify-between items-center">
-        <div>
-            <h1 class="text-base font-black tracking-tight text-white flex items-center gap-1">
-                Picos <span class="text-amber-500 font-extrabold">2026</span>
-                <span class="text-[8px] bg-amber-500/10 text-amber-500 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-bold ml-1 uppercase">ADAMUS</span>
-            </h1>
-            <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase mt-0.5">
-                Roadbook 2026 Edition
-            </p>
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 app-header px-4 py-3 flex justify-between items-center">
+        <div class="flex items-baseline gap-3">
+            <div class="mono text-[9px] tracking-[0.18em] text-mute uppercase leading-none pt-1">N&deg;&nbsp;01<br>Iberia</div>
+            <div class="border-l border-[var(--line)] pl-3">
+                <h1 class="display text-[20px] leading-none text-ink">Picos&nbsp;de&nbsp;Europa</h1>
+                <p class="eyebrow mt-1.5">Roadbook · IV—IX&nbsp;Jun&nbsp;MMXXVI</p>
+            </div>
         </div>
-        
-        <div class="flex items-center gap-1.5">
-            <!-- Sponsor Link Icon Button -->
-            <a href="https://adamus.pt/" 
-               target="_blank" 
-               class="bg-amber-600/15 border border-amber-500/30 text-amber-500 p-2 rounded-full flex items-center justify-center transition-all active:scale-95"
-               title="Adamus Gin Sponsor">
-                <i class="fa-solid fa-glass-water text-xs"></i>
+        <div class="flex items-center gap-2">
+            <a href="https://drive.google.com/file/d/1TM9oYI-RJ_aeEIFG08IQIUKAM03E4NTl/view?usp=drive_link" target="_blank" class="icon-btn" title="GPX">
+                <i class="fa-solid fa-map-location-dot text-[11px]"></i>
             </a>
-            <!-- GPX Link Icon Button -->
-            <a href="https://drive.google.com/file/d/1TM9oYI-RJ_aeEIFG08IQIUKAM03E4NTl/view?usp=drive_link" 
-               target="_blank" 
-               class="bg-slate-900 border border-slate-800 text-slate-200 p-2 rounded-full flex items-center justify-center transition-all active:scale-95"
-               title="GPX Map">
-                <i class="fa-solid fa-map-location-dot text-amber-500 text-xs"></i>
+            <a href="https://discord.com/channels/1247291979310567544/1247291979751096400" target="_blank" class="icon-btn" title="Discord">
+                <i class="fa-brands fa-discord text-[11px]"></i>
             </a>
-            <!-- Discord Link Icon Button -->
-            <a href="https://discord.com/channels/1247291979310567544/1247291979751096400" 
-               target="_blank" 
-               class="bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 p-2 rounded-full flex items-center justify-center transition-all active:scale-95"
-               title="Discord Chat">
-                <i class="fa-brands fa-discord text-xs"></i>
+            <a href="https://secure.splitwise.com/#/groups/96304958" target="_blank" class="icon-btn" title="Splitwise">
+                <i class="fa-solid fa-wallet text-[11px]"></i>
             </a>
-            <!-- Splitwise Link Icon Button -->
-            <a href="https://secure.splitwise.com/#/groups/96304958" 
-               target="_blank" 
-               class="bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 p-2 rounded-full flex items-center justify-center transition-all active:scale-95"
-               title="Splitwise Expenses">
-                <i class="fa-solid fa-wallet text-xs"></i>
-            </a>
-            <!-- SOS Emergency Pill -->
-            <a href="tel:112" 
-               class="bg-red-600/10 border border-red-500/30 text-red-400 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all active:scale-95">
-                <i class="fa-solid fa-phone-flip text-[9px]"></i> SOS
+            <a href="tel:112" class="sos-pill px-2.5 py-1 rounded text-[10px] font-semibold tracking-[0.14em] uppercase flex items-center gap-1.5 transition active:scale-95">
+                <i class="fa-solid fa-phone-flip text-[8px]"></i> SOS&nbsp;112
             </a>
         </div>
     </header>
 
-    <!-- MAIN CONTENT AREA -->
-    <main id="content-area" class="flex-grow p-4 space-y-6 pb-20">
+    <!-- MAIN -->
+    <main id="content-area" class="flex-grow p-4 space-y-5 pb-24 max-w-2xl mx-auto w-full">
         
-        <!-- SECÇÃO: ROTEIRO -->
-        <div id="section-rota" class="space-y-5 animate-ios-pop">
+        <!-- ROTEIRO -->
+        <div id="section-rota" class="space-y-5 fade-in">
+
+            <!-- Cabeçalho editorial da expedição -->
+            <section class="text-center pt-2 pb-1">
+                <div class="eyebrow">Expedição</div>
+                <h2 class="display text-[34px] text-ink mt-1.5 leading-[0.95]">Picos&nbsp;<span class="italic">de</span>&nbsp;Europa</h2>
+                <p class="mono text-[10.5px] text-mute mt-3 tracking-wider">COIMBRA · BRAGANÇA · RIAÑO · COVADONGA · LAS&nbsp;MÉDULAS · COIMBRA</p>
+                <div class="ornament mt-4">
+                    <span class="ornament-glyph">&diams; · &diams;</span>
+                </div>
+            </section>
             
-            <!-- Global Premium Stat Strip (Merged internally for clean Apple Dashboard feel) -->
-            <div class="grid grid-cols-3 gap-2 bg-slate-950/40 p-3 rounded-2xl border border-slate-900/60 text-center">
-                <div>
-                    <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold mb-0.5">Duração</span>
-                    <strong class="text-xs text-white">6 dias / 5 noites</strong>
+            <!-- Sumário -->
+            <section class="grid grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="display text-[26px] text-ink leading-none">VI</div>
+                    <div class="eyebrow mt-2">Dias</div>
                 </div>
-                <div class="border-x border-slate-900/60">
-                    <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold mb-0.5">Total Mota</span>
-                    <strong class="text-xs text-white">~1.600 km</strong>
+                <div class="text-center border-x border-[var(--line)]">
+                    <div class="display text-[26px] text-ink leading-none">1600</div>
+                    <div class="eyebrow mt-2">Quilómetros</div>
                 </div>
-                <div>
-                    <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-semibold mb-0.5">Hotéis</span>
-                    <strong class="text-xs text-emerald-400">1.283€</strong>
+                <div class="text-center">
+                    <div class="display text-[26px] text-copper leading-none">1283<span class="text-[16px] align-top">€</span></div>
+                    <div class="eyebrow mt-2">Dormida</div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Google Earth 3D Interactive Card (Premium Visual Add-on) -->
-            <div class="glass-card p-4 relative overflow-hidden bg-gradient-to-r from-blue-950/20 via-amber-600/5 to-slate-900/40 border border-blue-500/20 flex flex-col gap-3">
+            <div class="ornament"><span class="ornament-glyph">— · —</span></div>
+
+            <!-- Voo 3D -->
+            <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" class="card p-4 flex items-center justify-between gap-4 transition active:bg-[var(--bg-elev-2)]">
                 <div class="flex items-center gap-3">
-                    <div class="bg-blue-500/10 border border-blue-500/25 text-blue-400 p-2.5 rounded-xl flex items-center justify-center">
-                        <i class="fa-solid fa-earth-americas text-base"></i>
-                    </div>
+                    <i class="fa-solid fa-earth-europe text-copper text-base"></i>
                     <div>
-                        <span class="text-[9px] uppercase tracking-widest text-amber-500 font-extrabold block">Visualização Premium 3D</span>
-                        <h3 class="text-xs font-bold text-white mt-0.5">Projecto Oficial Google Earth 3D</h3>
-                        <p class="text-[10px] text-slate-400 leading-relaxed mt-0.5">Explore todo o relevo das montanhas, vales e curvas vertiginosas dos Picos de Europa em 3D interativo!</p>
+                        <div class="text-[13px] text-ink font-medium">Pré-visualização 3D</div>
+                        <div class="text-[11px] text-mute mt-0.5">Voo virtual sobre o percurso · Google Earth</div>
                     </div>
                 </div>
-                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" 
-                   target="_blank" 
-                   class="w-full bg-gradient-to-r from-blue-600/30 to-blue-500/40 hover:from-blue-600/40 hover:to-blue-500/50 border border-blue-500/35 text-blue-200 py-2.5 rounded-xl text-[10px] font-extrabold tracking-wider uppercase text-center flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] shadow-lg shadow-blue-500/5">
-                    <i class="fa-solid fa-plane-up text-[10px] rotate-45 text-blue-400 animate-pulse"></i> Iniciar Voo Virtual 3D
-                </a>
+                <i class="fa-solid fa-arrow-up-right-from-square text-mute text-[11px]"></i>
+            </a>
+
+            <!-- Selector de Dia -->
+            <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar -mx-4 px-4 sticky top-[64px] z-40 py-2" style="background:linear-gradient(to bottom,var(--bg) 70%,transparent);">
+                <button onclick="showDay(1)" id="btn-d1" class="day-btn day-pill day-pill-active px-3.5 py-2 rounded flex flex-col items-center min-w-[58px]"><span class="display text-[15px] leading-none">I</span><span class="pill-date mono text-[9px] mt-1.5 text-mute">04·06</span></button>
+                <button onclick="showDay(2)" id="btn-d2" class="day-btn day-pill px-3.5 py-2 rounded flex flex-col items-center min-w-[58px]"><span class="display text-[15px] leading-none">II</span><span class="pill-date mono text-[9px] mt-1.5 text-mute">05·06</span></button>
+                <button onclick="showDay(3)" id="btn-d3" class="day-btn day-pill px-3.5 py-2 rounded flex flex-col items-center min-w-[58px]"><span class="display text-[15px] leading-none">III</span><span class="pill-date mono text-[9px] mt-1.5 text-mute">06·06</span></button>
+                <button onclick="showDay(4)" id="btn-d4" class="day-btn day-pill px-3.5 py-2 rounded flex flex-col items-center min-w-[58px]"><span class="display text-[15px] leading-none">IV</span><span class="pill-date mono text-[9px] mt-1.5 text-mute">07·06</span></button>
+                <button onclick="showDay(5)" id="btn-d5" class="day-btn day-pill px-3.5 py-2 rounded flex flex-col items-center min-w-[58px]"><span class="display text-[15px] leading-none">V</span><span class="pill-date mono text-[9px] mt-1.5 text-mute">08·06</span></button>
+                <button onclick="showDay(6)" id="btn-d6" class="day-btn day-pill px-3.5 py-2 rounded flex flex-col items-center min-w-[58px]"><span class="display text-[15px] leading-none">VI</span><span class="pill-date mono text-[9px] mt-1.5 text-mute">09·06</span></button>
             </div>
 
-            <!-- Apple Capsule Day Selector Slider -->
-            <div class="flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar -mx-4 px-4 sticky top-[60px] z-40 bg-gradient-to-b from-[#05070a] via-[#05070a]/95 to-transparent">
-                <button onclick="showDay(1)" id="btn-d1" class="day-btn day-capsule day-capsule-active px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D1</span><span class="text-[8px] opacity-75 font-bold uppercase mt-0.5">04 JUN</span></button>
-                <button onclick="showDay(2)" id="btn-d2" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D2</span><span class="text-[8px] opacity-50 mt-0.5">05 JUN</span></button>
-                <button onclick="showDay(3)" id="btn-d3" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D3</span><span class="text-[8px] opacity-50 mt-0.5">06 JUN</span></button>
-                <button onclick="showDay(4)" id="btn-d4" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D4</span><span class="text-[8px] opacity-50 mt-0.5">07 JUN</span></button>
-                <button onclick="showDay(5)" id="btn-d5" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D5</span><span class="text-[8px] opacity-50 mt-0.5">08 JUN</span></button>
-                <button onclick="showDay(6)" id="btn-d6" class="day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all"><span>D6</span><span class="text-[8px] opacity-50 mt-0.5">09 JUN</span></button>
-            </div>
-
-            <!-- Detalhe do Dia Injetado pelo JS -->
             <div id="day-content" class="space-y-5"></div>
         </div>
 
         <!-- SECÇÃO: LOGÍSTICA -->
-        <div id="section-logistica" class="hidden space-y-5 animate-ios-pop">
-            <!-- iOS Styled Segmented Control Button -->
-            <div class="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-900/60">
-                <button onclick="switchLogisticsSubTab('log-geral')" id="btn-log-geral" class="py-2 text-xs font-bold rounded-lg bg-amber-500 text-black shadow transition-all">Prática & Apoio</button>
-                <button onclick="switchLogisticsSubTab('log-planb')" id="btn-log-planb" class="py-2 text-xs font-bold rounded-lg text-slate-400 transition-all">Planos B & SOS</button>
+        <div id="section-logistica" class="hidden space-y-5 fade-in">
+            <!-- Segmented control -->
+            <div class="grid grid-cols-2 gap-px bg-[var(--line)] p-px rounded-md overflow-hidden">
+                <button onclick="switchLogisticsSubTab('log-geral')" id="btn-log-geral" class="py-2.5 text-[12px] font-medium tracking-wide bg-[var(--bg-elev-2)] text-ink transition">Prática &amp; Apoio</button>
+                <button onclick="switchLogisticsSubTab('log-planb')" id="btn-log-planb" class="py-2.5 text-[12px] font-medium tracking-wide bg-[var(--bg-elev)] text-mute transition">Planos B &amp; SOS</button>
             </div>
 
-            <!-- SUB-SECÇÃO: PRÁTICA E APOIO -->
-            <div id="sub-log-geral" class="space-y-5">
-                <!-- Sponsor Banner (Adamus Organic Dry Gin) -->
-                <div class="glass-card p-5 border-l-4 border-amber-500 text-slate-300 relative overflow-hidden flex flex-col gap-3">
-                    <div>
-                        <span class="text-[9px] uppercase tracking-widest text-amber-500 font-bold block mb-0.5">Patrocinador Oficial</span>
-                        <h3 class="text-base font-extrabold text-white leading-tight">Adamus Organic Dry Gin</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed mt-1">
-                            Um gin orgânico super premium português com aromas botânicos singulares, engarrafado com a mítica e marcante tampa de cortiça natural portuguesa.
-                        </p>
-                    </div>
-                    <a href="https://adamus.pt/" 
-                       target="_blank" 
-                       class="bg-gradient-to-r from-amber-600 to-amber-700 text-black py-2.5 rounded-xl text-[10px] font-extrabold tracking-wider uppercase text-center flex items-center justify-center gap-1.5 transition-all active:scale-[0.97]">
-                        <i class="fa-solid fa-glass-water text-[10px]"></i> Visitar Adamus Gin
-                    </a>
-                </div>
-
-                <!-- Documentação Necessária -->
-                <div class="glass-card p-5">
-                    <h3 class="text-sm font-bold text-amber-500 mb-3.5 flex items-center gap-2">
-                        <i class="fa-solid fa-passport"></i> Documentos & Regras
-                    </h3>
-                    <ul class="text-xs space-y-3 text-slate-300">
+            <!-- SUB: Prática & Apoio -->
+            <div id="sub-log-geral" class="space-y-4">
+                <!-- Documentos -->
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Documentos &amp; regras</div>
+                    <ul class="text-[13px] space-y-2.5 text-dim">
                         <li class="flex items-start gap-2.5">
-                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
-                            <div><strong>Carta Condução e DUA:</strong> Originais físicos em bom estado.</div>
+                            <i class="fa-solid fa-check text-copper text-[11px] mt-1 w-3"></i>
+                            <div><span class="text-ink">Carta de condução e DUA</span> — originais físicos.</div>
                         </li>
                         <li class="flex items-start gap-2.5">
-                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
-                            <div><strong>Carta Verde de Seguro:</strong> Confirmar validade ativa em Espanha (símbolo 'E').</div>
+                            <i class="fa-solid fa-check text-copper text-[11px] mt-1 w-3"></i>
+                            <div><span class="text-ink">Carta verde do seguro</span> — confirmar símbolo &laquo;E&raquo; ativo.</div>
                         </li>
                         <li class="flex items-start gap-2.5">
-                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
-                            <div><strong>Cartão Europeu de Saúde (CESD):</strong> Obrigatório para assistência gratuita em hospitais públicos.</div>
+                            <i class="fa-solid fa-check text-copper text-[11px] mt-1 w-3"></i>
+                            <div><span class="text-ink">Cartão Europeu de Saúde (CESD)</span> — hospitais públicos espanhóis.</div>
                         </li>
                         <li class="flex items-start gap-2.5">
-                            <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 text-sm"></i>
-                            <div><strong>Equipamento Obrigatório (ES):</strong> Colete refletor (na mala de depósito) e luvas homologadas obrigatórias.</div>
+                            <i class="fa-solid fa-circle-exclamation text-copper text-[11px] mt-1 w-3"></i>
+                            <div><span class="text-ink">Equipamento obrigatório (ES)</span> — colete refletor e luvas homologadas.</div>
                         </li>
                     </ul>
-                </div>
+                </section>
 
-                <!-- Despesas & Orçamento (Splitwise) Card -->
-                <div class="glass-card p-5 border-l-4 border-emerald-500">
-                    <h3 class="text-sm font-bold text-emerald-400 mb-3.5 flex items-center gap-2">
-                        <i class="fa-solid fa-scale-balanced"></i> Despesas & Orçamento (Splitwise)
-                    </h3>
-                    <p class="text-xs text-slate-300 leading-relaxed mb-3.5">
-                        Divida de forma instantânea e transparente todos os custos acumulados da viagem (gasolina, portagens, almoços e hotéis) entre os membros do grupo.
-                    </p>
-                    <a href="https://secure.splitwise.com/#/groups/96304958" 
-                       target="_blank" 
-                       class="w-full bg-[#1cc29f] hover:bg-[#159a7e] text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-[0.97] shadow-lg shadow-emerald-600/10">
-                        <i class="fa-solid fa-coins text-base"></i>
-                        <span>Abrir Grupo Splitwise</span>
-                    </a>
-                </div>
+                <!-- Splitwise -->
+                <section class="card p-4">
+                    <div class="flex items-start justify-between gap-4 mb-3">
+                        <div>
+                            <div class="eyebrow">Despesas</div>
+                            <h3 class="display text-[16px] text-ink mt-1">Splitwise do grupo</h3>
+                        </div>
+                        <i class="fa-solid fa-scale-balanced text-copper text-base mt-1"></i>
+                    </div>
+                    <p class="text-[12.5px] text-dim leading-relaxed mb-3">Combustível, portagens, almoços e hotéis distribuídos entre os membros do grupo.</p>
+                    <a href="https://secure.splitwise.com/#/groups/96304958" target="_blank" class="block text-center py-2.5 rounded-md border border-copper text-copper text-[12px] tracking-wide font-medium transition active:bg-[var(--bg-elev-2)]">Abrir grupo Splitwise</a>
+                </section>
 
-                <!-- Combustível & Canister -->
-                <div class="glass-card p-5 border-l-4 border-amber-500">
-                    <h3 class="text-sm font-bold text-amber-500 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-gas-pump"></i> Combustível em Zonas Críticas
-                    </h3>
-                    <p class="text-xs text-slate-300 mb-3.5 leading-relaxed">
-                        A montanha tem poucos postos de abastecimento ativos. O seu bidão <strong>Hünersdorff de 2L</strong> homologado é a sua reserva estratégica vital.
-                    </p>
-                    <div class="text-[11px] space-y-2.5 text-slate-400 bg-slate-950/40 p-3.5 rounded-xl border border-slate-900">
-                        <div class="flex items-start gap-2">
-                            <i class="fa-solid fa-location-dot text-amber-500 mt-0.5"></i>
-                            <div><strong>Riaño:</strong> Bomba Repsol na entrada da vila (essencial abastecer à noite).</div>
+                <!-- Combustível -->
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Combustível em zonas críticas</div>
+                    <p class="text-[12.5px] text-dim leading-relaxed mb-3">A montanha tem poucos postos ativos. O bidão Hünersdorff de 2 L é reserva estratégica.</p>
+                    <div class="card-inset p-3 space-y-2.5 text-[12px] text-dim">
+                        <div class="flex gap-3"><span class="mono text-copper w-20 shrink-0">Riaño</span><span>Repsol à entrada da vila — abastecer à noite.</span></div>
+                        <div class="flex gap-3"><span class="mono text-copper w-20 shrink-0">Potes</span><span>Repsol à saída — antes da subida ao San Glorio.</span></div>
+                        <div class="flex gap-3"><span class="mono text-copper w-20 shrink-0">Cangas</span><span>Repsol e Cepsa ativas no vale.</span></div>
+                        <div class="rule-thin pt-2.5 mt-2.5 text-[11.5px] text-mute"><span class="text-copper">Sem postos:</span> San Glorio, Beyos/Hermida, subida aos Lagos.</div>
+                    </div>
+                </section>
+
+                <!-- Estacionamento -->
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Estacionamento de mota</div>
+                    <div class="text-[12.5px] space-y-3 text-dim">
+                        <div>
+                            <div class="text-ink font-medium">Santuário de Covadonga</div>
+                            <div class="text-mute mt-0.5">Parque gratuito para motas, acima da Basílica.</div>
                         </div>
-                        <div class="flex items-start gap-2">
-                            <i class="fa-solid fa-location-dot text-amber-500 mt-0.5"></i>
-                            <div><strong>Potes:</strong> Estação Repsol à saída (chave para abastecer antes de subir o San Glorio).</div>
+                        <div class="rule-thin pt-3">
+                            <div class="text-ink font-medium">Lagos de Covadonga</div>
+                            <div class="text-mute mt-0.5">Regras 2026: trânsito particular interdito 24 h/dia entre 1 de Junho e 18 de Outubro. Subida obrigatória em autocarro ALSA ou táxi Taxitur.</div>
                         </div>
-                        <div class="flex items-start gap-2">
-                            <i class="fa-solid fa-location-dot text-amber-500 mt-0.5"></i>
-                            <div><strong>Cangas / Arenas:</strong> Bombas Repsol e Cepsa ativas no vale.</div>
+                        <div class="rule-thin pt-3">
+                            <div class="text-ink font-medium">Cangas de Onís &amp; Potes</div>
+                            <div class="text-mute mt-0.5">Cangas — parque junto ao Posto de Turismo. Potes — Plaza Jesús de Monasterio.</div>
                         </div>
-                        <div class="text-amber-500/90 font-bold border-t border-slate-800/80 pt-2 flex items-start gap-1.5">
-                            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
-                            <span>Sem Bombas: Troço San Glorio, Desfiladeiros Beyos/Hermida e subida aos Lagos de Covadonga.</span>
+                        <div class="rule-thin pt-3">
+                            <div class="text-ink font-medium">Las Médulas</div>
+                            <div class="text-mute mt-0.5">Parque público à entrada. Mirador de Orellán: berma larga pavimentada.</div>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <!-- Estacionamento nos Sítios Turísticos -->
-                <div class="glass-card p-5">
-                    <h3 class="text-sm font-bold text-amber-500 mb-3.5 flex items-center gap-2">
-                        <i class="fa-solid fa-square-parking"></i> Estacionamento de Mota
-                    </h3>
-                    <div class="text-xs space-y-3.5 text-slate-300">
-                        <div>
-                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-circle text-amber-500 text-[8px] mr-1.5"></i>Santuário de Covadonga</strong>
-                            Estacionamento gratuito para motos logo acima da Basílica (muito perto da entrada do túnel da Santa Cueva).
+                <!-- Termas & piscinas -->
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Termas &amp; piscinas naturais</div>
+                    <p class="text-[12.5px] text-dim leading-relaxed mb-3">Banhos termais e fluviais ao longo do percurso. Calções e toalha leve na bagagem.</p>
+                    <div class="space-y-3 text-[12.5px]">
+                        <div class="card-inset p-3">
+                            <div class="flex items-baseline justify-between gap-3">
+                                <div class="text-ink font-medium">Pozas de La Hermida</div>
+                                <span class="mono text-[10px] text-mute">D3</span>
+                            </div>
+                            <p class="text-mute text-[12px] mt-1">Piscinas termais gratuitas no leito do Rio Deva, sob a ponte da N-621. Água a 60&nbsp;°C.</p>
+                            <a href="https://www.google.com/maps/search/?api=1&amp;query=Pozas+Termales+de+La+Hermida" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] text-copper mt-2"><i class="fa-solid fa-location-dot text-[10px]"></i>Direções</a>
                         </div>
-                        <div>
-                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-circle text-amber-500 text-[8px] mr-1.5"></i>Lagos de Covadonga</strong>
-                            ⚠️ REGRAS 2026: Proibido o trânsito de motas/carros particulares 24h por dia na época alta (1 de Junho a 18 de Outubro). Devem estacionar no parque do Santuário de Covadonga (gratuito para motas) ou em Cangas de Onís, e subir no autocarro oficial ALSA ou táxi autorizado (Taxitur).
+                        <div class="card-inset p-3">
+                            <div class="flex items-baseline justify-between gap-3">
+                                <div class="text-ink font-medium">Piscina Fluvial de Molinaseca</div>
+                                <span class="mono text-[10px] text-mute">D5</span>
+                            </div>
+                            <p class="text-mute text-[12px] mt-1">Piscina natural no Rio Meruelo, junto à ponte medieval. Esplanadas e tapas em redor.</p>
+                            <a href="https://www.google.com/maps/search/?api=1&amp;query=Piscina+Fluvial+de+Molinaseca" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] text-copper mt-2"><i class="fa-solid fa-location-dot text-[10px]"></i>Direções</a>
                         </div>
-                        <div>
-                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-circle text-amber-500 text-[8px] mr-1.5"></i>Cangas de Onís & Potes</strong>
-                            <strong>Cangas:</strong> Parque especial ao lado do Posto de Turismo. <strong>Potes:</strong> Zona reservada na Plaza Jesús de Monasterio (centro).
-                        </div>
-                        <div>
-                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-circle text-amber-500 text-[8px] mr-1.5"></i>Las Médulas</strong>
-                            Parque público na entrada. No <strong>Mirador de Orellán</strong>, há uma berma pavimentada larga ao pé da entrada pedonal.
+                        <div class="card-inset p-3">
+                            <div class="flex items-baseline justify-between gap-3">
+                                <div class="text-ink font-medium">Termas de Chaves</div>
+                                <span class="mono text-[10px] text-mute">D6</span>
+                            </div>
+                            <p class="text-mute text-[12px] mt-1">Km 0 da N2. Fonte do Povo a 73&nbsp;°C e parque à beira-rio Tâmega.</p>
+                            <a href="https://www.google.com/maps/search/?api=1&amp;query=Termas+de+Chaves" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] text-copper mt-2"><i class="fa-solid fa-location-dot text-[10px]"></i>Direções</a>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <!-- Dicas de Relaxamento: Termas & Piscinas Naturais -->
-                <div class="glass-card p-5 border-l-4 border-amber-500">
-                    <h3 class="text-sm font-bold text-amber-500 mb-3.5 flex items-center gap-2">
-                        <i class="fa-solid fa-water-ladder"></i> Termas & Piscinas Naturais na Rota
-                    </h3>
-                    <p class="text-xs text-slate-300 leading-relaxed mb-4">
-                        O percurso conta com locais fabulosos de banhos e águas termais curativas ao ar livre para relaxar os músculos da condução. <strong>Leve calções de banho e toalha leve!</strong>
-                    </p>
-                    <div class="text-xs space-y-4 text-slate-300 bg-slate-950/40 p-3.5 rounded-xl border border-slate-900">
+                <!-- Hospitais -->
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Hospitais de referência</div>
+                    <div class="text-[12.5px] space-y-3">
+                        <div class="card-inset p-3">
+                            <div class="mono text-[10px] text-mute mb-1">PICOS DE EUROPA</div>
+                            <div class="text-ink">Hospital Francisco Grande Covián</div>
+                            <div class="text-mute text-[11.5px] mt-0.5">Arriondas — a 18 km de Cangas de Onís</div>
+                            <a href="https://maps.google.com/?q=Hospital+Francisco+Grande+Covián+Arriondas" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] text-copper mt-2"><i class="fa-solid fa-location-dot text-[10px]"></i>Direções</a>
+                        </div>
+                        <div class="card-inset p-3">
+                            <div class="mono text-[10px] text-mute mb-1">LAS MÉDULAS / PONFERRADA</div>
+                            <div class="text-ink">Hospital de El Bierzo</div>
+                            <div class="text-mute text-[11.5px] mt-0.5">Paraje de Fuentesnuevas, Ponferrada</div>
+                            <a href="https://maps.google.com/?q=Hospital+de+El+Bierzo+Ponferrada" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] text-copper mt-2"><i class="fa-solid fa-location-dot text-[10px]"></i>Direções</a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Patrocinador (sóbrio, no final) -->
+                <section class="card p-4">
+                    <div class="flex items-start justify-between gap-3">
                         <div>
-                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-hot-tub-person text-amber-500 mr-1.5 text-xs"></i>Pozas de La Hermida (Dia 3)</strong>
-                            <p class="text-slate-400 mb-1.5 leading-relaxed">
-                                Pequenas piscinas termais de **acesso 100% gratuito** formadas por pedras no próprio leito do Rio Deva, debaixo da ponte da N-621. A água termal brota a **60°C** e mistura-se com o rio fresco!
-                            </p>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Pozas+Termales+de+La+Hermida" target="_blank" class="inline-flex items-center gap-1 text-[9px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full active:scale-95 transition-all">
-                                <i class="fa-solid fa-location-dot"></i> Como Chegar no Google Maps
-                            </a>
+                            <div class="eyebrow">Patrocinador</div>
+                            <h3 class="display text-[15px] text-ink mt-1">Adamus Organic Dry Gin</h3>
+                            <p class="text-[12px] text-mute leading-relaxed mt-1.5">Gin orgânico português com tampa de cortiça natural.</p>
                         </div>
-                        <div class="border-t border-slate-800/80 pt-3">
-                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-water text-amber-500 mr-1.5 text-xs"></i>Piscina Fluvial de Molinaseca (Dia 5)</strong>
-                            <p class="text-slate-400 mb-1.5 leading-relaxed">
-                                Uma belíssima piscina natural de montanha de águas cristalinas no Rio Meruelo, mesmo ao lado da histórica Ponte de Pedra medieval dos Peregrinos. Rodeada de bares de tapas e esplanadas no relvado.
-                            </p>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Piscina+Fluvial+de+Molinaseca" target="_blank" class="inline-flex items-center gap-1 text-[9px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full active:scale-95 transition-all">
-                                <i class="fa-solid fa-location-dot"></i> Como Chegar no Google Maps
-                            </a>
-                        </div>
-                        <div class="border-t border-slate-800/80 pt-3">
-                            <strong class="text-white block mb-0.5"><i class="fa-solid fa-spa text-amber-500 mr-1.5 text-xs"></i>Termas e Parque de Chaves (Dia 6)</strong>
-                            <p class="text-slate-400 mb-1.5 leading-relaxed">
-                                A capital termal histórica do norte de Portugal (Km 0 da N2). Visite a Fonte do Povo para ver as famosas águas curativas minero-medicinais a brotar a **73°C**, ou relaxe no belo parque à beira-rio Tâmega.
-                            </p>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Termas+de+Chaves" target="_blank" class="inline-flex items-center gap-1 text-[9px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full active:scale-95 transition-all">
-                                <i class="fa-solid fa-location-dot"></i> Como Chegar no Google Maps
-                            </a>
-                        </div>
+                        <a href="https://adamus.pt/" target="_blank" class="text-[11px] text-copper border border-copper px-2.5 py-1 rounded-md tracking-wide whitespace-nowrap mt-1">Site &rarr;</a>
                     </div>
-                </div>
-
-                <!-- Hospitais e Assistência Médica -->
-                <div class="glass-card p-5 border-l-4 border-red-500">
-                    <h3 class="text-sm font-bold text-red-400 mb-3.5 flex items-center gap-2">
-                        <i class="fa-solid fa-house-medical"></i> Hospitais de Referência
-                    </h3>
-                    <div class="text-xs space-y-3 text-slate-300">
-                        <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-900/60">
-                            <span class="text-xs font-bold text-white block mb-1">Zona Picos de Europa:</span>
-                            <strong class="text-slate-200">Hospital Francisco Grande Covián</strong> (Arriondas)<br>
-                            <span class="text-slate-400 text-[10px]">A 18 km de Cangas de Onís / Covadonga</span><br>
-                            <a href="https://maps.google.com/?q=Hospital+Francisco+Grande+Covián+Arriondas" target="_blank" class="text-amber-500 hover:underline inline-flex items-center gap-1 mt-1.5 font-bold"><i class="fa-solid fa-map-pin"></i> Abrir Direções Maps</a>
-                        </div>
-                        <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-900/60">
-                            <span class="text-xs font-bold text-white block mb-1">Zona Las Médulas / Ponferrada:</span>
-                            <strong class="text-slate-200">Hospital de El Bierzo</strong> (Ponferrada)<br>
-                            <span class="text-slate-400 text-[10px]">Paraje de Fuentesnuevas, Ponferrada</span><br>
-                            <a href="https://maps.google.com/?q=Hospital+de+El+Bierzo+Ponferrada" target="_blank" class="text-amber-500 hover:underline inline-flex items-center gap-1 mt-1.5 font-bold"><i class="fa-solid fa-map-pin"></i> Abrir Direções Maps</a>
-                        </div>
-                    </div>
-                </div>
+                </section>
             </div>
 
-            <!-- SUB-SECÇÃO: PLANOS B & SOS -->
-            <div id="sub-log-planb" class="hidden space-y-5">
-                <!-- SOS Quick Contacts Card -->
-                <div class="glass-card p-5 border-2 border-red-500/20 bg-red-500/5">
-                    <h3 class="text-sm font-bold text-red-400 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Emergência & Comunicação
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="grid grid-cols-2 gap-3 text-center">
-                            <a href="tel:112" class="bg-red-600 hover:bg-red-700 text-white p-3 rounded-xl font-bold text-xs flex flex-col items-center gap-1.5 transition-all active:scale-[0.97]">
-                                <i class="fa-solid fa-phone-volume text-lg"></i>
-                                <span>112 Geral (SOS)</span>
-                            </a>
-                            <a href="tel:+34062" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-100 p-3 rounded-xl font-bold text-xs flex flex-col items-center gap-1.5 transition-all active:scale-[0.97]">
-                                <i class="fa-solid fa-shield-halved text-lg text-amber-500"></i>
-                                <span>062 Guardia Civil</span>
-                            </a>
-                        </div>
-                        <a href="https://discord.com/channels/1247291979310567544/1247291979751096400" 
-                           target="_blank" 
-                           class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white p-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-[0.97] shadow-lg shadow-indigo-600/20">
-                            <i class="fa-brands fa-discord text-base"></i>
-                            <span>Abrir Chat do Discord (Viagem)</span>
+            <!-- SUB: Planos B & SOS -->
+            <div id="sub-log-planb" class="hidden space-y-4">
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Emergência</div>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <a href="tel:112" class="card-inset p-3 flex items-center gap-2.5 transition active:bg-[var(--bg-elev-2)]">
+                            <i class="fa-solid fa-phone-volume text-[color:var(--danger)]"></i>
+                            <div class="leading-tight">
+                                <div class="mono text-[15px] text-ink">112</div>
+                                <div class="text-[10.5px] text-mute">SOS Europa</div>
+                            </div>
+                        </a>
+                        <a href="tel:+34062" class="card-inset p-3 flex items-center gap-2.5 transition active:bg-[var(--bg-elev-2)]">
+                            <i class="fa-solid fa-shield-halved text-copper"></i>
+                            <div class="leading-tight">
+                                <div class="mono text-[15px] text-ink">062</div>
+                                <div class="text-[10.5px] text-mute">Guardia Civil</div>
+                            </div>
                         </a>
                     </div>
-                </div>
+                    <a href="https://discord.com/channels/1247291979310567544/1247291979751096400" target="_blank" class="card-inset p-3 flex items-center justify-between transition active:bg-[var(--bg-elev-2)]">
+                        <span class="flex items-center gap-2.5"><i class="fa-brands fa-discord text-[#5865F2]"></i><span class="text-[13px] text-ink">Discord da viagem</span></span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-mute text-[10px]"></i>
+                    </a>
+                </section>
 
-                <!-- Alternativa em Caso de Chuva Forte nos Portos -->
-                <div class="glass-card p-5">
-                    <h3 class="text-sm font-bold text-white mb-2.5 flex items-center gap-2">
-                        <i class="fa-solid fa-cloud-showers-heavy text-amber-500"></i> Chuva Forte nos Portos
-                    </h3>
-                    <p class="text-xs text-slate-300 leading-relaxed mb-3.5">
-                        Subir portos a 1600m ou cruzar desfiladeiros estreitos sob chuva torrencial e nevoeiro é desaconselhado devido a queda de pedras, piso escorregadio e visibilidade zero.
-                    </p>
-                    <div class="text-[11px] space-y-3 bg-slate-950/40 p-3.5 rounded-xl border border-slate-900/60 text-slate-300 leading-relaxed">
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Chuva forte nos portos</div>
+                    <p class="text-[12.5px] text-dim leading-relaxed mb-3">Travessias de portos acima dos 1 600 m sob chuva e nevoeiro são desaconselhadas: pedras soltas, piso escorregadio, visibilidade reduzida.</p>
+                    <div class="card-inset p-3 space-y-3 text-[12.5px] text-dim">
                         <div>
-                            <strong class="text-amber-500 block mb-0.5">Alternativa ao D3 (San Glorio):</strong>
-                            Evite o Puerto de San Glorio e o desfiladeiro da Hermida. Siga de Riaño pela estrada **N-625** diretamente através do **Puerto del Pontón** para descer o **Desfiladero de los Beyos** para Cangas de Onís. Embora ainda seja de montanha, é uma rota mais curta e direta. Se o tempo for extremo em todos os picos, contorne pelo oeste via N-630 / AS-1.
+                            <div class="text-copper text-[11px] tracking-wide uppercase">D3 · San Glorio</div>
+                            <p class="mt-1">Substituir por N-625 via Puerto del Pontón e Desfiladero de los Beyos para Cangas de Onís. Se tudo estiver fechado, contorno oeste via N-630 / AS-1.</p>
                         </div>
-                        <div class="pt-2.5 border-t border-slate-850">
-                            <strong class="text-amber-500 block mb-0.5">Alternativa aos Lagos de Covadonga (D4):</strong>
-                            Se houver nevoeiro cerrado, desista da subida. Substitua a rota por uma visita à **Basílica e Santa Cueva** (abrigadas), explore **Cangas de Onís** e almoce nas caves tradicionais ou visite o funicular subterrâneo de **Bulnes** para almoçar numa aldeia isolada de montanha.
+                        <div class="rule-thin pt-3">
+                            <div class="text-copper text-[11px] tracking-wide uppercase">D4 · Lagos de Covadonga</div>
+                            <p class="mt-1">Cancelar subida. Alternativa: Basílica e Santa Cueva (abrigadas), Cangas de Onís, ou funicular de Bulnes para almoçar na montanha.</p>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <!-- Encurtamentos do Longo Dia 6 de Regresso -->
-                <div class="glass-card p-5">
-                    <h3 class="text-sm font-bold text-white mb-2.5 flex items-center gap-2">
-                        <i class="fa-solid fa-forward text-amber-500"></i> Atalhos de Regresso (D6)
-                    </h3>
-                    <p class="text-xs text-slate-300 leading-relaxed mb-3">
-                        A rota planeada (Las Médulas → Chaves → N2 a Santa Comba Dão → Coimbra) tem **mais de 440 km** maioritariamente em nacionais sinuosas (8h+ condução).
-                    </p>
-                    <div class="space-y-3 text-[11px]">
-                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900/60">
-                            <span class="text-xs font-semibold text-emerald-400 block mb-1">Opção Rápida: A24 (Poupa 2h+)</span>
-                            <p class="text-slate-300">
-                                Após a paragem em Chaves (KM 0), entre na autoestrada **A24 em Vila Real ou Peso da Régua** em direção a Viseu. É uma via rápida fantástica, com paisagens sobre o Douro, livre de trânsito local e curvas cansativas.
-                            </p>
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Atalhos de regresso · D6</div>
+                    <p class="text-[12.5px] text-dim leading-relaxed mb-3">O percurso completo Las Médulas &rarr; Chaves &rarr; N2 &rarr; Coimbra excede 440 km e 8 h em nacionais sinuosas.</p>
+                    <div class="space-y-2.5 text-[12.5px]">
+                        <div class="card-inset p-3">
+                            <div class="text-ink">A24 desde Vila Real ou Régua</div>
+                            <p class="text-mute mt-1 text-[12px]">Via rápida sobre o Douro, sem trânsito local. Poupa ~2 h.</p>
                         </div>
-                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900/60">
-                            <span class="text-xs font-semibold text-emerald-400 block mb-1">Opção Final: IP3 a Coimbra</span>
-                            <p class="text-slate-300">
-                                A partir de Viseu, descarte a continuação da N2. Tome o **IP3 diretamente para Coimbra**. É uma via rápida de duas faixas, sem portagens nesta zona, que o coloca no destino final em menos de 50 minutos.
-                            </p>
+                        <div class="card-inset p-3">
+                            <div class="text-ink">IP3 a Coimbra a partir de Viseu</div>
+                            <p class="text-mute mt-1 text-[12px]">Sem portagens nesta zona. ~50 min até ao destino.</p>
                         </div>
-                        <div class="p-3 rounded-xl bg-slate-950/30 border border-slate-900/60">
-                            <span class="text-xs font-semibold text-amber-500 block mb-1">Alternativa Cénica (Alto da Portela — OU-121):</span>
-                            <p class="text-slate-300">
-                                Dica do blogue <strong>Quilómetro Infinito</strong>: Se no regresso a Portugal ainda pretenderem um último banho de curvas cénicas de montanha, de O Barco sigam para A Veiga pela <strong>OU-121</strong>, cruzando o espetacular <strong>Alto da Portela</strong> com vista sobre a Pena Trevinca, antes de descer para Chaves!
-                            </p>
+                        <div class="card-inset p-3">
+                            <div class="text-ink">Alto da Portela · OU-121 <span class="text-mute text-[11px]">(cénica)</span></div>
+                            <p class="text-mute mt-1 text-[12px]">De O Barco a A Veiga, com vista sobre a Pena Trevinca antes de descer a Chaves.</p>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
         </div>
 
-        <!-- SECÇÃO: CHECKLIST -->
-        <div id="section-checklist" class="hidden space-y-5 animate-ios-pop">
-            <div class="flex justify-between items-center">
+        <!-- CHECKLIST -->
+        <div id="section-checklist" class="hidden space-y-5 fade-in">
+            <div class="flex justify-between items-end">
                 <div>
-                    <h2 class="text-base text-amber-500 font-bold">Mota & Bagagem</h2>
-                    <p class="text-[10px] text-slate-400">Estado guardado automaticamente no telemóvel.</p>
+                    <div class="eyebrow">Preparação</div>
+                    <h2 class="display text-[20px] text-ink mt-1">Mota &amp; bagagem</h2>
+                    <p class="text-[11.5px] text-mute mt-0.5">Estado guardado no dispositivo.</p>
                 </div>
-                <button onclick="resetChecklist()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-950 border border-slate-900/60 transition-all active:scale-95">
-                    <i class="fa-solid fa-rotate-left mr-1"></i>Limpar Tudo
+                <button onclick="resetChecklist()" class="text-[11px] text-mute hover:text-[color:var(--danger)] tracking-wide flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-rotate-left text-[10px]"></i>Limpar
                 </button>
             </div>
 
-            <!-- Lista de Itens do Checklist -->
             <div class="space-y-4">
-                <!-- Documentos -->
-                <div class="glass-card p-4">
-                    <h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-id-card"></i> Documentação Obrigatória</h3>
-                    <div class="space-y-2.5" id="checklist-docs"></div>
-                </div>
-
-                <!-- Equipamento Mota -->
-                <div class="glass-card p-4">
-                    <h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-wrench"></i> Ferramentas e Emergência</h3>
-                    <div class="space-y-2.5" id="checklist-mota"></div>
-                </div>
-
-                <!-- Roupa e Térmicos -->
-                <div class="glass-card p-4">
-                    <h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-shirt"></i> Roupa & Térmico/Chuva</h3>
-                    <div class="space-y-2.5" id="checklist-roupa"></div>
-                </div>
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Documentação obrigatória</div>
+                    <div class="space-y-1.5" id="checklist-docs"></div>
+                </section>
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Ferramentas &amp; emergência</div>
+                    <div class="space-y-1.5" id="checklist-mota"></div>
+                </section>
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Roupa &amp; térmico</div>
+                    <div class="space-y-1.5" id="checklist-roupa"></div>
+                </section>
             </div>
         </div>
 
-        <!-- SECÇÃO: METEOROLOGIA -->
-        <div id="section-meteorologia" class="hidden space-y-5 animate-ios-pop">
-            <div class="flex justify-between items-center">
+        <!-- METEOROLOGIA -->
+        <div id="section-meteorologia" class="hidden space-y-5 fade-in">
+            <div class="flex justify-between items-end">
                 <div>
-                    <h2 class="text-base text-sky-400 font-bold flex items-center gap-1.5">
-                        <i class="fa-solid fa-cloud-sun"></i> Clima & Alertas
-                    </h2>
-                    <p class="text-[10px] text-slate-400">Previsões reais via Open-Meteo API.</p>
+                    <div class="eyebrow">Previsão</div>
+                    <h2 class="display text-[20px] text-ink mt-1">Clima &amp; alertas</h2>
+                    <p class="text-[11.5px] text-mute mt-0.5">Open-Meteo · médias históricas de Junho como fallback.</p>
                 </div>
-                
-                <!-- Toggle Mode: Live Forecast vs Historical -->
-                <div class="flex items-center bg-slate-950 p-1 rounded-full border border-slate-900 scale-95 origin-right">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="weather-mode-toggle" onchange="toggleWeatherMode()" class="sr-only peer">
-                        <div class="w-20 h-6 bg-slate-900 rounded-full flex items-center justify-between px-2 text-[8px] font-bold text-slate-500 relative transition-all peer-checked:text-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-800 after:rounded-full after:h-5 after:w-9 after:transition-all peer-checked:after:translate-x-9 peer-checked:after:bg-amber-500">
-                            <span class="z-10">MÉDIAS</span>
-                            <span class="z-10">LIVE</span>
-                        </div>
-                    </label>
-                </div>
+                <label class="relative inline-flex items-center cursor-pointer gap-2.5">
+                    <span id="weather-mode-label" class="mono text-[10px] tracking-wider text-mute uppercase">Médias</span>
+                    <input type="checkbox" id="weather-mode-toggle" onchange="toggleWeatherMode()" class="sr-only peer">
+                    <div class="switch-track"></div>
+                </label>
             </div>
 
-            <!-- Loader de Previsão -->
-            <div id="weather-loader" class="glass-card p-12 flex flex-col items-center justify-center gap-3 text-slate-400">
-                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-amber-500"></i>
-                <span class="text-xs font-semibold">A carregar previsões meteorológicas...</span>
+            <div id="weather-loader" class="card p-10 flex flex-col items-center justify-center gap-2.5">
+                <i class="fa-solid fa-circle-notch fa-spin text-xl text-copper"></i>
+                <span class="text-[11.5px] text-mute">A carregar previsões…</span>
             </div>
-
-            <!-- Grid de Previsões por Destino -->
-            <div id="weather-grid" class="space-y-4 hidden"></div>
+            <div id="weather-grid" class="space-y-3 hidden"></div>
         </div>
 
     </main>
 
-    <!-- NATIVE iOS-STYLE FIXED BOTTOM TAB BAR (Steve Jobs Premium Ergonomics) -->
-    <footer class="fixed bottom-0 left-0 right-0 z-50 glass-footer border-t border-slate-900/50 shadow-2xl">
-        <div class="flex justify-around py-2 max-w-lg mx-auto">
-            <!-- Tab Roteiro -->
-            <button onclick="switchMainTab('rota')" id="tab-btn-rota" class="ios-tab ios-tab-active flex-1 flex flex-col items-center gap-1.5 py-1 transition-all">
-                <i class="fa-solid fa-route text-lg"></i>
-                <span>Roteiro</span>
+    <!-- FOOTER TAB BAR -->
+    <footer class="fixed bottom-0 left-0 right-0 z-50 app-footer">
+        <div class="flex justify-around py-2.5 max-w-2xl mx-auto">
+            <button onclick="switchMainTab('rota')" id="tab-btn-rota" class="tab tab-active flex-1 flex flex-col items-center gap-1.5 relative">
+                <i class="fa-solid fa-route text-[15px]"></i><span>Roteiro</span>
             </button>
-            <!-- Tab Logística -->
-            <button onclick="switchMainTab('logistica')" id="tab-btn-logistica" class="ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all">
-                <i class="fa-solid fa-circle-info text-lg"></i>
-                <span>Logística</span>
+            <button onclick="switchMainTab('logistica')" id="tab-btn-logistica" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
+                <i class="fa-solid fa-circle-info text-[15px]"></i><span>Logística</span>
             </button>
-            <!-- Tab Checklist -->
-            <button onclick="switchMainTab('checklist')" id="tab-btn-checklist" class="ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all">
-                <i class="fa-solid fa-list-check text-lg"></i>
-                <span>Checklist</span>
+            <button onclick="switchMainTab('checklist')" id="tab-btn-checklist" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
+                <i class="fa-solid fa-list-check text-[15px]"></i><span>Checklist</span>
             </button>
-            <!-- Tab Clima -->
-            <button onclick="switchMainTab('meteorologia')" id="tab-btn-meteorologia" class="ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all">
-                <i class="fa-solid fa-cloud-sun text-lg"></i>
-                <span>Clima</span>
+            <button onclick="switchMainTab('meteorologia')" id="tab-btn-meteorologia" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
+                <i class="fa-solid fa-cloud-sun text-[15px]"></i><span>Clima</span>
             </button>
         </div>
     </footer>
@@ -1027,544 +990,379 @@
             "chaves": { name: "Chaves / N2 (Portugal)", lat: 41.7431, lon: -7.4722, hist: { tempMax: 25, tempMin: 13, rain: 30, desc: "Sol." } }
         };
 
-        // DYNAMIC TABS NAVIGATION WITH AUTO-RESIZE FOR LEAFLET (Loop 2 Fix)
+        // ─── Navegação ───────────────────────────────────────────
+        const TAB_BASE = "tab flex-1 flex flex-col items-center gap-1.5 relative";
         function switchMainTab(tab) {
-            // Hide all sections
-            document.getElementById('section-rota').classList.add('hidden');
-            document.getElementById('section-logistica').classList.add('hidden');
-            document.getElementById('section-checklist').classList.add('hidden');
-            document.getElementById('section-meteorologia').classList.add('hidden');
-            
-            // Show target section
+            ['rota','logistica','checklist','meteorologia'].forEach(t => {
+                document.getElementById('section-' + t).classList.add('hidden');
+                document.getElementById('tab-btn-' + t).className = TAB_BASE;
+            });
             document.getElementById('section-' + tab).classList.remove('hidden');
-            
-            // Toggle active states on tab buttons (Bottom Bar)
-            document.getElementById('tab-btn-rota').className = "ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
-            document.getElementById('tab-btn-logistica').className = "ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
-            document.getElementById('tab-btn-checklist').className = "ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
-            document.getElementById('tab-btn-meteorologia').className = "ios-tab flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
-            
-            document.getElementById('tab-btn-' + tab).className = "ios-tab ios-tab-active flex-1 flex flex-col items-center gap-1.5 py-1 transition-all";
+            document.getElementById('tab-btn-' + tab).className = TAB_BASE + ' tab-active';
 
-            // Loop 2 Engineering Masterpiece: Invalidate Leaflet size and recenter to bypass layout-shift grey glitches
             if (tab === 'rota' && activeMapInstance) {
                 setTimeout(() => {
                     activeMapInstance.invalidateSize();
                     const d = days[currentDayNum];
-                    if (d && d.mapCenter) {
-                        activeMapInstance.setView(d.mapCenter, d.zoom);
-                    }
+                    if (d && d.mapCenter) activeMapInstance.setView(d.mapCenter, d.zoom);
                 }, 180);
             }
-
-            // If meteorology tab is opened, fetch live forecasts
-            if (tab === 'meteorologia') {
-                fetchWeatherForecasts();
-            }
+            if (tab === 'meteorologia') fetchWeatherForecasts();
         }
 
-        // LOGISTICS SUB-TABS NAVIGATION
         function switchLogisticsSubTab(subTab) {
+            const a = document.getElementById('btn-log-geral');
+            const b = document.getElementById('btn-log-planb');
+            const base = "py-2.5 text-[12px] font-medium tracking-wide transition";
+            a.className = base + ' bg-[var(--bg-elev)] text-mute';
+            b.className = base + ' bg-[var(--bg-elev)] text-mute';
             document.getElementById('sub-log-geral').classList.add('hidden');
             document.getElementById('sub-log-planb').classList.add('hidden');
             document.getElementById('sub-' + subTab).classList.remove('hidden');
-
-            document.getElementById('btn-log-geral').className = "py-2 text-xs font-bold rounded-lg text-slate-400 transition-all";
-            document.getElementById('btn-log-planb').className = "py-2 text-xs font-bold rounded-lg text-slate-400 transition-all";
-
-            if (subTab === 'log-geral') {
-                document.getElementById('btn-log-geral').className = "py-2 text-xs font-bold rounded-lg bg-amber-500 text-black shadow transition-all";
-            } else {
-                document.getElementById('btn-log-planb').className = "py-2 text-xs font-bold rounded-lg bg-amber-500 text-black shadow transition-all";
-            }
+            document.getElementById('btn-' + subTab).className = base + ' bg-[var(--bg-elev-2)] text-ink';
         }
 
-        // DAY SELECTOR FOR ROTEIRO
+        // ─── Renderização do dia ─────────────────────────────────
         function showDay(num) {
             currentDayNum = num;
             const d = days[num];
-            
-            // Clean active map instance before rendering new day to prevent canvas leaks
+
             if (activeMapInstance) {
-                try {
-                    activeMapInstance.remove();
-                    activeMapInstance = null;
-                } catch (e) {
-                    console.error("Error removing map instance:", e);
-                }
+                try { activeMapInstance.remove(); } catch(e) {}
+                activeMapInstance = null;
             }
 
-            // Build Mountain Passes content
-            let passesHtml = '';
-            if (d.passes && d.passes.length > 0) {
-                passesHtml = `
-                    <div class="mt-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
-                        <span class="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-2.5"><i class="fa-solid fa-mountain mr-1"></i> Portos de Montanha / Passagens</span>
-                        <div class="space-y-3">
-                            ${d.passes.map(p => `
-                                <div class="text-xs">
-                                    <div class="flex justify-between items-center font-semibold text-white">
-                                        <span>${p.name}</span>
-                                        <span class="bg-amber-500/20 text-amber-500 text-[9px] px-2 py-0.5 rounded font-bold uppercase">${p.alt}</span>
-                                    </div>
-                                    <p class="text-slate-400 text-[10px] mt-1 leading-relaxed">Dificuldade: <span class="text-white font-medium">${p.diff}</span> • ${p.desc}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
+            // Helper to clean ** markdown bold from data
+            const md = (s) => (s || '').replace(/\*\*(.+?)\*\*/g, '<span class="text-ink">$1</span>').replace(/⚠️\s*/g, '');
 
-            // Build Timeline/Schedule content
-            let timelineHtml = `
-                <div class="p-4 rounded-2xl bg-slate-950/30 border border-slate-900/60">
-                    <span class="text-xs font-bold text-white uppercase tracking-widest block mb-3.5"><i class="fa-solid fa-clock-rotate-left mr-1.5 text-amber-500"></i> Horários Sugeridos & Etapas</span>
-                    <div class="relative border-l border-slate-800 pl-4 space-y-4">
-                        ${d.timeline.map((item, idx) => `
+            // Timeline
+            const timelineHtml = `
+                <section class="card p-4">
+                    <div class="eyebrow mb-4">Etapas do dia</div>
+                    <div class="relative pl-5 space-y-4" style="border-left:1px solid var(--line);">
+                        ${d.timeline.map(item => `
                             <div class="relative">
-                                <!-- Marker -->
-                                <div class="absolute -left-[21px] mt-0.5 w-2.5 h-2.5 rounded-full bg-amber-500 border border-slate-950 shadow-sm shadow-amber-500/50"></div>
-                                <div class="text-xs">
-                                    <div class="flex justify-between items-center mb-0.5">
-                                        <span class="font-bold text-amber-500">${item.time}</span>
-                                        ${item.mapsLink ? `
-                                            <a href="${item.mapsLink}" target="_blank" class="text-[8px] font-extrabold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 active:scale-95 transition-all">
-                                                <i class="fa-solid fa-map-pin text-[7px]"></i> Google Maps
-                                            </a>
-                                        ` : ''}
-                                    </div>
-                                    <p class="text-slate-300">${item.desc}</p>
+                                <div class="absolute -left-[23px] top-1.5 w-1.5 h-1.5 rounded-full bg-copper"></div>
+                                <div class="flex items-baseline justify-between gap-3 mb-1">
+                                    <span class="mono text-[12px] text-copper">${item.time}</span>
+                                    ${item.mapsLink ? `<a href="${item.mapsLink}" target="_blank" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-location-dot text-[9px]"></i>Maps</a>` : ''}
                                 </div>
+                                <p class="text-[12.5px] text-dim leading-relaxed">${md(item.desc)}</p>
                             </div>
                         `).join('')}
                     </div>
-                </div>
+                </section>
             `;
 
-            // Build Gastronomy regional cards (Loop 2 Redesign: Exquisite plate plaques with tactile direct calling)
-            let gastronomyHtml = `
-                <div class="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-amber-500 uppercase tracking-widest"><i class="fa-solid fa-utensils mr-1.5"></i> Gastronomia Regional</span>
-                        <span class="text-[9px] bg-amber-500/15 text-amber-500 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Sabores da Viagem</span>
-                    </div>
-                    <div class="text-xs space-y-3 text-slate-300 leading-relaxed">
-                        <p><strong>Região:</strong> <span class="text-white font-semibold">${d.gastronomy.region}</span></p>
-                        <p><strong>Pratos Típicos:</strong> ${d.gastronomy.dishes}</p>
-                        
-                        <div class="p-3 bg-slate-950/45 rounded-xl border border-slate-900 flex flex-col justify-between gap-3">
+            // Passes
+            const passesHtml = (d.passes && d.passes.length) ? `
+                <section class="card p-4">
+                    <div class="eyebrow mb-3">Portos de montanha</div>
+                    <div class="space-y-3 text-[12.5px]">
+                        ${d.passes.map(p => `
                             <div>
-                                <span class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="fa-solid fa-store text-amber-500 mr-1"></i> Taberna Recomendada:</span>
-                                <p class="text-slate-200 text-xs font-bold leading-normal">${d.gastronomy.restaurant.split(" - ")[0]}</p>
-                                <p class="text-slate-400 text-[10px] mt-0.5">${d.gastronomy.restaurant.split(" - ")[1] ? d.gastronomy.restaurant.split(" - ")[1].split(". Tel:")[0] : ''}</p>
+                                <div class="flex items-baseline justify-between gap-3">
+                                    <span class="text-ink">${p.name}</span>
+                                    <span class="mono text-[11px] text-copper">${p.alt}</span>
+                                </div>
+                                <p class="text-mute text-[11.5px] mt-1 leading-relaxed">${p.diff} · ${p.desc}</p>
                             </div>
-                            
-                            <!-- Tactical direct calling pill -->
-                            <a href="tel:${d.gastronomy.restaurant.split("Tel: ")[1]}" class="bg-amber-500/10 hover:bg-amber-500/25 border border-amber-500/30 text-amber-500 py-2 rounded-xl text-[10px] font-extrabold tracking-wider uppercase text-center flex items-center justify-center gap-1.5 transition-all active:scale-[0.97]">
-                                <i class="fa-solid fa-phone text-[9px]"></i> Reservar Mesa
-                            </a>
-                        </div>
+                        `).join('<div class="rule-thin"></div>')}
+                    </div>
+                </section>
+            ` : '';
 
-                        <!-- Adamus Gin Gastronomy Botanical Pairing (Premium Sponsor integration) -->
-                        <div class="p-3 bg-amber-600/10 border border-amber-500/20 rounded-xl mt-2 space-y-1">
-                            <span class="text-[9px] uppercase font-extrabold text-amber-500 flex items-center gap-1"><i class="fa-solid fa-wine-glass"></i> Harmonização Adamus Gin</span>
-                            <p class="text-[10px] leading-relaxed text-amber-100">${d.gastronomy.adamusPairing}</p>
+            // Gastronomy
+            const restParts = d.gastronomy.restaurant.split(' - ');
+            const restName  = restParts[0];
+            const restDesc  = (restParts[1] || '').split('. Tel:')[0];
+            const restTel   = (d.gastronomy.restaurant.split('Tel: ')[1] || '').replace('.', '').trim();
+            const gastronomyHtml = `
+                <section class="card p-4">
+                    <div class="flex items-baseline justify-between mb-3">
+                        <div class="eyebrow">Gastronomia</div>
+                        <span class="mono text-[10.5px] text-mute">${d.gastronomy.region}</span>
+                    </div>
+                    <p class="text-[12.5px] text-dim leading-relaxed mb-3">${d.gastronomy.dishes}</p>
+                    <div class="card-inset p-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <div class="text-ink text-[13px]">${restName}</div>
+                                <p class="text-mute text-[11.5px] mt-0.5">${restDesc}</p>
+                            </div>
+                            ${restTel ? `<a href="tel:${restTel}" class="text-[11px] text-copper border border-copper px-2.5 py-1 rounded-md tracking-wide whitespace-nowrap"><i class="fa-solid fa-phone text-[9px] mr-1"></i>Reservar</a>` : ''}
                         </div>
                     </div>
-                </div>
+                </section>
             `;
 
-            // Render Featured Mascot Image Cover for featured highlights
-            let mascotCoverHtml = '';
-            if (d.coverImage) {
-                mascotCoverHtml = `
-                    <div class="flex justify-center mb-4">
-                        <div class="w-48 h-48 md:w-56 md:h-56 relative rounded-2xl overflow-hidden border-2 border-[#8e6c46]/30 shadow-xl shadow-black/50">
-                            <img src="${d.coverImage}" alt="Capa Adamus - Roadbook 2026 Edition" class="w-full h-full object-cover" />
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950/90 to-transparent p-2.5 text-center">
-                                <span class="text-[7px] tracking-widest uppercase font-extrabold text-amber-500 px-2 py-0.5 bg-black/60 rounded-full border border-amber-500/20">Roadbook 2026 Edition</span>
-                            </div>
-                        </div>
+            // Cover (ilustração do dia)
+            const coverHtml = d.coverImage ? `
+                <div class="relative rounded overflow-hidden border border-[var(--line)]" style="aspect-ratio:16/9;">
+                    <img src="${d.coverImage}" alt="" class="w-full h-full object-cover" />
+                    <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(239,230,210,0) 30%,rgba(239,230,210,0.98) 100%);"></div>
+                    <div class="absolute bottom-3 left-4 right-4">
+                        <div class="mono text-[10px] text-copper tracking-[0.2em] uppercase">${d.weekday} · ${d.date}</div>
+                        <h2 class="display text-[22px] text-ink mt-1 leading-tight">${d.title}</h2>
                     </div>
-                `;
-            }
+                </div>
+            ` : '';
 
-            // Build final day layout including the map container
+            const sleepName  = d.sleep.split(' - ')[0];
+            const sleepPrice = d.sleep.split(' - ')[1] || '—';
+
             document.getElementById('day-content').innerHTML = `
-                <div class="space-y-5 animate-ios-pop">
-                    <!-- Featured Mascot Image Cover -->
-                    ${mascotCoverHtml}
+                <div class="space-y-4 fade-in">
+                    ${coverHtml}
 
-                    <!-- Day Overview Card -->
-                    <div class="glass-card p-4 space-y-4">
-                        <div class="flex justify-between items-start">
+                    <section class="card p-4 space-y-4">
+                        <div class="grid grid-cols-3 gap-px bg-[var(--line)] rounded-md overflow-hidden text-center">
+                            <div class="bg-[var(--bg-elev)] py-2.5">
+                                <div class="eyebrow">Distância</div>
+                                <div class="mono text-[13px] text-ink mt-1">${d.distance}</div>
+                            </div>
+                            <div class="bg-[var(--bg-elev)] py-2.5">
+                                <div class="eyebrow">Tempo</div>
+                                <div class="mono text-[13px] text-ink mt-1">${d.duration.split(' ')[0]}</div>
+                            </div>
+                            <div class="bg-[var(--bg-elev)] py-2.5">
+                                <div class="eyebrow">Dormida</div>
+                                <div class="mono text-[13px] text-copper mt-1">${sleepPrice}</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="eyebrow mb-1.5">Itinerário</div>
+                            <p class="text-[12.5px] text-dim leading-relaxed">${d.route}</p>
+                        </div>
+
+                        <div>
+                            <div class="flex items-baseline justify-between mb-2">
+                                <div class="eyebrow">Mapa do percurso</div>
+                                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-earth-europe text-[9px]"></i>Voo 3D</a>
+                            </div>
+                            <div id="map" class="w-full h-56 rounded-md border border-[var(--line)] overflow-hidden relative"></div>
+                        </div>
+
+                        <div class="card-inset p-3 flex items-center justify-between">
                             <div>
-                                <span class="text-[9px] text-amber-500 font-bold uppercase tracking-wider">${d.weekday}</span>
-                                <h2 class="text-base font-extrabold text-white mt-0.5">${d.title}</h2>
+                                <div class="eyebrow">Dormida</div>
+                                <div class="text-[13px] text-ink mt-1">${sleepName}</div>
                             </div>
-                            <span class="day-badge px-2.5 py-1 rounded bg-amber-500 text-black font-extrabold text-[10px] shadow-sm">${d.date}</span>
+                            <i class="fa-solid fa-bed text-mute"></i>
                         </div>
-                        
-                        <!-- Mini Info row -->
-                        <div class="grid grid-cols-2 gap-3 py-2.5 border-y border-slate-900/60 text-xs">
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-road text-amber-500 text-sm"></i>
-                                <div>
-                                    <span class="text-slate-400 text-[8px] block uppercase font-bold tracking-wider">Distância</span>
-                                    <strong class="text-white">${d.distance}</strong>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-clock text-amber-500 text-sm"></i>
-                                <div>
-                                    <span class="text-slate-400 text-[8px] block uppercase font-bold tracking-wider">Tempo</span>
-                                    <strong class="text-white">${d.duration}</strong>
-                                </div>
-                            </div>
-                        </div>
+                    </section>
 
-                        <!-- Route -->
-                        <div class="text-xs leading-relaxed">
-                            <strong class="text-slate-400 uppercase text-[8px] block font-bold tracking-wider mb-1">Itinerário Sugerido</strong>
-                            <p class="text-slate-200"><i class="fa-solid fa-route text-amber-500 mr-1.5"></i>${d.route}</p>
-                        </div>
-
-                        <!-- MAPA INTERATIVO DO PERCURSO -->
-                        <div class="text-xs mt-3">
-                            <div class="flex justify-between items-center mb-1">
-                                <strong class="text-slate-400 uppercase text-[8px] block font-bold tracking-wider">Mapa do Percurso (Navegável)</strong>
-                                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" 
-                                   target="_blank" 
-                                   class="text-[8px] font-extrabold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 active:scale-95 transition-all">
-                                    <i class="fa-solid fa-earth-americas text-[8.5px]"></i> Voo 3D Google Earth
-                                </a>
-                            </div>
-                            <div id="map" class="w-full h-56 rounded-2xl border border-slate-900 shadow-inner z-0 overflow-hidden relative"></div>
-                            <span class="text-[9px] text-slate-400 mt-1 block"><i class="fa-solid fa-circle-info text-amber-500/70 mr-1"></i>Toque nos marcadores no mapa para mais informações.</span>
-                        </div>
-
-                        <!-- Sleep -->
-                        <div class="text-xs bg-slate-950/30 p-3 rounded-2xl border border-slate-900 flex items-center justify-between mt-1">
-                            <div>
-                                <strong class="text-slate-400 uppercase text-[8px] block font-bold tracking-wider mb-1">Dormida Reservada</strong>
-                                <span class="text-slate-200 font-medium flex items-center gap-1.5"><i class="fa-solid fa-bed text-sky-400"></i>${d.sleep.split(" - ")[0]}</span>
-                            </div>
-                            <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/25">${d.sleep.split(" - ")[1] || "Grátis"}</span>
-                        </div>
-                    </div>
-
-                    <!-- Horários & Etapas -->
                     ${timelineHtml}
-
-                    <!-- Portos de Montanha (se aplicável) -->
                     ${passesHtml}
-
-                    <!-- Gastronomia Local -->
                     ${gastronomyHtml}
 
-                    <!-- Avisos Críticos de Segurança -->
-                    <div class="glass-card p-4 border-l-4 border-red-500 bg-red-500/5">
-                        <span class="text-xs font-bold text-red-400 uppercase tracking-widest block mb-1.5"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Avisos Importantes & Perigos</span>
-                        <p class="text-xs text-slate-300 leading-relaxed">${d.warnings}</p>
-                    </div>
+                    <section class="card p-4" style="border-color:rgba(122,46,42,0.3);">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fa-solid fa-triangle-exclamation text-[color:var(--danger)] text-[12px]"></i>
+                            <span class="eyebrow" style="color:var(--danger);">Avisos &amp; perigos</span>
+                        </div>
+                        <p class="text-[12.5px] text-dim leading-relaxed">${md(d.warnings)}</p>
+                    </section>
                 </div>
             `;
 
-            // Initialize Leaflet Map with customized glowing markers and dark design tileset
+            // Leaflet
             if (d.mapCenter && d.zoom) {
                 setTimeout(() => {
                     try {
                         activeMapInstance = L.map('map', {
-                            zoomControl: true,
-                            scrollWheelZoom: false, // Prevent zoom on scroll (annoying on mobile)
-                            dragging: true,
-                            tap: false
+                            zoomControl: true, scrollWheelZoom: false, dragging: true, tap: false
                         }).setView(d.mapCenter, d.zoom);
 
-                        // Load dark premium tiles matching the glassmorphism theme
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                            attribution: '&copy; OpenStreetMap &copy; CARTO'
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+                            attribution: '&copy; OSM &copy; CARTO',
+                            subdomains: 'abcd'
+                        }).addTo(activeMapInstance);
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+                            subdomains: 'abcd'
                         }).addTo(activeMapInstance);
 
-                        // Add waypoints markers with custom glowing pulse SVG icon
                         d.waypoints.forEach(wp => {
-                            const customIcon = L.divIcon({
+                            const icon = L.divIcon({
                                 className: 'custom-div-icon',
-                                html: `<div class="relative flex items-center justify-center w-8 h-8">
-                                         <div class="absolute w-4.5 h-4.5 rounded-full bg-amber-500 border-2 border-white shadow-lg animate-ping opacity-70"></div>
-                                         <div class="relative w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-slate-950 shadow-md shadow-amber-500/50"></div>
-                                       </div>`,
-                                iconSize: [30, 30],
-                                iconAnchor: [15, 15]
+                                html: '<div style="width:10px;height:10px;border-radius:50%;background:#a8632f;border:2px solid #efe6d2;box-shadow:0 0 0 1px #a8632f;"></div>',
+                                iconSize: [14, 14], iconAnchor: [7, 7]
                             });
-
-                            let marker = L.marker(wp.coords, { icon: customIcon }).addTo(activeMapInstance);
-                            marker.bindPopup(`
-                                <div class="text-xs font-sans text-slate-200">
-                                    <strong class="text-amber-500 block mb-0.5">${wp.name}</strong>
-                                    <span class="text-[10px] leading-relaxed text-slate-300">${wp.desc}</span>
-                                </div>
-                            `);
+                            L.marker(wp.coords, { icon }).addTo(activeMapInstance).bindPopup(
+                                `<div style="font-family:Inter;font-size:12px;color:#1c1814;padding:2px 4px;"><div style="color:#a8632f;font-weight:600;margin-bottom:2px;">${wp.name}</div><div style="color:#4a3d2e;font-size:11px;">${wp.desc}</div></div>`
+                            );
                         });
 
-                        // Draw Route Line in amber road style
-                        if (d.routePath && d.routePath.length > 0) {
-                            L.polyline(d.routePath, {
-                                color: '#f59e0b', // Amber 500
-                                weight: 4,
-                                opacity: 0.85,
-                                dashArray: '2, 6'
-                            }).addTo(activeMapInstance);
+                        if (d.routePath && d.routePath.length) {
+                            L.polyline(d.routePath, { color: '#a8632f', weight: 2.5, opacity: 0.9 }).addTo(activeMapInstance);
                         }
                     } catch (err) {
-                        console.error("Leaflet rendering error:", err);
-                        document.getElementById('map').innerHTML = `
-                            <div class="absolute inset-0 flex flex-col items-center justify-center p-4 bg-slate-950 text-slate-400 text-center gap-1.5">
-                                <i class="fa-solid fa-circle-exclamation text-amber-500 text-xl"></i>
-                                <span class="text-[11px] font-semibold">Não foi possível carregar o mapa interativo.</span>
-                                <span class="text-[9px] text-slate-500">Ligue-se à internet ou utilize o GPX indicado acima.</span>
-                            </div>
-                        `;
+                        console.error(err);
+                        document.getElementById('map').innerHTML =
+                            '<div class="absolute inset-0 flex flex-col items-center justify-center text-mute text-[11px] gap-1.5"><i class="fa-solid fa-circle-exclamation text-copper"></i><span>Mapa indisponível offline.</span></div>';
                     }
                 }, 150);
             }
 
-            // Active Day Capsule Selector styling toggle (Spring animations)
+            // Day pill active state
             document.querySelectorAll('.day-btn').forEach((btn, idx) => {
-                if (idx + 1 === num) {
-                    btn.className = "day-btn day-capsule day-capsule-active px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all";
-                } else {
-                    btn.className = "day-btn day-capsule text-slate-400 px-4 py-2 rounded-2xl font-bold text-xs flex flex-col items-center min-w-[62px] transition-all";
-                }
+                const base = "day-btn day-pill px-3.5 py-2 rounded-md flex flex-col items-center min-w-[58px]";
+                btn.className = base + ((idx + 1 === num) ? ' day-pill-active' : '');
             });
         }
 
-        // LOCALSTORAGE INTEGRATION FOR CHECKLIST
+        // ─── Checklist ───────────────────────────────────────────
         function loadChecklist() {
-            const renderCategory = (categoryKey, targetElementId) => {
+            const render = (categoryKey, targetId) => {
                 const items = checklistData[categoryKey];
-                const listContainer = document.getElementById(targetElementId);
-                listContainer.innerHTML = '';
-
+                const container = document.getElementById(targetId);
+                container.innerHTML = '';
                 items.forEach(item => {
-                    const savedState = localStorage.getItem(item.id) === 'true';
-                    
+                    const saved = localStorage.getItem(item.id) === 'true';
                     const label = document.createElement('label');
-                    label.className = `flex items-center gap-3.5 p-3.5 rounded-xl bg-slate-950/30 border border-slate-900 cursor-pointer active:scale-[0.98] transition-all ${savedState ? 'border-amber-500/20 bg-amber-500/5' : ''}`;
-                    label.id = `label-${item.id}`;
-                    
+                    label.className = 'flex items-center gap-3 py-2.5 cursor-pointer transition';
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.checked = savedState;
-                    checkbox.className = 'hidden'; // Hide default HTML checkbox to show iOS circle checkmark
-                    checkbox.addEventListener('change', (e) => {
+                    checkbox.checked = saved;
+                    checkbox.className = 'hidden';
+                    const box = document.createElement('span');
+                    box.className = 'check-box';
+                    const text = document.createElement('span');
+                    text.className = 'text-[13px] flex-1';
+                    text.style.color = saved ? 'var(--ink-mute)' : 'var(--ink)';
+                    text.style.textDecoration = saved ? 'line-through' : 'none';
+                    text.textContent = item.text;
+                    checkbox.addEventListener('change', e => {
                         localStorage.setItem(item.id, e.target.checked);
-                        if (e.target.checked) {
-                            label.classList.add('border-amber-500/20', 'bg-amber-500/5');
-                        } else {
-                            label.classList.remove('border-amber-500/20', 'bg-amber-500/5');
-                        }
+                        text.style.color = e.target.checked ? 'var(--ink-mute)' : 'var(--ink)';
+                        text.style.textDecoration = e.target.checked ? 'line-through' : 'none';
                     });
-
-                    const customCheck = document.createElement('span');
-                    customCheck.className = 'ios-checkbox';
-
-                    const span = document.createElement('span');
-                    span.className = savedState ? 'text-slate-300 font-semibold' : 'text-slate-300';
-                    span.textContent = item.text;
-
-                    label.appendChild(checkbox);
-                    label.appendChild(customCheck);
-                    label.appendChild(span);
-                    listContainer.appendChild(label);
+                    label.append(checkbox, box, text);
+                    container.appendChild(label);
                 });
             };
-
-            renderCategory('docs', 'checklist-docs');
-            renderCategory('mota', 'checklist-mota');
-            renderCategory('roupa', 'checklist-roupa');
+            render('docs', 'checklist-docs');
+            render('mota', 'checklist-mota');
+            render('roupa', 'checklist-roupa');
         }
 
         function resetChecklist() {
-            if (confirm('Deseja repor todos os itens do checklist para não marcados?')) {
+            if (confirm('Repor todos os itens do checklist?')) {
                 Object.keys(checklistData).forEach(cat => {
-                    checklistData[cat].forEach(item => {
-                        localStorage.setItem(item.id, 'false');
-                    });
+                    checklistData[cat].forEach(item => localStorage.setItem(item.id, 'false'));
                 });
                 loadChecklist();
             }
         }
 
-        // WEATHER API LOGIC (OPEN-METEO)
+        // ─── Meteorologia ────────────────────────────────────────
         let isWeatherLiveMode = false;
-
         function toggleWeatherMode() {
-            const toggleCheckbox = document.getElementById('weather-mode-toggle');
-            isWeatherLiveMode = toggleCheckbox.checked;
-            
-            if (isWeatherLiveMode) {
-                fetchWeatherForecasts();
-            } else {
-                renderHistoricalWeather();
-            }
+            isWeatherLiveMode = document.getElementById('weather-mode-toggle').checked;
+            document.getElementById('weather-mode-label').textContent = isWeatherLiveMode ? 'Live' : 'Médias';
+            isWeatherLiveMode ? fetchWeatherForecasts() : renderHistoricalWeather();
         }
 
         function getWeatherIconAndDesc(code) {
-            // WMO Weather interpretation codes
-            if (code === 0) return { icon: 'fa-sun text-amber-400', desc: 'Sol limpo' };
-            if ([1, 2, 3].includes(code)) return { icon: 'fa-cloud-sun text-slate-300', desc: 'Pouco nublado' };
-            if ([45, 48].includes(code)) return { icon: 'fa-smog text-slate-400', desc: 'Nevoeiro denso' };
-            if ([51, 53, 55].includes(code)) return { icon: 'fa-cloud-rain text-sky-400', desc: 'Chuviscos' };
-            if ([61, 63, 65].includes(code)) return { icon: 'fa-cloud-showers-heavy text-blue-500', desc: 'Chuva' };
-            if ([80, 81, 82].includes(code)) return { icon: 'fa-cloud-showers-water text-blue-400', desc: 'Aguaceiros' };
-            if ([95, 96, 99].includes(code)) return { icon: 'fa-cloud-bolt text-red-400', desc: 'Trovoada ativa' };
-            return { icon: 'fa-cloud text-slate-300', desc: 'Nublado' };
+            if (code === 0) return { icon: 'fa-sun', desc: 'Limpo' };
+            if ([1, 2, 3].includes(code)) return { icon: 'fa-cloud-sun', desc: 'Pouco nublado' };
+            if ([45, 48].includes(code)) return { icon: 'fa-smog', desc: 'Nevoeiro' };
+            if ([51, 53, 55].includes(code)) return { icon: 'fa-cloud-rain', desc: 'Chuviscos' };
+            if ([61, 63, 65].includes(code)) return { icon: 'fa-cloud-showers-heavy', desc: 'Chuva' };
+            if ([80, 81, 82].includes(code)) return { icon: 'fa-cloud-showers-water', desc: 'Aguaceiros' };
+            if ([95, 96, 99].includes(code)) return { icon: 'fa-cloud-bolt', desc: 'Trovoada' };
+            return { icon: 'fa-cloud', desc: 'Nublado' };
+        }
+
+        function tempRangeStyle(minVal, maxVal) {
+            const left = Math.max(0, Math.min(80, (minVal - 2) * 4));
+            const width = Math.max(10, Math.min(100 - left, (maxVal - minVal + 2) * 5));
+            return `left:${left}%;width:${width}%;`;
         }
 
         async function fetchWeatherForecasts() {
-            if (!isWeatherLiveMode) {
-                renderHistoricalWeather();
-                return;
-            }
+            if (!isWeatherLiveMode) return renderHistoricalWeather();
 
             document.getElementById('weather-loader').classList.remove('hidden');
             document.getElementById('weather-grid').classList.add('hidden');
-
             const container = document.getElementById('weather-grid');
             container.innerHTML = '';
 
             try {
-                // Fetch data for all locations asynchronously
                 const promises = Object.keys(locations).map(async key => {
                     const loc = locations[key];
                     const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&hourly=temperature_2m,precipitation_probability,weathercode&timezone=Europe/Madrid&forecast_days=3`;
-                    
                     try {
                         const res = await fetch(url);
-                        if (!res.ok) throw new Error('API Error');
+                        if (!res.ok) throw new Error();
                         const data = await res.json();
-                        
-                        // Extract today's 09:00 (idx 9) and 21:00 (idx 21) or equivalent hourly forecast
-                        const tempMorning = data.hourly.temperature_2m[9] !== undefined ? Math.round(data.hourly.temperature_2m[9]) : 15;
-                        const tempEvening = data.hourly.temperature_2m[21] !== undefined ? Math.round(data.hourly.temperature_2m[21]) : 11;
-                        
-                        const rainMorning = data.hourly.precipitation_probability[9] !== undefined ? data.hourly.precipitation_probability[9] : 20;
-                        const rainEvening = data.hourly.precipitation_probability[21] !== undefined ? data.hourly.precipitation_probability[21] : 20;
-
-                        const codeMorning = data.hourly.weathercode[9] !== undefined ? data.hourly.weathercode[9] : 1;
-                        const codeEvening = data.hourly.weathercode[21] !== undefined ? data.hourly.weathercode[21] : 1;
-
                         return {
-                            key,
-                            name: loc.name,
-                            success: true,
-                            morning: { temp: tempMorning, rain: rainMorning, code: codeMorning },
-                            evening: { temp: tempEvening, rain: rainEvening, code: codeEvening }
+                            key, name: loc.name, success: true,
+                            morning: { temp: Math.round(data.hourly.temperature_2m[9] ?? 15), rain: data.hourly.precipitation_probability[9] ?? 20, code: data.hourly.weathercode[9] ?? 1 },
+                            evening: { temp: Math.round(data.hourly.temperature_2m[21] ?? 11), rain: data.hourly.precipitation_probability[21] ?? 20, code: data.hourly.weathercode[21] ?? 1 }
                         };
-                    } catch (e) {
-                        return { key, name: loc.name, success: false };
-                    }
+                    } catch (e) { return { key, name: loc.name, success: false }; }
                 });
-
                 const results = await Promise.all(promises);
 
                 results.forEach(res => {
+                    const card = document.createElement('section');
+                    card.className = 'card p-4';
                     if (res.success) {
-                        const morn = getWeatherIconAndDesc(res.morning.code);
-                        const eve = getWeatherIconAndDesc(res.evening.code);
-                        const hasHighRainRisk = res.morning.rain > 45 || res.evening.rain > 45;
-
-                        // Loop 2 Redesign: Premium Apple Weather style vertical linear forecast card
-                        // Calculates a virtual 10-day styled thermal range indicator bar!
+                        const m = getWeatherIconAndDesc(res.morning.code);
+                        const e = getWeatherIconAndDesc(res.evening.code);
                         const minVal = Math.min(res.morning.temp, res.evening.temp);
                         const maxVal = Math.max(res.morning.temp, res.evening.temp);
-                        const leftPercent = Math.max(0, Math.min(80, (minVal - 2) * 4)); // relative positioning
-                        const widthPercent = Math.max(10, Math.min(100 - leftPercent, (maxVal - minVal + 2) * 5));
-
-                        const card = document.createElement('div');
-                        card.className = 'glass-card p-4.5 space-y-3.5';
+                        const risk = res.morning.rain > 45 || res.evening.rain > 45;
                         card.innerHTML = `
-                            <!-- Card Header -->
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-location-crosshairs text-sky-400"></i> ${res.name}</span>
-                                <span class="text-[8px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-sky-500/20">Previsão 12h</span>
+                            <div class="flex items-baseline justify-between mb-3">
+                                <div class="text-[13px] text-ink">${res.name}</div>
+                                <span class="mono text-[10px] text-mute">Próximas 12 h</span>
                             </div>
-                            
-                            <!-- Apple Weather range design row -->
-                            <div class="flex items-center justify-between gap-4 text-xs">
-                                <!-- Min Temp -->
-                                <div class="w-10 text-slate-400 text-left font-medium flex flex-col">
-                                    <span class="text-[8px] uppercase tracking-wider opacity-60">MIN</span>
-                                    <span class="text-xs text-sky-300 font-bold">${minVal}°C</span>
-                                </div>
-
-                                <!-- Linear gradient range progress bar -->
-                                <div class="flex-grow flex flex-col items-center">
-                                    <div class="temp-range-bar">
-                                        <div class="temp-range-fill" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Max Temp -->
-                                <div class="w-10 text-right font-medium flex flex-col">
-                                    <span class="text-[8px] uppercase tracking-wider opacity-60">MAX</span>
-                                    <span class="text-xs text-amber-500 font-bold">${maxVal}°C</span>
-                                </div>
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="mono text-[12px] text-mute w-10">${minVal}°</div>
+                                <div class="temp-range-bar flex-1"><div class="temp-range-fill" style="${tempRangeStyle(minVal,maxVal)}"></div></div>
+                                <div class="mono text-[12px] text-copper w-10 text-right">${maxVal}°</div>
                             </div>
-
-                            <!-- Detail breakdowns (Morning vs Night) -->
-                            <div class="grid grid-cols-2 gap-3 text-xs pt-1 border-t border-slate-900/60">
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid ${morn.icon} text-base opacity-90"></i>
+                            <div class="grid grid-cols-2 gap-3 pt-3 rule-thin text-[12px]">
+                                <div class="flex items-center gap-2.5">
+                                    <i class="fa-solid ${m.icon} text-mute"></i>
                                     <div>
-                                        <span class="text-[8px] text-slate-400 uppercase tracking-widest block font-semibold">Manhã</span>
-                                        <span class="text-[11px] text-slate-200 font-bold">${res.morning.temp}°C • ${morn.desc}</span>
-                                        <span class="text-[9px] text-slate-400 block"><i class="fa-solid fa-umbrella text-sky-400/80 mr-1"></i>${res.morning.rain}% chuva</span>
+                                        <div class="text-[10px] text-mute uppercase tracking-wider">Manhã</div>
+                                        <div class="text-ink">${res.morning.temp}° · <span class="text-dim">${m.desc}</span></div>
+                                        <div class="text-mute text-[10.5px] mono">${res.morning.rain}% chuva</div>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid ${eve.icon} text-base opacity-90"></i>
+                                <div class="flex items-center gap-2.5">
+                                    <i class="fa-solid ${e.icon} text-mute"></i>
                                     <div>
-                                        <span class="text-[8px] text-slate-400 uppercase tracking-widest block font-semibold">Noite</span>
-                                        <span class="text-[11px] text-slate-200 font-bold">${res.evening.temp}°C • ${eve.desc}</span>
-                                        <span class="text-[9px] text-slate-400 block"><i class="fa-solid fa-umbrella text-sky-400/80 mr-1"></i>${res.evening.rain}% chuva</span>
+                                        <div class="text-[10px] text-mute uppercase tracking-wider">Noite</div>
+                                        <div class="text-ink">${res.evening.temp}° · <span class="text-dim">${e.desc}</span></div>
+                                        <div class="text-mute text-[10.5px] mono">${res.evening.rain}% chuva</div>
                                     </div>
                                 </div>
                             </div>
-
-                            ${hasHighRainRisk ? `
-                                <div class="p-2.5 rounded-lg bg-red-500/10 border border-red-500/25 text-[10px] text-red-400 flex items-center gap-1.5 font-semibold">
-                                    <i class="fa-solid fa-triangle-exclamation"></i>
-                                    <span>Probabilidade de chuva elevada nesta etapa! Prepare o fato de chuva.</span>
-                                </div>
-                            ` : ''}
+                            ${risk ? `<div class="rule-thin mt-3 pt-3 text-[11.5px] text-[color:var(--danger)] flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i>Probabilidade de chuva elevada — preparar fato de chuva.</div>` : ''}
                         `;
-                        container.appendChild(card);
                     } else {
-                        // Fallback to individual location card if offline or error
-                        const hist = locations[res.key].hist;
-                        const card = document.createElement('div');
-                        card.className = 'glass-card p-4 border-l-4 border-amber-500 space-y-2';
+                        const h = locations[res.key].hist;
                         card.innerHTML = `
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-bold text-white"><i class="fa-solid fa-location-dot text-amber-500 mr-1.5"></i> ${res.name}</span>
-                                <span class="text-[8px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full font-bold uppercase">Sem Rede</span>
+                            <div class="flex items-baseline justify-between mb-2">
+                                <div class="text-[13px] text-ink">${res.name}</div>
+                                <span class="mono text-[10px] text-mute">Sem ligação · médias</span>
                             </div>
-                            <p class="text-[10px] text-slate-400 leading-relaxed">Erro de ligação. A apresentar médias históricas:</p>
-                            <div class="grid grid-cols-3 gap-2 text-[9px] bg-slate-950/40 p-2 rounded-lg text-slate-400">
-                                <div>Max: <strong class="text-white">${hist.tempMax}°C</strong></div>
-                                <div>Min: <strong class="text-white">${hist.tempMin}°C</strong></div>
-                                <div>Chuva: <strong class="text-white">${hist.rain}%</strong></div>
+                            <div class="grid grid-cols-3 gap-3 text-[12px] mono">
+                                <div><span class="text-mute">max</span> <span class="text-copper">${h.tempMax}°</span></div>
+                                <div><span class="text-mute">min</span> <span class="text-ink">${h.tempMin}°</span></div>
+                                <div><span class="text-mute">chuva</span> <span class="text-ink">${h.rain}%</span></div>
                             </div>
                         `;
-                        container.appendChild(card);
                     }
+                    container.appendChild(card);
                 });
-
-            } catch (err) {
-                console.error(err);
-            } finally {
+            } catch (err) { console.error(err); }
+            finally {
                 document.getElementById('weather-loader').classList.add('hidden');
                 document.getElementById('weather-grid').classList.remove('hidden');
             }
@@ -1573,64 +1371,33 @@
         function renderHistoricalWeather() {
             document.getElementById('weather-loader').classList.add('hidden');
             document.getElementById('weather-grid').classList.remove('hidden');
-
             const container = document.getElementById('weather-grid');
             container.innerHTML = '';
-
             Object.keys(locations).forEach(key => {
                 const loc = locations[key];
-                
-                // Calculates a virtual 10-day styled thermal range indicator bar for historical values
-                const minVal = loc.hist.tempMin;
-                const maxVal = loc.hist.tempMax;
-                const leftPercent = Math.max(0, Math.min(80, (minVal - 2) * 4));
-                const widthPercent = Math.max(10, Math.min(100 - leftPercent, (maxVal - minVal + 2) * 5));
-
-                const card = document.createElement('div');
-                card.className = 'glass-card p-4.5 space-y-3';
+                const minVal = loc.hist.tempMin, maxVal = loc.hist.tempMax;
+                const card = document.createElement('section');
+                card.className = 'card p-4';
                 card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-mountain text-amber-500"></i> ${loc.name}</span>
-                        <span class="text-[8px] bg-amber-500/10 text-amber-500 px-2.5 py-0.5 rounded-full font-bold uppercase border border-amber-500/20">Média Junho</span>
+                    <div class="flex items-baseline justify-between mb-3">
+                        <div class="text-[13px] text-ink">${loc.name}</div>
+                        <span class="mono text-[10px] text-mute">Média · Junho</span>
                     </div>
-                    
-                    <p class="text-[10px] text-slate-300 leading-normal mb-1"><i class="fa-solid fa-info-circle text-amber-500/80 mr-1.5"></i> ${loc.hist.desc}</p>
-                    
-                    <div class="flex items-center justify-between gap-4 text-xs pt-1">
-                        <!-- Min Temp -->
-                        <div class="w-10 text-slate-400 text-left font-medium flex flex-col">
-                            <span class="text-[8px] uppercase tracking-wider opacity-60">MIN</span>
-                            <span class="text-xs text-sky-300 font-bold">${minVal}°C</span>
-                        </div>
-
-                        <!-- Linear range bar -->
-                        <div class="flex-grow flex flex-col items-center">
-                            <div class="temp-range-bar">
-                                <div class="temp-range-fill" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- Max Temp -->
-                        <div class="w-10 text-right font-medium flex flex-col">
-                            <span class="text-[8px] uppercase tracking-wider opacity-60">MAX</span>
-                            <span class="text-xs text-amber-500 font-bold">${maxVal}°C</span>
-                        </div>
+                    <p class="text-[12px] text-dim leading-relaxed mb-3">${loc.hist.desc}</p>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="mono text-[12px] text-mute w-10">${minVal}°</div>
+                        <div class="temp-range-bar flex-1"><div class="temp-range-fill" style="${tempRangeStyle(minVal,maxVal)}"></div></div>
+                        <div class="mono text-[12px] text-copper w-10 text-right">${maxVal}°</div>
                     </div>
-                    
-                    <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-900/60 flex items-center gap-1.5">
-                        <i class="fa-solid fa-umbrella text-blue-400"></i> Probabilidade de precipitação média histórica: <strong class="text-slate-200">${loc.hist.rain}%</strong>
-                    </div>
+                    <div class="text-[11px] text-mute mono pt-2 rule-thin">chuva ${loc.hist.rain}%</div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // ONLOAD INITIALIZATION
+        // ─── Init ────────────────────────────────────────────────
         window.addEventListener('DOMContentLoaded', () => {
-            // Render first day on load
             showDay(1);
-            
-            // Load and initialize persistent checklist
             loadChecklist();
         });
     </script>
