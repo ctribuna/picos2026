@@ -1,0 +1,13 @@
+{
+  "name": "picos-2026-roadbook",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Roadbook da expedição Picos de Europa 2026 — app estática de página única.",
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i src/input.css -o styles.css --minify",
+    "watch:css": "tailwindcss -c tailwind.config.js -i src/input.css -o styles.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

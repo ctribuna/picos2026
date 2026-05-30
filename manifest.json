@@ -1,0 +1,17 @@
+{
+  "name": "Picos 2026 · Roadbook",
+  "short_name": "Picos 2026",
+  "description": "Roadbook da expedição de mota Picos de Europa · 4–9 Junho 2026",
+  "lang": "pt",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#efe6d2",
+  "theme_color": "#efe6d2",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

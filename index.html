@@ -2,10 +2,16 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Picos 2026 Roadbook Edition</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PWA / instalável & offline -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#efe6d2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Picos 2026">
+    <meta name="description" content="Roadbook da expedição de mota Picos de Europa · 4–9 Junho 2026">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- FontAwesome para Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet.js para Mapas Interativos -->
@@ -31,6 +37,13 @@
             --danger: #7a2e2a;       /* Oxblood / vinho */
             --ok: #4a5a3a;           /* Verde-musgo */
             --paper-tex: rgba(28, 24, 20, 0.025);
+            /* ── Tokens de movimento ── */
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);   /* saída suave editorial */
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* ressalto subtil */
+            --dur-1: 0.18s;
+            --dur-2: 0.32s;
+            --dur-3: 0.5s;
+            --dur-4: 0.72s;
         }
 
         * { -webkit-tap-highlight-color: transparent; }
@@ -122,11 +135,10 @@
             letter-spacing: 0.05em;
             transition: color 0.2s ease;
         }
+        .tab { transition: color var(--dur-2) var(--ease-out); }
         .tab-active { color: var(--copper); font-weight: 600; }
-        .tab-active::after {
-            content: ""; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 22px; height: 2px; background: var(--copper);
-        }
+        .tab i { transition: transform var(--dur-2) var(--ease-spring); }
+        .tab-active i { transform: translateY(-1px) scale(1.08); }
 
         /* Day pill — selo postal */
         .day-pill {
@@ -174,25 +186,191 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .fade-in { opacity: 1; }
+        /* ─────────────────────────────────────────────
+           SISTEMA DE MOVIMENTO — roadbook em movimento
+           ───────────────────────────────────────────── */
 
-        /* Hide scrollbars but keep functionality */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* Animations */
+        /* Pop de entrada (mantido) */
         @keyframes iosPop {
             0% { transform: scale(0.96); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+        .animate-ios-pop { animation: iosPop var(--dur-2) var(--ease-out) forwards; }
 
-        .animate-ios-pop {
-            animation: iosPop 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Revelação ao rolar — cartões sobem como folhas pousando */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity var(--dur-3) var(--ease-out),
+                        transform var(--dur-3) var(--ease-out);
+            will-change: opacity, transform;
+        }
+        .reveal.is-in { opacity: 1; transform: none; }
+
+        /* Troca de dia — conteúdo entra deslizando */
+        @keyframes dayIn {
+            0%   { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: none; }
+        }
+        .day-enter { animation: dayIn var(--dur-3) var(--ease-out) both; }
+
+        /* Selo postal — carimbo ao escolher o dia */
+        @keyframes stamp {
+            0%   { transform: scale(1); }
+            35%  { transform: scale(0.9) rotate(-2deg); }
+            70%  { transform: scale(1.04) rotate(0.5deg); }
+            100% { transform: scale(1); }
+        }
+        .stamping { animation: stamp 0.42s var(--ease-spring); }
+
+        /* Barra de progresso de leitura — traça os km */
+        #read-progress {
+            position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+            background: var(--copper); z-index: 60;
+            transition: width 0.08s linear;
+            box-shadow: 0 0 6px rgba(168,99,47,0.4);
+        }
+
+        /* Traço da rota no mapa — desenha-se sozinho */
+        .route-draw {
+            stroke-dasharray: var(--len);
+            stroke-dashoffset: var(--len);
+            animation: routeDraw var(--dur-4) var(--ease-out) forwards;
+        }
+        @keyframes routeDraw { to { stroke-dashoffset: 0; } }
+
+        /* Marcadores caem como pinos no mapa */
+        @keyframes pinDrop {
+            0%   { transform: translateY(-14px) scale(0.4); opacity: 0; }
+            60%  { transform: translateY(2px) scale(1.05); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .pin-drop { animation: pinDrop 0.4s var(--ease-spring) both; }
+        .wp-dot { transition: transform 0.25s var(--ease-spring), box-shadow 0.25s ease; }
+        .wp-active .wp-dot {
+            transform: scale(1.9);
+            box-shadow: 0 0 0 4px rgba(168,99,47,0.25), 0 0 0 1px #a8632f !important;
+        }
+
+        /* Linha da timeline desenha-se de cima a baixo */
+        .tl-line {
+            transform-origin: top;
+            transform: scaleY(0);
+            transition: transform var(--dur-4) var(--ease-out);
+        }
+        .tl-line.is-in { transform: scaleY(1); }
+        .tl-dot {
+            opacity: 0; transform: scale(0);
+            transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-spring);
+        }
+        .tl-step.is-in .tl-dot { opacity: 1; transform: scale(1); }
+        .tl-step {
+            opacity: 0; transform: translateX(-6px);
+            transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+        }
+        .tl-step.is-in { opacity: 1; transform: none; }
+        .tl-step.tl-current { background: rgba(168,99,47,0.06); border-radius: 4px; }
+
+        /* Mapa fixo durante o scroll do itinerário (scrollytelling) */
+        .map-sticky { position: sticky; top: 108px; z-index: 20; }
+
+        /* Indicador da tab desliza entre separadores */
+        #tab-indicator {
+            position: absolute; bottom: 0; height: 2px; background: var(--copper);
+            border-radius: 2px; transition: left var(--dur-2) var(--ease-out), width var(--dur-2) var(--ease-out);
+            pointer-events: none;
+        }
+
+        /* Carimbo de check no checklist */
+        @keyframes checkPop {
+            0% { transform: translate(-50%,-50%) scale(0) rotate(-20deg); }
+            100% { transform: translate(-50%,-50%) scale(1) rotate(0); }
+        }
+        input[type="checkbox"]:checked + .check-box::after { animation: checkPop var(--dur-2) var(--ease-spring); }
+
+        /* Contagem dos números do sumário */
+        .count-up { font-variant-numeric: tabular-nums; }
+
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Foco visível — acessibilidade */
+        a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+            outline: 2px solid var(--copper); outline-offset: 2px; border-radius: 3px;
+        }
+
+        /* ── View Transitions API (troca nativa de vistas) ── */
+        @keyframes vt-fade-in  { from { opacity: 0; } }
+        @keyframes vt-fade-out { to   { opacity: 0; } }
+        @keyframes vt-slide-up { from { opacity: 0; transform: translateY(12px); } }
+        ::view-transition-old(root) { animation: vt-fade-out var(--dur-2) var(--ease-out) both; }
+        ::view-transition-new(root) { animation: vt-slide-up var(--dur-2) var(--ease-out) both; }
+
+        /* ── Previsão horária por etapa (emoji + temp) ── */
+        .tl-wx {
+            display: inline-flex; align-items: center; gap: 4px;
+            opacity: 0; transform: translateY(1px);
+            transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+        }
+        .tl-wx.is-loaded { opacity: 1; transform: none; }
+        .tl-wx .wx-ic { color: var(--copper); font-size: 10.5px; width: 13px; text-align: center; }
+        .tl-wx.wx-alert { color: var(--danger); }
+        .tl-wx.wx-alert .wx-ic { color: var(--danger); }
+
+        /* ── Glifos de clima (subtis, no roteiro) ── */
+        .wx-spin  { animation: wxSpin 20s linear infinite; transform-origin: 50% 50%; }
+        @keyframes wxSpin { to { transform: rotate(360deg); } }
+        .wx-float { animation: wxFloat 4.5s ease-in-out infinite; }
+        @keyframes wxFloat { 0%,100% { transform: translateX(0); } 50% { transform: translateX(2.5px); } }
+        .wx-rain  { animation: wxRain 2.6s ease-in-out infinite; }
+        @keyframes wxRain { 0%,100% { transform: translateY(0); opacity: 0.85; } 50% { transform: translateY(1.5px); opacity: 1; } }
+        .wx-fog   { animation: wxFog 3.6s ease-in-out infinite; }
+        @keyframes wxFog { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        /* ── Voo 3D (MapLibre + terreno) ── */
+        #modal-3d {
+            position: fixed; inset: 0; z-index: 80;
+            background: var(--bg);
+            display: flex; flex-direction: column;
+            opacity: 0; visibility: hidden;
+            transition: opacity var(--dur-2) var(--ease-out), visibility var(--dur-2);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        #modal-3d.open { opacity: 1; visibility: visible; }
+        #modal-3d .m3d-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; border-bottom: 1px solid var(--line);
+            background: rgba(239,230,210,0.92);
+            backdrop-filter: saturate(140%) blur(10px);
+        }
+        #map3d { flex: 1; position: relative; background: #e0d3b3; }
+        #map3d .maplibregl-canvas { filter: sepia(0.32) saturate(0.72) brightness(0.97) contrast(0.94); }
+        #map3d .maplibregl-ctrl-attrib {
+            background: rgba(245,237,217,0.85) !important; color: var(--ink-mute) !important; font-size: 9px !important;
+        }
+        #map3d .maplibregl-ctrl-attrib a { color: var(--ink-mute) !important; }
+        #m3d-loader {
+            position: absolute; inset: 0; z-index: 5;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+            background: var(--bg); color: var(--ink-mute); font-size: 12px;
+        }
+
+        /* ── Respeitar preferência de movimento reduzido ── */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+            .reveal { opacity: 1; transform: none; }
+            .tl-line { transform: scaleY(1); }
+            .tl-step, .tl-dot { opacity: 1; transform: none; }
+            ::view-transition-group(*),
+            ::view-transition-old(*),
+            ::view-transition-new(*) { animation: none !important; }
         }
 
         /* Leaflet — papel sépia */
@@ -294,8 +472,13 @@
         input:checked + .switch-track { background: var(--copper); }
         input:checked + .switch-track::after { transform: translateX(20px); background: var(--bg); border-color: var(--copper); }
     </style>
+    <!-- Tailwind pré-compilado (estático, sem CDN) — gerado por `npm run build:css` -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Barra de progresso de leitura -->
+    <div id="read-progress" role="presentation"></div>
 
     <!-- HEADER -->
     <header class="sticky top-0 z-50 app-header px-4 py-3 flex justify-between items-center">
@@ -307,13 +490,13 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <a href="https://drive.google.com/file/d/1TM9oYI-RJ_aeEIFG08IQIUKAM03E4NTl/view?usp=drive_link" target="_blank" class="icon-btn" title="GPX">
+            <a href="https://drive.google.com/file/d/1TM9oYI-RJ_aeEIFG08IQIUKAM03E4NTl/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="icon-btn" title="GPX" aria-label="Descarregar ficheiro GPX">
                 <i class="fa-solid fa-map-location-dot text-[11px]"></i>
             </a>
-            <a href="https://discord.com/channels/1247291979310567544/1247291979751096400" target="_blank" class="icon-btn" title="Discord">
+            <a href="https://discord.com/channels/1247291979310567544/1247291979751096400" target="_blank" rel="noopener noreferrer" class="icon-btn" title="Discord" aria-label="Abrir Discord da viagem">
                 <i class="fa-brands fa-discord text-[11px]"></i>
             </a>
-            <a href="https://secure.splitwise.com/#/groups/96304958" target="_blank" class="icon-btn" title="Splitwise">
+            <a href="https://secure.splitwise.com/#/groups/96304958" target="_blank" rel="noopener noreferrer" class="icon-btn" title="Splitwise" aria-label="Abrir grupo Splitwise">
                 <i class="fa-solid fa-wallet text-[11px]"></i>
             </a>
             <a href="tel:112" class="sos-pill px-2.5 py-1 rounded text-[10px] font-semibold tracking-[0.14em] uppercase flex items-center gap-1.5 transition active:scale-95">
@@ -339,34 +522,34 @@
             </section>
             
             <!-- Sumário -->
-            <section class="grid grid-cols-3 gap-4">
+            <section class="grid grid-cols-3 gap-4 reveal">
                 <div class="text-center">
                     <div class="display text-[26px] text-ink leading-none">VI</div>
                     <div class="eyebrow mt-2">Dias</div>
                 </div>
                 <div class="text-center border-x border-[var(--line)]">
-                    <div class="display text-[26px] text-ink leading-none">1600</div>
+                    <div class="display count-up text-[26px] text-ink leading-none" data-count="1600">1600</div>
                     <div class="eyebrow mt-2">Quilómetros</div>
                 </div>
                 <div class="text-center">
-                    <div class="display text-[26px] text-copper leading-none">1283<span class="text-[16px] align-top">€</span></div>
+                    <div class="display text-[26px] text-copper leading-none"><span class="count-up" data-count="1283">1283</span><span class="text-[16px] align-top">€</span></div>
                     <div class="eyebrow mt-2">Dormida</div>
                 </div>
             </section>
 
             <div class="ornament"><span class="ornament-glyph">— · —</span></div>
 
-            <!-- Voo 3D -->
-            <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" class="card p-4 flex items-center justify-between gap-4 transition active:bg-[var(--bg-elev-2)]">
+            <!-- Voo 3D — terreno interativo, dentro da app -->
+            <button onclick="open3D()" class="card p-4 w-full flex items-center justify-between gap-4 reveal transition active:bg-[var(--bg-elev-2)] active:scale-[0.99] text-left">
                 <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-earth-europe text-copper text-base"></i>
+                    <i class="fa-solid fa-mountain-sun text-copper text-base"></i>
                     <div>
-                        <div class="text-[13px] text-ink font-medium">Pré-visualização 3D</div>
-                        <div class="text-[11px] text-mute mt-0.5">Voo virtual sobre o percurso · Google Earth</div>
+                        <div class="text-[13px] text-ink font-medium">Voo 3D sobre o percurso</div>
+                        <div class="text-[11px] text-mute mt-0.5">Terreno interativo dos Picos · sem sair da app</div>
                     </div>
                 </div>
-                <i class="fa-solid fa-arrow-up-right-from-square text-mute text-[11px]"></i>
-            </a>
+                <i class="fa-solid fa-cube text-mute text-[12px]"></i>
+            </button>
 
             <!-- Selector de Dia -->
             <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar -mx-4 px-4 sticky top-[64px] z-40 py-2" style="background:linear-gradient(to bottom,var(--bg) 70%,transparent);">
@@ -643,27 +826,159 @@
 
     <!-- FOOTER TAB BAR -->
     <footer class="fixed bottom-0 left-0 right-0 z-50 app-footer">
-        <div class="flex justify-around py-2.5 max-w-2xl mx-auto">
-            <button onclick="switchMainTab('rota')" id="tab-btn-rota" class="tab tab-active flex-1 flex flex-col items-center gap-1.5 relative">
+        <div id="tab-bar" role="tablist" aria-label="Secções" class="flex justify-around py-2.5 max-w-2xl mx-auto relative">
+            <span id="tab-indicator" aria-hidden="true"></span>
+            <button onclick="switchMainTab('rota')" id="tab-btn-rota" role="tab" aria-selected="true" aria-controls="section-rota" class="tab tab-active flex-1 flex flex-col items-center gap-1.5 relative">
                 <i class="fa-solid fa-route text-[15px]"></i><span>Roteiro</span>
             </button>
-            <button onclick="switchMainTab('logistica')" id="tab-btn-logistica" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
+            <button onclick="switchMainTab('logistica')" id="tab-btn-logistica" role="tab" aria-selected="false" aria-controls="section-logistica" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
                 <i class="fa-solid fa-circle-info text-[15px]"></i><span>Logística</span>
             </button>
-            <button onclick="switchMainTab('checklist')" id="tab-btn-checklist" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
+            <button onclick="switchMainTab('checklist')" id="tab-btn-checklist" role="tab" aria-selected="false" aria-controls="section-checklist" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
                 <i class="fa-solid fa-list-check text-[15px]"></i><span>Checklist</span>
             </button>
-            <button onclick="switchMainTab('meteorologia')" id="tab-btn-meteorologia" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
+            <button onclick="switchMainTab('meteorologia')" id="tab-btn-meteorologia" role="tab" aria-selected="false" aria-controls="section-meteorologia" class="tab flex-1 flex flex-col items-center gap-1.5 relative">
                 <i class="fa-solid fa-cloud-sun text-[15px]"></i><span>Clima</span>
             </button>
         </div>
     </footer>
+
+    <!-- MODAL VOO 3D (MapLibre + terreno, carregado a pedido) -->
+    <div id="modal-3d" role="dialog" aria-modal="true" aria-label="Voo 3D sobre o percurso">
+        <div class="m3d-bar">
+            <div>
+                <div class="eyebrow">Voo 3D · Terreno</div>
+                <div class="display text-[15px] text-ink leading-none mt-0.5">Picos de Europa</div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-[11px] text-mute hover:text-copper transition inline-flex items-center gap-1.5" title="Abrir no Google Earth"><i class="fa-brands fa-google text-[11px]"></i>Earth</a>
+                <button onclick="close3D()" class="icon-btn" aria-label="Fechar voo 3D"><i class="fa-solid fa-xmark text-[13px]"></i></button>
+            </div>
+        </div>
+        <div id="map3d">
+            <div id="m3d-loader"><i class="fa-solid fa-mountain-sun text-copper text-xl"></i><span>A preparar o terreno 3D…</span></div>
+        </div>
+    </div>
 
     <!-- JAVASCRIPT: LÓGICA E CONTEÚDO -->
     <script>
         // GLOBAL MAP INSTANCE
         let activeMapInstance = null;
         let currentDayNum = 1;
+        let mapEl = null;            // <div> persistente que o Leaflet possui
+        let dayLayerGroup = null;    // camadas (rota + marcadores) do dia atual
+        let currentMarkers = [];     // marcadores do dia, para scrollytelling
+
+        // ── Preferência de movimento + View Transitions ──
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function withViewTransition(fn) {
+            if (prefersReducedMotion || !document.startViewTransition) { fn(); return; }
+            document.startViewTransition(fn);
+        }
+        const haptic = (ms = 8) => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+
+        // ─── Voo 3D (MapLibre + terreno) — carregado a pedido ────
+        let map3dInstance = null, map3dLoading = false, map3dRotateRAF = null, m3dInteracting = false;
+        const esc3D = (e) => { if (e.key === 'Escape') close3D(); };
+
+        function open3D() {
+            haptic(8);
+            document.getElementById('modal-3d').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            document.addEventListener('keydown', esc3D);
+            init3D();
+        }
+        function close3D() {
+            document.getElementById('modal-3d').classList.remove('open');
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', esc3D);
+            if (map3dRotateRAF) { cancelAnimationFrame(map3dRotateRAF); map3dRotateRAF = null; }
+        }
+        function loadScriptOnce(src, ready) {
+            return new Promise((resolve, reject) => {
+                if (ready()) return resolve();
+                const s = document.createElement('script');
+                s.src = src; s.async = true;
+                s.onload = () => resolve();
+                s.onerror = () => reject(new Error('script ' + src));
+                document.head.appendChild(s);
+            });
+        }
+        function loadCssOnce(href) {
+            if (document.querySelector('link[href="' + href + '"]')) return;
+            const l = document.createElement('link');
+            l.rel = 'stylesheet'; l.href = href;
+            document.head.appendChild(l);
+        }
+        function startOrbit() {
+            if (prefersReducedMotion || !map3dInstance) return;
+            if (map3dRotateRAF) cancelAnimationFrame(map3dRotateRAF);
+            const step = () => {
+                if (m3dInteracting || !map3dInstance) { map3dRotateRAF = null; return; }
+                map3dInstance.setBearing(map3dInstance.getBearing() + 0.06);
+                map3dRotateRAF = requestAnimationFrame(step);
+            };
+            map3dRotateRAF = requestAnimationFrame(step);
+        }
+        async function init3D() {
+            if (map3dInstance) { map3dInstance.resize(); startOrbit(); return; }
+            if (map3dLoading) return;
+            map3dLoading = true;
+            const loader = document.getElementById('m3d-loader');
+            try {
+                loadCssOnce('https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css');
+                await loadScriptOnce('https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js', () => !!window.maplibregl);
+
+                const carto = ['a', 'b', 'c', 'd'].map(s => 'https://' + s + '.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png');
+                map3dInstance = new maplibregl.Map({
+                    container: 'map3d',
+                    attributionControl: { compact: true },
+                    center: [-4.95, 43.19], zoom: 9.2, pitch: 72, bearing: -20, maxPitch: 80,
+                    style: {
+                        version: 8,
+                        sources: {
+                            imagery: { type: 'raster', tiles: carto, tileSize: 256, attribution: '&copy; OSM &copy; CARTO' },
+                            dem: { type: 'raster-dem', tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], tileSize: 256, encoding: 'terrarium', maxzoom: 13 }
+                        },
+                        layers: [
+                            { id: 'bg', type: 'background', paint: { 'background-color': '#e0d3b3' } },
+                            { id: 'imagery', type: 'raster', source: 'imagery' }
+                        ],
+                        terrain: { source: 'dem', exaggeration: 1.5 }
+                    }
+                });
+                map3dInstance.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-left');
+                ['dragstart', 'mousedown', 'touchstart', 'wheel'].forEach(ev => map3dInstance.on(ev, () => { m3dInteracting = true; }));
+
+                map3dInstance.on('load', () => {
+                    map3dInstance.setTerrain({ source: 'dem', exaggeration: 1.5 });
+                    // Sombreado de relevo — dá profundidade às montanhas (estética topográfica)
+                    map3dInstance.addLayer({
+                        id: 'hillshade', type: 'hillshade', source: 'dem',
+                        paint: { 'hillshade-exaggeration': 0.5, 'hillshade-shadow-color': '#6b3f1e', 'hillshade-highlight-color': '#f5edd9', 'hillshade-accent-color': '#a8632f' }
+                    });
+                    // Rota completa de todos os dias, em cobre (com brilho)
+                    const lines = Object.keys(days).map(k => days[k].routePath).filter(rp => rp && rp.length)
+                        .map(rp => ({ type: 'Feature', geometry: { type: 'LineString', coordinates: rp.map(p => [p[1], p[0]]) }, properties: {} }));
+                    map3dInstance.addSource('rota', { type: 'geojson', data: { type: 'FeatureCollection', features: lines } });
+                    map3dInstance.addLayer({ id: 'rota-glow', type: 'line', source: 'rota', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#a8632f', 'line-width': 6, 'line-opacity': 0.25, 'line-blur': 3 } });
+                    map3dInstance.addLayer({ id: 'rota-line', type: 'line', source: 'rota', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#a8632f', 'line-width': 2.5 } });
+                    const wpts = [];
+                    Object.keys(days).forEach(k => (days[k].waypoints || []).forEach(w => wpts.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [w.coords[1], w.coords[0]] }, properties: { name: w.name } })));
+                    map3dInstance.addSource('wpts', { type: 'geojson', data: { type: 'FeatureCollection', features: wpts } });
+                    map3dInstance.addLayer({ id: 'wpts', type: 'circle', source: 'wpts', paint: { 'circle-radius': 3.5, 'circle-color': '#a8632f', 'circle-stroke-color': '#efe6d2', 'circle-stroke-width': 1.5 } });
+
+                    if (loader) loader.style.display = 'none';
+                    startOrbit();
+                });
+                map3dInstance.on('error', (e) => { console.warn('map3d', e && e.error && e.error.message); });
+            } catch (err) {
+                console.error(err);
+                if (loader) loader.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-copper"></i><span>Sem ligação — o voo 3D precisa de internet.</span>';
+            } finally {
+                map3dLoading = false;
+            }
+        }
 
         // BASE DE DADOS COMPLETA DO ROTEIRO COM COORDENADAS E WAYPOINTS PARA O MAPA
         const days = {
@@ -706,7 +1021,7 @@
                 gastronomy: {
                     region: "Trás-os-Montes",
                     dishes: "Posta Mirandesa na brasa, Alheira de Mirandela e cogumelos silvestres salteados.",
-                    restaurant: "Taberna do Javali (Bragança) - Carnes grelhadas excecionais. Tel: +351 273 381 371.",
+                    restaurant: { name: "Taberna do Javali (Bragança)", desc: "Carnes grelhadas excecionais.", tel: "+351 273 381 371" },
                     adamusPairing: "Sugestão ADAMUS: Para abrir o apetite em Trás-os-Montes, harmonize os seus queijos transmontanos com o requintado Adamus Organic Dry Gin servido com tónica premium e uma raspa de limão fresco."
                 }
             },
@@ -755,7 +1070,7 @@
                 gastronomy: {
                     region: "Castela e Leão",
                     dishes: "Lechazo Asado (Cordeiro assado lentamente em forno de lenha) e Cecina de León (carne de vaca curada e fumada de sabor único).",
-                    restaurant: "Restaurante Sainz (Riaño) - Carnes excecionais e vistas sobre a barragem. Tel: +34 987 74 06 12.",
+                    restaurant: { name: "Restaurante Sainz (Riaño)", desc: "Carnes excecionais e vistas sobre a barragem.", tel: "+34 987 74 06 12" },
                     adamusPairing: "Sugestão ADAMUS: Em Riaño, após as curvas frias do planalto, relaxe a beber uma dose de Adamus Gin com tónica e folhas frescas de manjericão, harmonizando na perfeição com a saborosa Cecina de León."
                 }
             },
@@ -802,7 +1117,7 @@
                 gastronomy: {
                     region: "Astúrias",
                     dishes: "Cachopo Asturiano (dois bifes grandes recheados com presunto e queijo, panados e fritos) servido com batatas e Sidra Natural vertida.",
-                    restaurant: "La Pasera Restaurant - O restaurante do complexo hoteleiro serve excelente gastronomia. Tel: +34 985 84 60 41.",
+                    restaurant: { name: "La Pasera Restaurant", desc: "O restaurante do complexo hoteleiro serve excelente gastronomia.", tel: "+34 985 84 60 41" },
                     adamusPairing: "Sugestão ADAMUS: Depois de enfrentar as curvas técnicas e frias de San Glorio, relaxe no hotel saboreando o requinte do Adamus Dry Gin servido com tónica premium e bagas de zimbro esmagadas."
                 }
             },
@@ -849,7 +1164,7 @@
                 gastronomy: {
                     region: "Astúrias Alta Montanha",
                     dishes: "Fabada Asturiana (feijoada rica tradicional com enchidos locais - compango) e Queijo de Cabrales (queijo azul artesanal fortíssimo).",
-                    restaurant: "El Cenador de los Canónigos (Cangas de Onís) - Fantástica cozinha asturiana tradicional. Tel: +34 985 84 94 45.",
+                    restaurant: { name: "El Cenador de los Canónigos (Cangas de Onís)", desc: "Fantástica cozinha asturiana tradicional.", tel: "+34 985 84 94 45" },
                     adamusPairing: "Sugestão ADAMUS: O queijo de Cabrales é famoso pela sua força e picante. O contraste perfeito é um gin tónico Adamus Organic Dry muito fresco servido com uma rodela fina de tangerina doce."
                 }
             },
@@ -899,7 +1214,7 @@
                 gastronomy: {
                     region: "El Bierzo",
                     dishes: "Botillo del Bierzo (enchido grande recheado com costela de porco picada, cozido com batatas e couve) e Empanada Berciana com mexilhão ou carne.",
-                    restaurant: "Restaurante Orellán (Las Médulas) - Cozinha caseira tradicional com vistas incríveis. Tel: +34 987 42 01 24.",
+                    restaurant: { name: "Restaurante Orellán (Las Médulas)", desc: "Cozinha caseira tradicional com vistas incríveis.", tel: "+34 987 42 01 24" },
                     adamusPairing: "Sugestão ADAMUS: No magnífico pôr do sol sobre as colinas vermelhas de Las Médulas, contemple a paisagem a degustar o sofisticado Adamus Gin com tónica e uma pétala de hibisco seca."
                 }
             },
@@ -947,7 +1262,7 @@
                 gastronomy: {
                     region: "Norte de Portugal & N2",
                     dishes: "Pastel de Chaves (massa folhada recheada com carne picada) ou Presunto de Chaves na brasa com pão de centeio.",
-                    restaurant: "Restaurante Carvalho (Chaves) - Ponto de paragem obrigatório de motards portugueses. Tel: +351 276 321 727.",
+                    restaurant: { name: "Restaurante Carvalho (Chaves)", desc: "Ponto de paragem obrigatório de motards portugueses.", tel: "+351 276 321 727" },
                     adamusPairing: "Sugestão ADAMUS: Chegados de volta a Portugal, celebre o sucesso da grande viagem Picos 2026 Roadbook Edition brindando em grupo com o inconfundível Adamus Organic Dry Gin!"
                 }
             }
@@ -992,20 +1307,44 @@
 
         // ─── Navegação ───────────────────────────────────────────
         const TAB_BASE = "tab flex-1 flex flex-col items-center gap-1.5 relative";
+        const TABS = ['rota','logistica','checklist','meteorologia'];
+        let currentTab = 'rota';
+
+        function moveTabIndicator(tab) {
+            const ind = document.getElementById('tab-indicator');
+            const btn = document.getElementById('tab-btn-' + tab);
+            if (!ind || !btn) return;
+            const w = 22;
+            ind.style.width = w + 'px';
+            ind.style.left = (btn.offsetLeft + btn.offsetWidth / 2 - w / 2) + 'px';
+        }
+
         function switchMainTab(tab) {
-            ['rota','logistica','checklist','meteorologia'].forEach(t => {
-                document.getElementById('section-' + t).classList.add('hidden');
-                document.getElementById('tab-btn-' + t).className = TAB_BASE;
+            haptic(6);
+            currentTab = tab;
+            withViewTransition(() => {
+                TABS.forEach(t => {
+                    document.getElementById('section-' + t).classList.add('hidden');
+                    const b = document.getElementById('tab-btn-' + t);
+                    b.className = TAB_BASE;
+                    b.setAttribute('aria-selected', 'false');
+                });
+                document.getElementById('section-' + tab).classList.remove('hidden');
+                const active = document.getElementById('tab-btn-' + tab);
+                active.className = TAB_BASE + ' tab-active';
+                active.setAttribute('aria-selected', 'true');
             });
-            document.getElementById('section-' + tab).classList.remove('hidden');
-            document.getElementById('tab-btn-' + tab).className = TAB_BASE + ' tab-active';
+            moveTabIndicator(tab);
+
+            // Reanima a revelação dos cartões da secção que acabou de aparecer
+            requestAnimationFrame(() => observeReveals('#section-' + tab));
 
             if (tab === 'rota' && activeMapInstance) {
                 setTimeout(() => {
                     activeMapInstance.invalidateSize();
                     const d = days[currentDayNum];
-                    if (d && d.mapCenter) activeMapInstance.setView(d.mapCenter, d.zoom);
-                }, 180);
+                    if (d && d.mapCenter) activeMapInstance.setView(d.mapCenter, d.zoom, { animate: true });
+                }, 220);
             }
             if (tab === 'meteorologia') fetchWeatherForecasts();
         }
@@ -1023,40 +1362,189 @@
         }
 
         // ─── Renderização do dia ─────────────────────────────────
+        // ─── Helpers de movimento ────────────────────────────────
+        let revealObserver = null;
+        function setupRevealObserver() {
+            if (!('IntersectionObserver' in window)) return;
+            revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('is-in');
+                        if (e.target.matches('.count-up')) countUp(e.target);
+                        e.target.querySelectorAll && e.target.querySelectorAll('.count-up').forEach(countUp);
+                        revealObserver.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+        }
+        function observeReveals(scope) {
+            const root = scope ? document.querySelector(scope) : document;
+            if (!root) return;
+            const targets = root.querySelectorAll('.reveal, .tl-line, .tl-step, .count-up');
+            if (!revealObserver) { targets.forEach(t => t.classList.add('is-in')); return; }
+            targets.forEach(t => revealObserver.observe(t));
+        }
+        function countUp(el) {
+            if (el.dataset.counted) return;
+            el.dataset.counted = '1';
+            const target = parseInt(el.dataset.count, 10);
+            if (isNaN(target)) return;
+            const suffix = el.dataset.suffix || '';
+            if (prefersReducedMotion) { el.textContent = target + suffix; return; }
+            const dur = 850, start = performance.now();
+            (function tick(now) {
+                const p = Math.min(1, (now - start) / dur);
+                const eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.round(target * eased) + suffix;
+                if (p < 1) requestAnimationFrame(tick);
+            })(performance.now());
+        }
+
+        // ─── Clima do dia (médias de Junho, offline-friendly) ────
+        const DAY_WEATHER = { 1: ['braganca'], 2: ['riano'], 3: ['sanglorio', 'covadonga'], 4: ['covadonga'], 5: ['lasmedulas'], 6: ['chaves'] };
+        function histWeatherGlyph(hist) {
+            const t = (hist.desc || '').toLowerCase(), rain = hist.rain || 0;
+            if (t.includes('nevoeiro')) return { fa: 'fa-smog', anim: 'wx-fog' };
+            if (rain >= 45 || t.includes('chuva') || t.includes('chuvisc') || t.includes('aguace')) return { fa: 'fa-cloud-rain', anim: 'wx-rain' };
+            if (t.includes('sol') || t.includes('limpo') || t.includes('seco')) return { fa: 'fa-sun', anim: 'wx-spin' };
+            if (rain >= 30 || t.includes('nubl') || t.includes('húmid') || t.includes('atlântico')) return { fa: 'fa-cloud-sun', anim: 'wx-float' };
+            return { fa: 'fa-sun', anim: 'wx-spin' };
+        }
+        function dayWeatherHtml(num) {
+            const keys = DAY_WEATHER[num];
+            if (!keys || !keys.length) return '';
+            const chips = keys.map(k => {
+                const loc = locations[k]; if (!loc) return '';
+                const g = histWeatherGlyph(loc.hist);
+                const short = loc.name.split(/[\/(]/)[0].trim();
+                const alert = loc.hist.rain >= 45;
+                return `
+                    <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                        <i class="fa-solid ${g.fa} ${g.anim} ${alert ? 'text-[color:var(--danger)]' : 'text-copper'} text-[16px] w-5 text-center shrink-0"></i>
+                        <div class="leading-tight min-w-0">
+                            <div class="text-[12px] text-ink truncate">${short}</div>
+                            <div class="mono text-[10.5px] text-mute">${loc.hist.tempMin}–${loc.hist.tempMax}° · ${loc.hist.rain}%${alert ? ' <span class="text-[color:var(--danger)]">⚠</span>' : ''}</div>
+                        </div>
+                    </div>`;
+            }).join('<div class="w-px self-stretch bg-[var(--line)] mx-1"></div>');
+            return `
+                <div class="card-inset p-3">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <div class="eyebrow">Clima previsto</div>
+                        <button onclick="switchMainTab('meteorologia')" class="mono text-[9.5px] text-mute hover:text-copper transition inline-flex items-center gap-1">média · Junho<i class="fa-solid fa-arrow-right text-[8px]"></i></button>
+                    </div>
+                    <div class="flex items-stretch gap-3">${chips}</div>
+                </div>`;
+        }
+
+        // ─── Previsão horária por etapa (Open-Meteo, ao vivo) ───
+        const MONTHS_ISO = { JAN: '01', FEV: '02', MAR: '03', ABR: '04', MAI: '05', JUN: '06', JUL: '07', AGO: '08', SET: '09', OUT: '10', NOV: '11', DEZ: '12' };
+        const TRIP_YEAR = 2026;
+        function tripIsoDate(d) {
+            const p = (d.date || '').split(' ');
+            if (p.length < 2 || !MONTHS_ISO[p[1]]) return null;
+            return TRIP_YEAR + '-' + MONTHS_ISO[p[1]] + '-' + p[0].padStart(2, '0');
+        }
+        function wxIcon(code) {
+            if (code === 0) return 'fa-sun';
+            if (code === 1 || code === 2) return 'fa-cloud-sun';
+            if (code === 3) return 'fa-cloud';
+            if (code === 45 || code === 48) return 'fa-smog';
+            if ([51, 53, 55, 56, 57].includes(code)) return 'fa-cloud-rain';
+            if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'fa-cloud-showers-heavy';
+            if ([71, 73, 75, 77, 85, 86].includes(code)) return 'fa-snowflake';
+            if ([95, 96, 99].includes(code)) return 'fa-cloud-bolt';
+            return 'fa-cloud-sun';
+        }
+        // Um único pedido por dia (Open-Meteo aceita coordenadas múltiplas separadas por vírgula)
+        const hourlyCache = {};
+        async function fetchHourlyBatch(lats, lons, iso) {
+            const key = iso + '|' + lats.join(',') + '|' + lons.join(',');
+            if (key in hourlyCache) return hourlyCache[key];
+            const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lats.join(',') + '&longitude=' + lons.join(',') +
+                '&hourly=temperature_2m,weathercode,precipitation_probability&start_date=' + iso + '&end_date=' + iso + '&timezone=Europe%2FMadrid';
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('http');
+                const j = await res.json();
+                const arr = Array.isArray(j) ? j : [j];
+                const out = arr.map(o => (o && o.hourly && o.hourly.time)
+                    ? { time: o.hourly.time, temp: o.hourly.temperature_2m, code: o.hourly.weathercode, rain: o.hourly.precipitation_probability }
+                    : null);
+                hourlyCache[key] = out;            // só cacheia sucessos
+                return out;
+            } catch (e) { return null; }            // falha transitória → permite nova tentativa
+        }
+        async function loadDayHourly(d, num) {
+            const iso = tripIsoDate(d);
+            if (!iso || !d.waypoints) return;
+            const steps = Array.from(document.querySelectorAll('#scrolly .tl-step'));
+            if (!steps.length) return;
+            const wpIdx = [...new Set(steps.map(s => parseInt(s.dataset.wp, 10)).filter(i => !isNaN(i) && d.waypoints[i]))];
+            if (!wpIdx.length) return;
+            const data = await fetchHourlyBatch(wpIdx.map(i => d.waypoints[i].coords[0]), wpIdx.map(i => d.waypoints[i].coords[1]), iso);
+            if (!data || currentDayNum !== num) return;   // falhou, ou o utilizador mudou de dia
+            const byWp = {};
+            wpIdx.forEach((i, k) => { byWp[i] = data[k]; });
+            steps.forEach(s => {
+                const series = byWp[parseInt(s.dataset.wp, 10)];
+                const slot = s.querySelector('.tl-wx');
+                if (!slot || !series) return;
+                const hour = parseInt(slot.dataset.hour, 10);
+                const stamp = 'T' + String(hour).padStart(2, '0') + ':00';
+                const idx = series.time.findIndex(t => t.endsWith(stamp));
+                if (idx < 0) return;
+                const code = series.code[idx], temp = Math.round(series.temp[idx]);
+                const rain = series.rain ? series.rain[idx] : null;
+                const wet = rain != null && rain >= 50;
+                slot.innerHTML = '<i class="fa-solid ' + wxIcon(code) + ' wx-ic" aria-hidden="true"></i>' + temp + '°' + (wet ? ' · ' + rain + '%' : '');
+                slot.title = 'Previsão para as ' + hour + 'h neste ponto' + (rain != null ? ' · ' + rain + '% de chuva' : '');
+                slot.classList.toggle('wx-alert', wet);
+                slot.classList.add('is-loaded');
+            });
+        }
+
+        // ─── Renderização do dia ─────────────────────────────────
         function showDay(num) {
             currentDayNum = num;
             const d = days[num];
 
-            if (activeMapInstance) {
-                try { activeMapInstance.remove(); } catch(e) {}
-                activeMapInstance = null;
-            }
-
             // Helper to clean ** markdown bold from data
             const md = (s) => (s || '').replace(/\*\*(.+?)\*\*/g, '<span class="text-ink">$1</span>').replace(/⚠️\s*/g, '');
 
-            // Timeline
+            const wpCount = (d.waypoints && d.waypoints.length) || 1;
+            const stepCount = d.timeline.length;
+            // Timeline com scrollytelling: cada etapa aponta para um waypoint do mapa
             const timelineHtml = `
                 <section class="card p-4">
                     <div class="eyebrow mb-4">Etapas do dia</div>
-                    <div class="relative pl-5 space-y-4" style="border-left:1px solid var(--line);">
-                        ${d.timeline.map(item => `
-                            <div class="relative">
-                                <div class="absolute -left-[23px] top-1.5 w-1.5 h-1.5 rounded-full bg-copper"></div>
+                    <div class="relative pl-5">
+                        <div class="tl-line" style="position:absolute;left:0;top:6px;bottom:6px;width:1px;background:var(--line);"></div>
+                        <div class="space-y-4">
+                        ${d.timeline.map((item, i) => {
+                            const wp = Math.round((i / Math.max(1, stepCount - 1)) * (wpCount - 1));
+                            const hour = parseInt(item.time, 10);
+                            return `
+                            <div class="tl-step relative p-2 -mx-2" data-wp="${wp}">
+                                <div class="tl-dot absolute -left-[15px] top-3.5 w-1.5 h-1.5 rounded-full bg-copper"></div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <span class="mono text-[12px] text-copper">${item.time}</span>
-                                    ${item.mapsLink ? `<a href="${item.mapsLink}" target="_blank" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-location-dot text-[9px]"></i>Maps</a>` : ''}
+                                    <span class="flex items-baseline gap-2">
+                                        <span class="mono text-[12px] text-copper">${item.time}</span>
+                                        <span class="tl-wx mono text-[11px] text-mute" data-hour="${hour}"></span>
+                                    </span>
+                                    ${item.mapsLink ? `<a href="${item.mapsLink}" target="_blank" rel="noopener noreferrer" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-location-dot text-[9px]"></i>Maps</a>` : ''}
                                 </div>
                                 <p class="text-[12.5px] text-dim leading-relaxed">${md(item.desc)}</p>
-                            </div>
-                        `).join('')}
+                            </div>`;
+                        }).join('')}
+                        </div>
                     </div>
                 </section>
             `;
 
             // Passes
             const passesHtml = (d.passes && d.passes.length) ? `
-                <section class="card p-4">
+                <section class="card p-4 reveal">
                     <div class="eyebrow mb-3">Portos de montanha</div>
                     <div class="space-y-3 text-[12.5px]">
                         ${d.passes.map(p => `
@@ -1072,13 +1560,19 @@
                 </section>
             ` : '';
 
-            // Gastronomy
-            const restParts = d.gastronomy.restaurant.split(' - ');
-            const restName  = restParts[0];
-            const restDesc  = (restParts[1] || '').split('. Tel:')[0];
-            const restTel   = (d.gastronomy.restaurant.split('Tel: ')[1] || '').replace('.', '').trim();
+            // Gastronomy — modelo estruturado {name, desc, tel} (com fallback p/ string antiga)
+            const r = d.gastronomy.restaurant;
+            let restName, restDesc, restTel;
+            if (r && typeof r === 'object') {
+                restName = r.name; restDesc = r.desc || ''; restTel = r.tel || '';
+            } else {
+                const parts = (r || '').split(' - ');
+                restName = parts[0];
+                restDesc = (parts[1] || '').split('. Tel:')[0];
+                restTel  = ((r || '').split('Tel: ')[1] || '').replace('.', '').trim();
+            }
             const gastronomyHtml = `
-                <section class="card p-4">
+                <section class="card p-4 reveal">
                     <div class="flex items-baseline justify-between mb-3">
                         <div class="eyebrow">Gastronomia</div>
                         <span class="mono text-[10.5px] text-mute">${d.gastronomy.region}</span>
@@ -1096,10 +1590,10 @@
                 </section>
             `;
 
-            // Cover (ilustração do dia)
+            // Cover (ilustração do dia) — elemento partilhado na View Transition
             const coverHtml = d.coverImage ? `
-                <div class="relative rounded overflow-hidden border border-[var(--line)]" style="aspect-ratio:16/9;">
-                    <img src="${d.coverImage}" alt="" class="w-full h-full object-cover" />
+                <div class="relative rounded overflow-hidden border border-[var(--line)]" style="aspect-ratio:16/9;view-transition-name:day-cover;">
+                    <img src="${d.coverImage}" alt="Ilustração do dia ${num}: ${d.title}" class="w-full h-full object-cover cover-img" />
                     <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(239,230,210,0) 30%,rgba(239,230,210,0.98) 100%);"></div>
                     <div class="absolute bottom-3 left-4 right-4">
                         <div class="mono text-[10px] text-copper tracking-[0.2em] uppercase">${d.weekday} · ${d.date}</div>
@@ -1110,16 +1604,21 @@
 
             const sleepName  = d.sleep.split(' - ')[0];
             const sleepPrice = d.sleep.split(' - ')[1] || '—';
+            const distNum = parseInt(d.distance, 10);
+            const distStat = isNaN(distNum)
+                ? `<div class="mono text-[13px] text-ink mt-1">${d.distance}</div>`
+                : `<div class="mono count-up text-[13px] text-ink mt-1" data-count="${distNum}" data-suffix=" km">${d.distance}</div>`;
 
-            document.getElementById('day-content').innerHTML = `
-                <div class="space-y-4 fade-in">
+            const paint = () => {
+                document.getElementById('day-content').innerHTML = `
+                <div class="space-y-4 day-enter">
                     ${coverHtml}
 
                     <section class="card p-4 space-y-4">
                         <div class="grid grid-cols-3 gap-px bg-[var(--line)] rounded-md overflow-hidden text-center">
                             <div class="bg-[var(--bg-elev)] py-2.5">
                                 <div class="eyebrow">Distância</div>
-                                <div class="mono text-[13px] text-ink mt-1">${d.distance}</div>
+                                ${distStat}
                             </div>
                             <div class="bg-[var(--bg-elev)] py-2.5">
                                 <div class="eyebrow">Tempo</div>
@@ -1131,17 +1630,11 @@
                             </div>
                         </div>
 
+                        ${dayWeatherHtml(num)}
+
                         <div>
                             <div class="eyebrow mb-1.5">Itinerário</div>
                             <p class="text-[12.5px] text-dim leading-relaxed">${d.route}</p>
-                        </div>
-
-                        <div>
-                            <div class="flex items-baseline justify-between mb-2">
-                                <div class="eyebrow">Mapa do percurso</div>
-                                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-earth-europe text-[9px]"></i>Voo 3D</a>
-                            </div>
-                            <div id="map" class="w-full h-56 rounded-md border border-[var(--line)] overflow-hidden relative"></div>
                         </div>
 
                         <div class="card-inset p-3 flex items-center justify-between">
@@ -1153,11 +1646,23 @@
                         </div>
                     </section>
 
-                    ${timelineHtml}
+                    <!-- Scrollytelling: o mapa fica fixo enquanto o itinerário rola -->
+                    <div id="scrolly" class="space-y-4">
+                        <div class="map-sticky card p-3">
+                            <div class="flex items-baseline justify-between mb-2">
+                                <div class="eyebrow">Mapa do percurso</div>
+                                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-earth-europe text-[9px]"></i>Voo 3D</a>
+                            </div>
+                            <div id="map-slot" class="w-full h-56 rounded-md border border-[var(--line)] overflow-hidden relative"></div>
+                        </div>
+
+                        ${timelineHtml}
+                    </div>
+
                     ${passesHtml}
                     ${gastronomyHtml}
 
-                    <section class="card p-4" style="border-color:rgba(122,46,42,0.3);">
+                    <section class="card p-4 reveal" style="border-color:rgba(122,46,42,0.3);">
                         <div class="flex items-center gap-2 mb-2">
                             <i class="fa-solid fa-triangle-exclamation text-[color:var(--danger)] text-[12px]"></i>
                             <span class="eyebrow" style="color:var(--danger);">Avisos &amp; perigos</span>
@@ -1165,50 +1670,120 @@
                         <p class="text-[12.5px] text-dim leading-relaxed">${md(d.warnings)}</p>
                     </section>
                 </div>
-            `;
+                `;
+                lastWp = -1;
+                observeReveals('#day-content');
+                requestAnimationFrame(() => renderDayMap(d));
+                loadDayHourly(d, num);
+            };
 
-            // Leaflet
-            if (d.mapCenter && d.zoom) {
-                setTimeout(() => {
-                    try {
-                        activeMapInstance = L.map('map', {
-                            zoomControl: true, scrollWheelZoom: false, dragging: true, tap: false
-                        }).setView(d.mapCenter, d.zoom);
+            withViewTransition(paint);
 
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
-                            attribution: '&copy; OSM &copy; CARTO',
-                            subdomains: 'abcd'
-                        }).addTo(activeMapInstance);
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
-                            subdomains: 'abcd'
-                        }).addTo(activeMapInstance);
-
-                        d.waypoints.forEach(wp => {
-                            const icon = L.divIcon({
-                                className: 'custom-div-icon',
-                                html: '<div style="width:10px;height:10px;border-radius:50%;background:#a8632f;border:2px solid #efe6d2;box-shadow:0 0 0 1px #a8632f;"></div>',
-                                iconSize: [14, 14], iconAnchor: [7, 7]
-                            });
-                            L.marker(wp.coords, { icon }).addTo(activeMapInstance).bindPopup(
-                                `<div style="font-family:Inter;font-size:12px;color:#1c1814;padding:2px 4px;"><div style="color:#a8632f;font-weight:600;margin-bottom:2px;">${wp.name}</div><div style="color:#4a3d2e;font-size:11px;">${wp.desc}</div></div>`
-                            );
-                        });
-
-                        if (d.routePath && d.routePath.length) {
-                            L.polyline(d.routePath, { color: '#a8632f', weight: 2.5, opacity: 0.9 }).addTo(activeMapInstance);
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        document.getElementById('map').innerHTML =
-                            '<div class="absolute inset-0 flex flex-col items-center justify-center text-mute text-[11px] gap-1.5"><i class="fa-solid fa-circle-exclamation text-copper"></i><span>Mapa indisponível offline.</span></div>';
-                    }
-                }, 150);
-            }
-
-            // Day pill active state
+            // Day pill active state + carimbo postal
             document.querySelectorAll('.day-btn').forEach((btn, idx) => {
                 const base = "day-btn day-pill px-3.5 py-2 rounded-md flex flex-col items-center min-w-[58px]";
-                btn.className = base + ((idx + 1 === num) ? ' day-pill-active' : '');
+                const active = (idx + 1 === num);
+                btn.className = base + (active ? ' day-pill-active' : '');
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+                if (active && !prefersReducedMotion) {
+                    btn.classList.remove('stamping'); void btn.offsetWidth; btn.classList.add('stamping');
+                }
+            });
+            haptic(5);
+        }
+
+        // ─── Mapa persistente: voa entre dias, desenha a rota ────
+        function ensureMap() {
+            const slot = document.getElementById('map-slot');
+            if (!slot) return null;
+            if (!activeMapInstance) {
+                mapEl = document.createElement('div');
+                mapEl.id = 'map';
+                mapEl.style.width = '100%';
+                mapEl.style.height = '100%';
+                slot.appendChild(mapEl);
+                activeMapInstance = L.map(mapEl, { zoomControl: true, scrollWheelZoom: false, dragging: true, tap: false });
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; OSM &copy; CARTO', subdomains: 'abcd'
+                }).addTo(activeMapInstance);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+                    subdomains: 'abcd'
+                }).addTo(activeMapInstance);
+                dayLayerGroup = L.layerGroup().addTo(activeMapInstance);
+            } else if (mapEl && mapEl.parentNode !== slot) {
+                slot.appendChild(mapEl);          // reaproveita a mesma instância
+            }
+            activeMapInstance.invalidateSize();
+            return activeMapInstance;
+        }
+
+        function renderDayMap(d) {
+            if (!(d.mapCenter && d.zoom)) return;
+            let map = null;
+            try { map = ensureMap(); } catch (e) { console.error(e); }
+            if (!map) {
+                const s = document.getElementById('map-slot');
+                if (s) s.innerHTML = '<div class="absolute inset-0 flex flex-col items-center justify-center text-mute text-[11px] gap-1.5"><i class="fa-solid fa-circle-exclamation text-copper"></i><span>Mapa indisponível offline.</span></div>';
+                return;
+            }
+            const pts = (d.routePath && d.routePath.length) ? d.routePath : d.waypoints.map(w => w.coords);
+            const bounds = L.latLngBounds(pts);
+            const draw = () => drawDayVectors(d);
+            if (prefersReducedMotion) {
+                map.fitBounds(bounds, { padding: [24, 24], maxZoom: d.zoom + 1, animate: false });
+                draw();
+            } else {
+                try { map.flyToBounds(bounds, { padding: [24, 24], maxZoom: d.zoom + 1, duration: 0.85 }); }
+                catch (e) { map.fitBounds(bounds, { padding: [24, 24] }); }
+                setTimeout(draw, 880);
+            }
+        }
+
+        function drawDayVectors(d) {
+            if (!activeMapInstance || !dayLayerGroup) return;
+            dayLayerGroup.clearLayers();
+            currentMarkers = [];
+
+            // Rota — desenha-se sozinha (stroke-dashoffset)
+            if (d.routePath && d.routePath.length) {
+                const poly = L.polyline(d.routePath, { color: '#a8632f', weight: 2.5, opacity: 0.9 });
+                dayLayerGroup.addLayer(poly);
+                if (!prefersReducedMotion && poly._path && poly._path.getTotalLength) {
+                    try {
+                        const len = poly._path.getTotalLength();
+                        poly._path.style.setProperty('--len', len);
+                        poly._path.classList.remove('route-draw');
+                        void poly._path.getBoundingClientRect();
+                        poly._path.classList.add('route-draw');
+                    } catch (e) {}
+                }
+            }
+
+            // Marcadores — caem como pinos, em sequência
+            (d.waypoints || []).forEach((wp, i) => {
+                const icon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: '<div class="wp-dot" style="width:10px;height:10px;border-radius:50%;background:#a8632f;border:2px solid #efe6d2;box-shadow:0 0 0 1px #a8632f;"></div>',
+                    iconSize: [14, 14], iconAnchor: [7, 7]
+                });
+                const m = L.marker(wp.coords, { icon }).bindPopup(
+                    `<div style="font-family:Inter;font-size:12px;color:#1c1814;padding:2px 4px;"><div style="color:#a8632f;font-weight:600;margin-bottom:2px;">${wp.name}</div><div style="color:#4a3d2e;font-size:11px;">${wp.desc}</div></div>`
+                );
+                dayLayerGroup.addLayer(m);
+                currentMarkers.push(m);
+                if (!prefersReducedMotion && m._icon) {
+                    m._icon.style.animationDelay = (i * 70) + 'ms';
+                    m._icon.classList.add('pin-drop');
+                }
+            });
+        }
+
+        let lastWp = -1;
+        function highlightWaypoint(idx) {
+            if (idx === lastWp) return;
+            lastWp = idx;
+            currentMarkers.forEach((m, i) => {
+                if (m._icon) m._icon.classList.toggle('wp-active', i === idx);
             });
         }
 
@@ -1233,10 +1808,12 @@
                     text.style.color = saved ? 'var(--ink-mute)' : 'var(--ink)';
                     text.style.textDecoration = saved ? 'line-through' : 'none';
                     text.textContent = item.text;
+                    text.style.transition = 'color var(--dur-2) var(--ease-out)';
                     checkbox.addEventListener('change', e => {
                         localStorage.setItem(item.id, e.target.checked);
                         text.style.color = e.target.checked ? 'var(--ink-mute)' : 'var(--ink)';
                         text.style.textDecoration = e.target.checked ? 'line-through' : 'none';
+                        haptic(e.target.checked ? 12 : 6);
                     });
                     label.append(checkbox, box, text);
                     container.appendChild(label);
@@ -1395,10 +1972,70 @@
             });
         }
 
+        // ─── Scroll: progresso de leitura + scrollytelling ───────
+        let scrollTicking = false;
+        function onScroll() {
+            if (scrollTicking) return;
+            scrollTicking = true;
+            requestAnimationFrame(() => {
+                const sc = document.scrollingElement || document.documentElement;
+                const max = sc.scrollHeight - sc.clientHeight;
+                const pct = max > 0 ? (sc.scrollTop / max) * 100 : 0;
+                const bar = document.getElementById('read-progress');
+                if (bar) bar.style.width = pct.toFixed(2) + '%';
+
+                if (currentTab === 'rota' && currentMarkers.length) {
+                    const steps = document.querySelectorAll('#scrolly .tl-step');
+                    if (steps.length) {
+                        const target = window.innerHeight * 0.42;
+                        let best = null, bestDist = Infinity;
+                        steps.forEach(s => {
+                            const r = s.getBoundingClientRect();
+                            if (r.bottom < 90 || r.top > window.innerHeight) return;
+                            const dist = Math.abs((r.top + r.height / 2) - target);
+                            if (dist < bestDist) { bestDist = dist; best = s; }
+                        });
+                        steps.forEach(s => s.classList.toggle('tl-current', s === best));
+                        if (best) highlightWaypoint(parseInt(best.dataset.wp, 10) || 0);
+                    }
+                }
+                scrollTicking = false;
+            });
+        }
+
+        // ─── Dia inicial: hoje, se estivermos em viagem ──────────
+        function pickInitialDay() {
+            try {
+                const now = new Date();
+                const months = { JAN:0, FEV:1, MAR:2, ABR:3, MAI:4, JUN:5, JUL:6, AGO:7, SET:8, OUT:9, NOV:10, DEZ:11 };
+                for (const k in days) {
+                    const [dd, mon] = days[k].date.split(' ');
+                    if (months[mon] === now.getMonth() && parseInt(dd, 10) === now.getDate()) return parseInt(k, 10);
+                }
+            } catch (e) {}
+            return 1;
+        }
+
         // ─── Init ────────────────────────────────────────────────
         window.addEventListener('DOMContentLoaded', () => {
-            showDay(1);
+            setupRevealObserver();
+            showDay(pickInitialDay());
             loadChecklist();
+            observeReveals();                 // revela o conteúdo estático já visível
+
+            const placeIndicator = () => moveTabIndicator(currentTab);
+            placeIndicator();
+            requestAnimationFrame(placeIndicator);
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeIndicator);
+            window.addEventListener('resize', placeIndicator);
+            window.addEventListener('orientationchange', placeIndicator);
+
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW indisponível', e));
+            }
         });
     </script>
 </body>
