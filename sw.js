@@ -3,7 +3,7 @@
    meteorologia em rede-primeiro com fallback para cache.
    Objetivo: a app funciona na montanha, sem rede. */
 
-const VERSION = 'picos-v2';
+const VERSION = 'picos-v3';
 const SHELL = [
   './',
   './index.html',
@@ -14,10 +14,34 @@ const SHELL = [
   './d4_cover.png', './d5_cover.png', './d6_cover.png'
 ];
 
+// Recursos críticos de CDN — necessários para a app arrancar offline
+// numa instalação fresca (Leaflet + Font Awesome).
+const CDN_ASSETS = [
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+];
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(VERSION)
-      .then((cache) => cache.addAll(SHELL))
+      .then((cache) =>
+        // Shell local: tudo-ou-nada. CDNs: tolerante (allSettled), modo no-cors
+        // para obter respostas opacas cacheáveis; um falhar não aborta a instalação.
+        cache.addAll(SHELL).then(() =>
+          Promise.allSettled(
+            CDN_ASSETS.map((u) =>
+              fetch(new Request(u, { mode: 'no-cors' }))
+                .then((res) => {
+                  if (res && (res.ok || res.type === 'opaque')) {
+                    return cache.put(u, res);
+                  }
+                })
+                .catch(() => {})
+            )
+          )
+        )
+      )
       .then(() => self.skipWaiting())
       .catch(() => self.skipWaiting())
   );
