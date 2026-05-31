@@ -245,7 +245,10 @@
             60%  { transform: translateY(2px) scale(1.05); opacity: 1; }
             100% { transform: translateY(0) scale(1); opacity: 1; }
         }
-        .pin-drop { animation: pinDrop 0.4s var(--ease-spring) both; }
+        /* NB: aplicado ao elemento INTERNO do pino (não ao ícone do Leaflet),
+           e com fill 'backwards' — caso contrário o transform final sobrepõe-se
+           ao posicionamento translate3d do Leaflet e empilha os pinos na origem. */
+        .pin-drop { animation: pinDrop 0.4s var(--ease-spring) backwards; }
         .wp-dot { transition: transform 0.25s var(--ease-spring), box-shadow 0.25s ease; }
         .wp-active .wp-dot {
             transform: scale(1.9);
@@ -471,6 +474,112 @@
         }
         input:checked + .switch-track { background: var(--copper); }
         input:checked + .switch-track::after { transform: translateX(20px); background: var(--bg); border-color: var(--copper); }
+
+        /* ── Pino com dica de ouro (waypoint clicável) ── */
+        .wp-dot-gold {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--copper);
+            border: 2px solid var(--bg);
+            box-shadow: 0 0 0 1px var(--copper), 0 0 0 5px rgba(168,99,47,0.20);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--bg); font-size: 11px; line-height: 1;
+            font-family: 'Inter', system-ui, sans-serif;
+            cursor: pointer;
+            animation: goldPulse 2.4s var(--ease-out) infinite;
+        }
+        @keyframes goldPulse {
+            0%, 100% { box-shadow: 0 0 0 1px var(--copper), 0 0 0 4px rgba(168,99,47,0.24); }
+            50%      { box-shadow: 0 0 0 1px var(--copper), 0 0 0 9px rgba(168,99,47,0.05); }
+        }
+        .wp-active .wp-dot-gold {
+            transform: scale(1.5);
+            animation: none;
+            box-shadow: 0 0 0 1px var(--copper), 0 0 0 6px rgba(168,99,47,0.34) !important;
+        }
+
+        /* ── Folha de dica do lugar (bottom-sheet) ── */
+        #place-sheet { position: fixed; inset: 0; z-index: 90; visibility: hidden; }
+        #place-sheet.open { visibility: visible; }
+        #place-sheet .ps-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(28,24,20,0.34);
+            opacity: 0; transition: opacity var(--dur-2) var(--ease-out);
+            -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+        }
+        #place-sheet.open .ps-backdrop { opacity: 1; }
+        #place-sheet .ps-panel {
+            position: absolute; left: 0; right: 0; bottom: 0;
+            max-width: 42rem; margin: 0 auto;
+            max-height: 86vh; overflow-y: auto;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-bottom: none;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -8px 30px rgba(28,24,20,0.22);
+            padding: 10px 18px calc(22px + env(safe-area-inset-bottom));
+            transform: translateY(102%);
+            transition: transform var(--dur-3) var(--ease-out);
+            background-image: radial-gradient(circle at 1px 1px, var(--paper-tex) 1px, transparent 0);
+            background-size: 3px 3px;
+        }
+        #place-sheet.open .ps-panel { transform: translateY(0); }
+        #place-sheet .ps-grip {
+            width: 38px; height: 4px; border-radius: 3px;
+            background: var(--line-strong);
+            margin: 4px auto 12px;
+        }
+        .ps-gold {
+            background: linear-gradient(180deg, rgba(168,99,47,0.10), rgba(168,99,47,0.04));
+            border: 1px solid rgba(168,99,47,0.35);
+            border-radius: 6px;
+            padding: 12px 14px;
+        }
+        .ps-tag {
+            display: inline-block;
+            font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+            font-weight: 600;
+            padding: 2px 7px; border-radius: 999px;
+            border: 1px solid var(--line); color: var(--ink-mute);
+            background: var(--bg-elev);
+        }
+        .ps-tag-gp { color: var(--copper); border-color: var(--copper); }
+        @media (prefers-reduced-motion: reduce) {
+            #place-sheet .ps-panel, #place-sheet .ps-backdrop { transition: none; }
+            .wp-dot-gold { animation: none; }
+        }
+
+        /* ── Highlight por etapa (chip expansível na timeline) ── */
+        .tl-hl {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 8px; padding: 0;
+            background: none; border: none; cursor: pointer;
+            font-family: inherit;
+        }
+        .tl-hl-chip {
+            font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase;
+            font-weight: 600; color: var(--copper);
+            border: 1px solid rgba(168,99,47,0.38);
+            background: var(--bg-elev);
+            border-radius: 999px; padding: 2.5px 9px;
+            display: inline-flex; align-items: center; gap: 5px;
+            transition: background var(--dur-1) ease, border-color var(--dur-1) ease;
+        }
+        .tl-hl:active .tl-hl-chip { background: var(--bg-elev-2); }
+        .tl-hl-chip i { font-size: 9px; }
+        .tl-hl-caret {
+            font-size: 8px; color: var(--ink-mute);
+            transition: transform var(--dur-2) var(--ease-out);
+        }
+        .tl-hl[aria-expanded="true"] .tl-hl-caret { transform: rotate(180deg); }
+        .tl-hl-body {
+            overflow: hidden; max-height: 0; opacity: 0;
+            transition: max-height var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease-out), margin-top var(--dur-2) var(--ease-out);
+        }
+        .tl-hl-body.open { max-height: 260px; opacity: 1; margin-top: 8px; }
+        .tl-hl-body p {
+            font-size: 12px; color: var(--ink-dim); line-height: 1.55;
+            border-left: 2px solid rgba(168,99,47,0.4); padding-left: 10px;
+        }
     </style>
     <!-- Tailwind pré-compilado (estático, sem CDN) — gerado por `npm run build:css` -->
     <link rel="stylesheet" href="styles.css">
@@ -857,6 +966,15 @@
         </div>
         <div id="map3d">
             <div id="m3d-loader"><i class="fa-solid fa-mountain-sun text-copper text-xl"></i><span>A preparar o terreno 3D…</span></div>
+        </div>
+    </div>
+
+    <!-- FOLHA DE DICA DO LUGAR (abre ao clicar num pino com dica de ouro) -->
+    <div id="place-sheet" role="dialog" aria-modal="true" aria-label="Dica do lugar">
+        <div class="ps-backdrop" onclick="closePlaceSheet()"></div>
+        <div class="ps-panel">
+            <div class="ps-grip"></div>
+            <div id="place-sheet-body"></div>
         </div>
     </div>
 
@@ -1268,6 +1386,412 @@
             }
         };
 
+        // ─────────────────────────────────────────────────────────
+        //  DICAS DE OURO POR LUGAR / REGIÃO
+        //  Abrem numa folha estilada ao clicar no pino do mapa.
+        //  · gold   — melhor ponto de moto-turismo da zona
+        //  · eat    — tascas / comer bem (e GastroPiço nas paragens PT)
+        //  · gps    — coordenadas; o desvio à rota é calculado ao vivo
+        // ─────────────────────────────────────────────────────────
+        const GASTROPICO_URL = "https://www.youtube.com/@gastropico";
+        const placeTips = {
+            coimbra: {
+                region: "Beira · Mondego", gps: [40.2033, -8.4101], gp: true, detour: 0,
+                gold: "Ponto de partida. Antes de arrancar, a subida à Universidade Velha e à Sé Velha vale a foto. Para mota: a saída pela margem do Mondego rumo a Anadia evita o trânsito do centro.",
+                eat: [
+                    { name: "Zé Manel dos Ossos", type: "Tasca histórica", desc: "A tasca mais icónica de Coimbra — ossos da espinha estufados e feijoada de javali. Filas à porta, vale a pena.", maps: "Ze Manel dos Ossos Coimbra" },
+                    { name: "No Tacho", type: "GastroPiço", desc: "Nas recomendações de Coimbra do GastroPiço — comida portuguesa de tacho, porções honestas.", maps: "Restaurante No Tacho Coimbra" },
+                    { name: "Fogo e Tradição", type: "GastroPiço", desc: "Também na lista de Coimbra do GastroPiço — grelhados e cozinha tradicional.", maps: "Fogo e Tradicao Coimbra" }
+                ]
+            },
+            pesodaregua: {
+                region: "Douro Vinhateiro", gps: [41.1729, -7.5080], gp: true,
+                gold: "A N222 Régua → Pinhão foi eleita a melhor estrada do mundo para conduzir (Avis, 2015): 27 km colados ao rio entre socalcos de vinha. Faz o troço de manhã cedo — sol rasante e quase sem autocarros.",
+                eat: [
+                    { name: "Castas e Pratos", type: "Comer bem", desc: "Cozinha duriense num antigo armazém da estação. Reserva aconselhada.", maps: "Castas e Pratos Peso da Regua" },
+                    { name: "Cacho d'Oiro", type: "Tasca", desc: "Casa de comida regional honesta no centro — bom para um almoço rápido antes da N222.", maps: "Restaurante Cacho d'Oiro Peso da Regua" }
+                ]
+            },
+            pinhao: {
+                region: "Douro Vinhateiro", gps: [41.1903, -7.5407], gp: true,
+                gold: "Coração do Douro. Sobe a N323 até ao Miradouro de Casal de Loivos — uma das vistas mais fotografadas de Portugal sobre a curva do rio. A estação tem painéis de azulejos imperdíveis.",
+                eat: [
+                    { name: "Veladouro", type: "Tasca", desc: "Petiscos e pratos do dia à beira-rio, sem pretensões. Polvo e bola de carne.", maps: "Restaurante Veladouro Pinhao" },
+                    { name: "Ponto Final", type: "Comer bem", desc: "Vista para o rio e cozinha duriense cuidada.", maps: "Ponto Final Pinhao" }
+                ]
+            },
+            vilanovadefozcoa: {
+                region: "Vale do Côa", gps: [41.0827, -7.1354], gp: true,
+                gold: "Miradouro de São Salvador do Mundo: capelas no topo de um penhasco sobre a foz do Côa. A estrada de acesso é estreita e sinuosa — puro prazer de mota. Em redor, o Parque Arqueológico do Côa (gravuras rupestres, Património Mundial).",
+                eat: [
+                    { name: "A Marisqueira", type: "Tasca", desc: "Casa de confiança em Foz Côa para um almoço regional sólido.", maps: "A Marisqueira Vila Nova de Foz Coa" }
+                ]
+            },
+            braganca: {
+                region: "Trás-os-Montes", gps: [41.8061, -6.7567], gp: true,
+                gold: "Base da Serra de Montesinho. Sobe à Cidadela medieval (Domus Municipalis, raríssima românica civil). Para mota: a estrada para Montesinho e a fronteira do Portelo, e o troço para Rio de Onor (aldeia comunitária a cavalo na fronteira).",
+                eat: [
+                    { name: "Solar Bragançano", type: "Comer bem", desc: "Referência transmontana num solar na praça — caça, posta mirandesa e javali.", maps: "Solar Bragancano Braganca" },
+                    { name: "Tasca do Zé Tuga", type: "Tasca", desc: "Cozinha de autor sobre produto local, ambiente descontraído.", maps: "Tasca do Ze Tuga Braganca" },
+                    { name: "D. Roberto (Gimonde)", type: "Tasca", desc: "A 6 km, em Gimonde, desde 1935 — folar, enchidos e posta na brasa.", maps: "Restaurante D. Roberto Gimonde" }
+                ]
+            },
+            puebladesanabria: {
+                region: "Sanabria · Zamora", gps: [42.0544, -6.6350],
+                gold: "Um dos «pueblos más bonitos de España»: ruelas de pedra subindo ao castelo dos Condes de Benavente. A ZA-104 até ao Lago de Sanabria é um troço curto e divertido entre carvalhais.",
+                eat: [
+                    { name: "Mesón Vacceo", type: "Tasca", desc: "Habas de Sanabria, polvo e carnes da serra dentro das muralhas.", maps: "Meson Vacceo Puebla de Sanabria" }
+                ]
+            },
+            lagodesanabria: {
+                region: "Sanabria · Zamora", gps: [42.1215, -6.7118],
+                gold: "O maior lago glaciar da Península Ibérica. Para na Playa de los Enanos para a foto. Quem tiver tempo: a ZA-104 sobe até San Martín de Castañeda (mosteiro + miradouro sobre todo o lago).",
+                eat: [
+                    { name: "Restaurante Las Pedrinas", type: "Comer bem", desc: "Truta do lago e habas, mesa à beira-água em Ribadelago.", maps: "Las Pedrinas Lago de Sanabria" }
+                ]
+            },
+            astorga: {
+                region: "Maragatería · León", gps: [42.4593, -6.0560],
+                gold: "Cidade dupla: o Palácio Episcopal de Gaudí ao lado da catedral gótica. Capital da Maragatería e do chocolate. Boa paragem técnica antes da LE-142.",
+                eat: [
+                    { name: "Restaurante Las Termas", type: "Comer bem", desc: "O templo do Cocido Maragato — três pratos comidos ao contrário (carnes primeiro, sopa no fim). Vem com fome.", maps: "Restaurante Las Termas Astorga" },
+                    { name: "La Peseta", type: "Tasca", desc: "Casa centenária na praça, também famosa pelo cocido.", maps: "Restaurante La Peseta Astorga" }
+                ]
+            },
+            leon: {
+                region: "León", gps: [42.5987, -5.5671],
+                gold: "Catedral gótica com 1800 m² de vitrais (vê-a ao fim da tarde, com luz). Mas o segredo é o Barrio Húmedo: cada caña vem com tapa grátis, sem pedir.",
+                eat: [
+                    { name: "Barrio Húmedo (tapeo)", type: "Tasca", desc: "Faz a ronda pela Plaza de San Martín — morcilla, cecina e a tapa que acompanha a bebida. A Cantina e El Rebote são clássicos.", maps: "Barrio Humedo Leon tapas" }
+                ]
+            },
+            riano: {
+                region: "Montaña de Riaño · León", gps: [42.9766, -5.0057],
+                gold: "O «fiorde leonês»: aldeia reconstruída à beira da albufeira, com os picos a mergulhar na água. Daqui arranca a N-621 para San Glorio — uma das melhores estradas de mota de Espanha. Abastece à noite.",
+                eat: [
+                    { name: "Restaurante Sainz", type: "Comer bem", desc: "Carnes da montanha e vista sobre a barragem. Já é a paragem oficial do roteiro.", maps: "Restaurante Sainz Riano", tel: "+34 987 74 06 12" }
+                ]
+            },
+            puertosanglorio: {
+                region: "Porto de montanha · 1609 m", gps: [43.0669, -4.7659], detour: 1.5,
+                gold: "Curvas lendárias com piso impecável. No cume, deixa a mota e sobe a pé ~1,5 km ao Mirador de Llesba (Monumento ao Urso): panorâmica 360° sobre o maciço dos Picos. Pode estar 8 °C aqui e 24 °C em Potes — veste por camadas.",
+                eat: []
+            },
+            potes: {
+                region: "Liébana · Cantabria", gps: [43.1536, -4.6237],
+                gold: "A vila motard por excelência da Cantábria. Base para o teleférico de Fuente Dé (sobe a 1850 m em 4 min) e o Monasterio de Santo Toribio (Lignum Crucis). Lota nos fins-de-semana.",
+                eat: [
+                    { name: "Casa Cayo", type: "Comer bem", desc: "Cocido lebaniego (grão-de-bico, compango e os tradicionais relleno) numa casa de família com quartos.", maps: "Casa Cayo Potes" },
+                    { name: "El Cenador del Capitán", type: "Tasca", desc: "Petiscos da Liébana e bom ambiente no centro histórico.", maps: "El Cenador del Capitan Potes" }
+                ]
+            },
+            desfiladerodelahermida: {
+                region: "Garganta do Deva", gps: [43.2471, -4.5934],
+                gold: "21 km de garganta calcária — a mais longa de Espanha. Para na ponte da N-621 para as Pozas Termais (60 °C, grátis, no leito do rio). A meio, o desvio para a Iglesia de Santa María de Lebeña (moçárabe, séc. X) vale 5 min.",
+                eat: []
+            },
+            arenasdecabrales: {
+                region: "Picos · Cabrales", gps: [43.3015, -4.8184],
+                gold: "Capital do queijo Cabrales — visita a Cueva-Exposición, onde o queijo azul cura dentro de uma gruta natural. Porta de entrada para a Ruta del Cares (a melhor caminhada dos Picos) e para a estrada brutal a Sotres.",
+                eat: [
+                    { name: "Mercado / sidrería local", type: "Tasca", desc: "Prova o Cabrales com sidra natural escanciada. Quase qualquer sidrería do centro serve bem.", maps: "Sidreria Arenas de Cabrales" }
+                ]
+            },
+            covadonga: {
+                region: "Picos de Europa · Astúrias", gps: [43.3124, -5.0594],
+                gold: "Santuário com a Santa Cueva escavada na rocha e a Basílica rosa. A poucos km, Cangas de Onís e a sua Ponte «Romana» com a Cruz de la Victoria pendurada. À mesa, manda a sidra natural escanciada de alto.",
+                eat: [
+                    { name: "Sidrería El Polesu (Cangas)", type: "Tasca", desc: "Sidra escanciada e petiscos asturianos a 8 km, em Cangas de Onís.", maps: "Sidreria El Polesu Cangas de Onis" },
+                    { name: "El Cenador de los Canónigos", type: "Comer bem", desc: "Cozinha asturiana cuidada — fabada e cachopo. Paragem do roteiro.", maps: "El Cenador de los Canonigos Cangas de Onis", tel: "+34 985 84 94 45" }
+                ]
+            },
+            lagosdecovadonga: {
+                region: "Picos · Lagos de Enol", gps: [43.2714, -4.9940], detour: 12,
+                gold: "Os lagos glaciares Enol e Ercina, a 1100 m. Caminhada fácil entre os dois, passando pelas minas de Buferrera. ⚠ Em 2026 (1 Jun–18 Out) a subida de mota está proibida 24 h/dia — sobe de autocarro ALSA ou táxi Taxitur a partir do Santuário.",
+                eat: [
+                    { name: "Buffet do Lago Ercina", type: "Comer bem", desc: "Quiosque simples junto ao Ercina — fabada e bocadillos com vista. Não esperes mais que isto na montanha.", maps: "Lago Ercina Covadonga" }
+                ]
+            },
+            cangasdeonis: {
+                region: "Picos · Astúrias", gps: [43.3514, -5.1278],
+                gold: "A icónica Ponte «Romana» (na verdade medieval) sobre o Sella, com a Cruz de la Victoria a pender do arco. Centro vivo para almoçar e abastecer antes de Sotres.",
+                eat: [
+                    { name: "Sidrería Los Arcos", type: "Tasca", desc: "Tábuas de queijos asturianos (Cabrales, Gamonéu) e sidra junto à ponte.", maps: "Sidreria Los Arcos Cangas de Onis" }
+                ]
+            },
+            pozodelaoracion: {
+                region: "Miradouro · Cabrales", gps: [43.2981, -4.8422],
+                gold: "O miradouro clássico do Naranjo de Bulnes (Picu Urriellu, 2519 m). Painel panorâmico identifica os cumes. Luz melhor ao fim da tarde, com a parede a ficar laranja — daí o nome do pico.",
+                eat: []
+            },
+            sotres: {
+                region: "Picos · aldeia mais alta", gps: [43.2326, -4.7469], detour: 0,
+                gold: "A aldeia habitada mais alta dos Picos (1045 m). A AS-264 desde Arenas é estreita, técnica e espetacular — provavelmente a melhor estrada do dia. Daqui partem trilhos para os refúgios de altitude.",
+                eat: [
+                    { name: "Casa Cipriano", type: "Tasca", desc: "Cozido de Cabrales e queijo Gamonéu curado em gruta, no topo do mundo asturiano.", maps: "Casa Cipriano Sotres" }
+                ]
+            },
+            desfiladerobeyos: {
+                region: "Garganta do Sella · N-625", gps: [43.1867, -5.0766],
+                gold: "Uma das gargantas mais estreitas e verticais da Europa, escavada pelo Sella. Condução técnica entre paredões e túneis curtos — atenção a pedras caídas e à humidade no piso.",
+                eat: []
+            },
+            puertodelponton: {
+                region: "Porto de montanha · 1280 m", gps: [43.1160, -5.0142],
+                gold: "Liga o Desfiladero de los Beyos (norte) a Riaño (sul). Curvas amplas de raio constante, piso excelente e floresta — um dos troços mais «fluidos» da viagem. Bom ponto para esticar pernas.",
+                eat: []
+            },
+            cruzdeferro: {
+                region: "Caminho de Santiago · 1505 m", gps: [42.4912, -6.3456],
+                gold: "O ponto mais alto do Caminho Francês. Tradição: atira uma pedra de costas ao montículo, junto à cruz de ferro. A LE-142 (Foncebadón) é mística e tem uma descida técnica soberba — cuidado com peregrinos na berma.",
+                eat: [
+                    { name: "La Taberna de Gaia (Foncebadón)", type: "Tasca", desc: "Aldeia ressuscitada pelos peregrinos — caldo, botillo e ambiente de albergue a 1430 m.", maps: "Foncebadon restaurante" }
+                ]
+            },
+            elacebo: {
+                region: "El Bierzo · aldeia de xisto", gps: [42.5181, -6.4182],
+                gold: "Aldeia de lousa com varandas de madeira, suspensa na descida ao Bierzo. Monumento ao ciclista peregrino à entrada. Para a foto e segue — a Piscina Fluvial de Molinaseca espera mais abaixo.",
+                eat: [
+                    { name: "Mesón El Acebo", type: "Tasca", desc: "Botillo e cecina numa casa de pedra do Caminho.", maps: "Meson El Acebo Bierzo" }
+                ]
+            },
+            lasmedulas: {
+                region: "El Bierzo", gps: [42.4571, -6.7688],
+                gold: "A maior mina de ouro romana a céu aberto, Património Mundial — picos vermelhos rasgados pela técnica «ruina montium». Sobe ao Mirador de Orellán ao pôr-do-sol (vermelho intenso) e percorre as galerias (cuevas) a pé.",
+                eat: [
+                    { name: "Restaurante Orellán", type: "Comer bem", desc: "Cozinha caseira com vista para as colinas vermelhas. Botillo del Bierzo. Paragem do roteiro.", maps: "Restaurante Orellan Las Medulas", tel: "+34 987 42 01 24" },
+                    { name: "El Palacio", type: "Tasca", desc: "Empanada berciana e pimentos do Bierzo no centro da aldeia.", maps: "Restaurante El Palacio Las Medulas" }
+                ]
+            },
+            apobradetrives: {
+                region: "Ribeira Sacra · Galiza", gps: [42.3402, -7.2519],
+                gold: "Porta dos canyons do Sil. A OU-536 desde Trives é das estradas mais sinuosas e bonitas da Galiza, com miradouros sobre os socalcos de vinha agarrados à ravina. Opcional: catamarã pelo Sil a partir de Doade.",
+                eat: [
+                    { name: "Casa do Pulpo (Trives)", type: "Tasca", desc: "Pulpo á feira e caldo galego antes de mergulhar no desfiladeiro.", maps: "A Pobra de Trives restaurante pulpo" }
+                ]
+            },
+            chaves: {
+                region: "Alto Tâmega · N2", gps: [41.7161, -7.4819], gp: true,
+                gold: "Km 0 da mítica N2. Ponte romana de Trajano, castelo e o Forte de São Francisco. Águas termais a 73 °C a brotar no parque à beira-rio — a foto obrigatória do marco da N2.",
+                eat: [
+                    { name: "Restaurante Carvalho", type: "Comer bem", desc: "Paragem clássica de motards portugueses — cozinha transmontana farta.", maps: "Restaurante Carvalho Chaves", tel: "+351 276 321 727" },
+                    { name: "Pastelaria onde nasceu o Pastel de Chaves", type: "Tasca", desc: "O pastel de Chaves (folhado de carne) é IGP — come um quente à saída da cidade.", maps: "Pastel de Chaves Chaves" }
+                ]
+            },
+            viseu: {
+                region: "Beira Alta · N2", gps: [40.6566, -7.9125], gp: true,
+                gold: "Capital do Dão. Centro histórico em volta da Sé e do Cava de Viriato. Bom ponto para café e descanso na longa etapa de regresso pela N2.",
+                eat: [
+                    { name: "Muralha da Sé", type: "Tasca", desc: "Vitela à Lafões e rojões num casarão junto à catedral.", maps: "Muralha da Se Viseu" }
+                ]
+            }
+        };
+
+        // Resolve a dica a partir do nome do waypoint (ignora acentos/parênteses)
+        const slugifyPlace = s => (s || '').toLowerCase().normalize('NFD')
+            .replace(/[̀-ͯ]/g, '').replace(/\(.*?\)/g, '').replace(/[^a-z0-9]/g, '');
+        function tipFor(name) { return placeTips[slugifyPlace(name)] || null; }
+
+        // Desvio à rota do dia (distância ponto→segmento, em km) — projeção equirectangular local
+        function detourFromRouteKm(coords, day) {
+            const path = day && day.routePath;
+            if (!coords || !path || path.length < 2) return null;
+            const R = 6371, toRad = x => x * Math.PI / 180;
+            const lat0 = toRad(coords[0]);
+            const proj = ([la, lo]) => [toRad(lo) * Math.cos(lat0) * R, toRad(la) * R];
+            const p = proj(coords);
+            let best = Infinity;
+            for (let i = 0; i < path.length - 1; i++) {
+                const a = proj(path[i]), b = proj(path[i + 1]);
+                const dx = b[0] - a[0], dy = b[1] - a[1];
+                const len2 = dx * dx + dy * dy;
+                let t = len2 ? ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / len2 : 0;
+                t = Math.max(0, Math.min(1, t));
+                const cx = a[0] + t * dx, cy = a[1] + t * dy;
+                const d = Math.hypot(p[0] - cx, p[1] - cy);
+                if (d < best) best = d;
+            }
+            return best;
+        }
+
+        // ─── Folha de dica do lugar ──────────────────────────────
+        const escPlaceSheet = (e) => { if (e.key === 'Escape') closePlaceSheet(); };
+        function openPlaceSheet(name) {
+            const tip = tipFor(name);
+            if (!tip) return;
+            haptic(8);
+            const mapsHref = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+            const coords = tip.gps;
+
+            // Desvio à rota: explícito (tip.detour) ou calculado a partir do percurso do dia
+            let detourTxt = '';
+            const dayD = days[currentDayNum];
+            let km = (typeof tip.detour === 'number') ? tip.detour : detourFromRouteKm(coords, dayD);
+            if (km != null) {
+                if (km < 0.4) detourTxt = 'na rota';
+                else detourTxt = '≈ ' + (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km de desvio';
+            }
+
+            const eatHtml = (tip.eat && tip.eat.length) ? `
+                <div class="mt-4">
+                    <div class="eyebrow mb-2.5">Comer bem · tascas</div>
+                    <div class="space-y-2.5">
+                        ${tip.eat.map(e => `
+                            <div class="card-inset p-3">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <span class="text-ink text-[13px] font-medium">${e.name}</span>
+                                            <span class="ps-tag ${e.type === 'GastroPiço' ? 'ps-tag-gp' : ''}">${e.type}</span>
+                                        </div>
+                                        <p class="text-mute text-[11.5px] mt-1 leading-relaxed">${e.desc}</p>
+                                    </div>
+                                    ${e.tel ? `<a href="tel:${e.tel}" class="shrink-0 icon-btn" title="Telefonar" aria-label="Telefonar"><i class="fa-solid fa-phone text-[10px]"></i></a>` : ''}
+                                </div>
+                                <a href="${mapsHref(e.maps)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] text-copper mt-2"><i class="fa-solid fa-location-dot text-[10px]"></i>Ver no mapa</a>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : '';
+
+            const gpHtml = tip.gp ? `
+                <a href="${GASTROPICO_URL}" target="_blank" rel="noopener noreferrer" class="mt-4 flex items-center justify-between gap-3 card-inset p-3 transition active:bg-[var(--bg-elev-2)]">
+                    <span class="flex items-center gap-2.5">
+                        <i class="fa-brands fa-youtube text-[color:var(--danger)]"></i>
+                        <span class="text-[12px] text-ink">Mais tascas no canal do <span class="text-copper font-medium">GastroPiço</span></span>
+                    </span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-mute text-[10px]"></i>
+                </a>` : '';
+
+            document.getElementById('place-sheet-body').innerHTML = `
+                <div class="flex items-start justify-between gap-3 mb-1">
+                    <div class="min-w-0">
+                        <div class="eyebrow">${tip.region}</div>
+                        <h2 class="display text-[22px] text-ink mt-1 leading-tight">${name}</h2>
+                    </div>
+                    <button onclick="closePlaceSheet()" class="icon-btn shrink-0" aria-label="Fechar"><i class="fa-solid fa-xmark text-[13px]"></i></button>
+                </div>
+
+                <div class="ornament my-3"><span class="ornament-glyph">&diams; · &diams;</span></div>
+
+                <div class="ps-gold">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fa-solid fa-medal text-copper text-[13px]"></i>
+                        <span class="eyebrow text-copper">Dica de ouro · moto-turismo</span>
+                    </div>
+                    <p class="text-[12.5px] text-dim leading-relaxed">${tip.gold}</p>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 mt-3 card-inset p-3">
+                    <div class="leading-tight">
+                        <div class="mono text-[12px] text-ink">${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}</div>
+                        ${detourTxt ? `<div class="mono text-[10.5px] ${detourTxt === 'na rota' ? 'text-mute' : 'text-copper'} mt-0.5"><i class="fa-solid fa-route text-[9px] mr-1"></i>${detourTxt}</div>` : ''}
+                    </div>
+                    <a href="${mapsHref(coords[0] + ',' + coords[1])}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-copper border border-copper px-2.5 py-1.5 rounded-md tracking-wide whitespace-nowrap"><i class="fa-solid fa-diamond-turn-right text-[10px] mr-1"></i>Direções</a>
+                </div>
+
+                ${eatHtml}
+                ${gpHtml}
+            `;
+
+            const sheet = document.getElementById('place-sheet');
+            sheet.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            document.addEventListener('keydown', escPlaceSheet);
+            sheet.querySelector('.ps-panel').scrollTop = 0;
+        }
+        function closePlaceSheet() {
+            document.getElementById('place-sheet').classList.remove('open');
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', escPlaceSheet);
+        }
+
+        // ─────────────────────────────────────────────────────────
+        //  HIGHLIGHTS POR ETAPA — uma curiosidade por linha do dia
+        //  Tipos: moto · food · mon (monumento) · hist · curio
+        //  Os arrays estão alinhados por índice com days[n].timeline
+        // ─────────────────────────────────────────────────────────
+        const HL_TYPES = {
+            moto:  { ic: 'fa-motorcycle', label: 'Motard' },
+            food:  { ic: 'fa-utensils',   label: 'Comer bem' },
+            mon:   { ic: 'fa-landmark',   label: 'Monumento' },
+            hist:  { ic: 'fa-book',       label: 'História' },
+            curio: { ic: 'fa-lightbulb',  label: 'Curiosidade' }
+        };
+        const dayHL = {
+            1: [
+                { t: 'moto',  x: "Anadia é a capital portuguesa do espumante (Bairrada). Atestem aqui — a próxima paragem boa de combustível só na Régua." },
+                { t: 'hist',  x: "O Douro é a região vinhateira demarcada e regulamentada mais antiga do mundo (1756, por ordem do Marquês de Pombal)." },
+                { t: 'moto',  x: "Estes 27 km da N222 foram eleitos a melhor estrada do mundo para conduzir (estudo Avis, 2015). Curvas suaves e olhos no rio." },
+                { t: 'food',  x: "Prova um copo de Porto na origem — as quintas históricas (Bomfim, Carvalhas) ladeiam o Pinhão. Repara nos azulejos da estação." },
+                { t: 'mon',   x: "Sete capelas no topo de um penhasco sobre o Douro — o 'miradouro das almas' de São Salvador do Mundo. Acesso estreito, puro prazer de mota." },
+                { t: 'hist',  x: "A Domus Municipalis da cidadela de Bragança é uma das raras casas de câmara românicas civis da Europa (séc. XII)." },
+                { t: 'food',  x: "Pede Posta Mirandesa: vaca de raça mirandesa (DOP), grelhada só com sal grosso e um fio de azeite. Nada mais." }
+            ],
+            2: [
+                { t: 'curio', x: "Atravessam o Parque Natural de Montesinho, a 'Terra Fria' — um dos últimos refúgios do lobo-ibérico em Portugal." },
+                { t: 'moto',  x: "A ZA-925 entra na Sierra de la Culebra, a maior densidade de lobo da Europa Ocidental. Atenção a fauna na via ao amanhecer." },
+                { t: 'hist',  x: "O Lago de Sanabria é o maior lago glaciar da Península. A lenda diz que esconde a aldeia de Valverde de Lucerna, submersa por castigo divino." },
+                { t: 'mon',   x: "O Palácio Episcopal de Astorga é uma das poucas obras de Gaudí fora da Catalunha. A cidade é capital do chocolate desde o séc. XVII." },
+                { t: 'curio', x: "Brinde ao amigo Daniel! Estão no 'Páramo', a grande planície cerealífera de León." },
+                { t: 'mon',   x: "A Catedral de León — a 'Pulchra Leonina' — tem ~1800 m² de vitrais. Vê-a ao fim da tarde, com a luz a atravessar o gótico." },
+                { t: 'moto',  x: "A CL-626 por Sabero: curvas largas e rápidas com piso impecável aos pés da Cordilheira Cantábrica. Aquecimento perfeito." },
+                { t: 'hist',  x: "Riaño foi reconstruída nos anos 80 — a aldeia velha ficou submersa pela barragem. Daí o ar novo num cenário milenar." },
+                { t: 'food',  x: "Ao jantar: Cecina de León (vaca curada e fumada) e lechazo — cordeiro de leite assado lentamente em forno de lenha." }
+            ],
+            3: [
+                { t: 'moto',  x: "Última gasolina fácil antes da montanha. Daqui arranca a N-621 a San Glorio: uma das melhores estradas de mota de Espanha." },
+                { t: 'mon',   x: "O Monumento al Oso lembra que estes montes ainda têm urso-pardo cantábrico — cerca de 370 na cordilheira." },
+                { t: 'curio', x: "No Mirador del Corzo o vale abre-se para os Picos. Guardem bateria no telemóvel — vão precisar." },
+                { t: 'moto',  x: "Potes é a 'meca' motard da Cantábria: ponto de encontro de milhares de motas nos fins-de-semana de verão." },
+                { t: 'food',  x: "Cocido lebaniego: grão-de-bico dos vales com compango e os típicos 'rellenos'. Fecha com um golo de orujo." },
+                { t: 'curio', x: "La Hermida é o desfiladeiro mais longo de Espanha (21 km). As pozas brotam a ~60 °C — banho termal grátis no leito do rio." },
+                { t: 'hist',  x: "Covadonga é o berço da Reconquista: aqui Pelayo venceu os mouros em 722, segundo a tradição." },
+                { t: 'mon',   x: "A Virgem 'La Santina' está numa gruta sobre uma cascata; a Basílica neo-românica é toda em calcário rosa." },
+                { t: 'moto',  x: "Janela rara: hoje a estrada dos Lagos reabre de tarde e podem subir de mota própria. Anoitece tarde, às 21:50." }
+            ],
+            4: [
+                { t: 'moto',  x: "Em 2026 as motas estão proibidas nos Lagos 24 h/dia (1 Jun–18 Out). Deixem-nas no parque gratuito do Santuário." },
+                { t: 'curio', x: "A subida de 12 km tem rampas a 15% — daí o autocarro obrigatório. Reservem o bilhete ALSA online na véspera." },
+                { t: 'hist',  x: "Os lagos Enol e Ercina são glaciares; as minas de Buferrera extraíram manganês e ferro até 1979. Trilho fácil entre as galerias." },
+                { t: 'curio', x: "Foto do Enol com os picos atrás — a luz da manhã, antes das nuvens, é a melhor de todas." },
+                { t: 'mon',   x: "Na Santa Cueva, por baixo da basílica, está o túmulo do próprio Pelayo." },
+                { t: 'moto',  x: "Troço curto e fluido até Cangas; cuidado com os autocarros turísticos em sentido contrário nas curvas." },
+                { t: 'mon',   x: "A 'Ponte Romana' de Cangas é afinal medieval. Tem pendurada a Cruz de la Victoria, símbolo das Astúrias." },
+                { t: 'moto',  x: "A AS-264 a Sotres é estreita, técnica e brutal — a melhor estrada de hoje. Sotres é a aldeia habitada mais alta dos Picos (1045 m)." },
+                { t: 'mon',   x: "Do Pozo de la Oración vê-se o Picu Urriellu (Naranjo de Bulnes, 2519 m), o 'Cervino' espanhol. Fica laranja ao pôr-do-sol." },
+                { t: 'food',  x: "À noite, sidra escanciada: o empregado verte de braço no alto para a oxigenar. Pede 'culín' — um golo de cada vez." }
+            ],
+            5: [
+                { t: 'moto',  x: "O Desfiladero de los Beyos (N-625) é das gargantas mais estreitas da Europa, escavada pelo rio Sella entre paredões verticais." },
+                { t: 'moto',  x: "O Puerto del Pontón: curvas amplas e piso excelente a 1280 m — dos troços mais 'fluidos' da viagem." },
+                { t: 'curio', x: "Paragem técnica em Cistierna: estão a deixar a montanha cantábrica e a entrar na meseta leonesa." },
+                { t: 'food',  x: "Se sobrou apetite, o cocido maragato come-se ao contrário: primeiro as sete carnes, depois o grão, e a sopa no fim." },
+                { t: 'hist',  x: "A LE-142 entra no Caminho de Santiago francês na sua cota mais alta — vão partilhar a estrada com peregrinos." },
+                { t: 'hist',  x: "Na Cruz de Ferro, atira uma pedra de costas ao montículo: tradição peregrina milenar de deixar para trás o que pesa." },
+                { t: 'mon',   x: "El Acebo é aldeia de lousa do Caminho; mais abaixo, Molinaseca tem piscina fluvial sob ponte medieval. Banho merecido." },
+                { t: 'hist',  x: "Las Médulas foi a maior mina de ouro do Império Romano — a paisagem vermelha foi rasgada pela técnica 'ruina montium'." },
+                { t: 'mon',   x: "Sobe de mota ao Mirador de Orellán: ao fim da tarde os picos ardem em vermelho. Património Mundial da UNESCO." }
+            ],
+            6: [
+                { t: 'curio', x: "Início do regresso. Em Chaves apanham o Km 0 da N2 — a Estrada Nacional 2, a mais longa de Portugal (738 km, de Chaves a Faro)." },
+                { t: 'moto',  x: "A OU-536 serpenteia sobre os canyons do Sil, na Ribeira Sacra, entre vinhas em socalcos verticais ('viticultura heroica')." },
+                { t: 'hist',  x: "A ponte de Trajano de Chaves (séc. I) ainda exibe marcos miliários romanos. As termas brotam a 73 °C — das mais quentes da Europa." },
+                { t: 'food',  x: "Em Lamego prova o presunto e a bola; na Régua, o cabrito com um tinto do Douro. Combustível humano para a reta final." },
+                { t: 'moto',  x: "A N2 enrola-se aqui pelo Dão — é a parte mais sinuosa do regresso. Ritmo calmo, a viagem está quase a fechar." },
+                { t: 'hist',  x: "Viseu, capital do Dão, é a cidade de Viriato — o líder lusitano que fez frente a Roma." },
+                { t: 'curio', x: "Fim do troço N2 em Santa Comba Dão; daqui o IP3 leva-vos rápido a Coimbra." },
+                { t: 'food',  x: "Brinde final! Em Coimbra, o GastroPiço recomenda o No Tacho e o Fogo e Tradição — ou os ossos do Zé Manel." }
+            ]
+        };
+        function toggleHl(btn) {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            const body = btn.nextElementSibling;
+            if (body) body.classList.toggle('open', !expanded);
+            haptic(6);
+        }
+
         // CHECKLIST DATABASE
         const checklistData = {
             docs: [
@@ -1524,6 +2048,14 @@
                         ${d.timeline.map((item, i) => {
                             const wp = Math.round((i / Math.max(1, stepCount - 1)) * (wpCount - 1));
                             const hour = parseInt(item.time, 10);
+                            const hl = (dayHL[num] || [])[i];
+                            const hlMeta = hl && HL_TYPES[hl.t];
+                            const hlHtml = hlMeta ? `
+                                <button type="button" class="tl-hl" aria-expanded="false" onclick="toggleHl(this)" aria-label="Mostrar ${hlMeta.label}">
+                                    <span class="tl-hl-chip"><i class="fa-solid ${hlMeta.ic}"></i>${hlMeta.label}</span>
+                                    <i class="fa-solid fa-chevron-down tl-hl-caret"></i>
+                                </button>
+                                <div class="tl-hl-body"><p>${hl.x}</p></div>` : '';
                             return `
                             <div class="tl-step relative p-2 -mx-2" data-wp="${wp}">
                                 <div class="tl-dot absolute -left-[15px] top-3.5 w-1.5 h-1.5 rounded-full bg-copper"></div>
@@ -1535,6 +2067,7 @@
                                     ${item.mapsLink ? `<a href="${item.mapsLink}" target="_blank" rel="noopener noreferrer" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-location-dot text-[9px]"></i>Maps</a>` : ''}
                                 </div>
                                 <p class="text-[12.5px] text-dim leading-relaxed">${md(item.desc)}</p>
+                                ${hlHtml}
                             </div>`;
                         }).join('')}
                         </div>
@@ -1654,6 +2187,7 @@
                                 <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-earth-europe text-[9px]"></i>Voo 3D</a>
                             </div>
                             <div id="map-slot" class="w-full h-56 rounded-md border border-[var(--line)] overflow-hidden relative"></div>
+                            <div class="mono text-[9.5px] text-mute mt-2 flex items-center gap-1.5"><i class="fa-solid fa-star text-copper text-[8px]"></i>Toca nos pinos com estrela para a dica de ouro do lugar.</div>
                         </div>
 
                         ${timelineHtml}
@@ -1761,19 +2295,35 @@
 
             // Marcadores — caem como pinos, em sequência
             (d.waypoints || []).forEach((wp, i) => {
+                const tip = tipFor(wp.name);
                 const icon = L.divIcon({
                     className: 'custom-div-icon',
-                    html: '<div class="wp-dot" style="width:10px;height:10px;border-radius:50%;background:#a8632f;border:2px solid #efe6d2;box-shadow:0 0 0 1px #a8632f;"></div>',
-                    iconSize: [14, 14], iconAnchor: [7, 7]
+                    html: tip
+                        ? '<div class="wp-dot wp-dot-gold">★</div>'
+                        : '<div class="wp-dot" style="width:10px;height:10px;border-radius:50%;background:#a8632f;border:2px solid #efe6d2;box-shadow:0 0 0 1px #a8632f;"></div>',
+                    iconSize: tip ? [24, 24] : [14, 14], iconAnchor: tip ? [12, 12] : [7, 7]
                 });
-                const m = L.marker(wp.coords, { icon }).bindPopup(
-                    `<div style="font-family:Inter;font-size:12px;color:#1c1814;padding:2px 4px;"><div style="color:#a8632f;font-weight:600;margin-bottom:2px;">${wp.name}</div><div style="color:#4a3d2e;font-size:11px;">${wp.desc}</div></div>`
-                );
+                const m = L.marker(wp.coords, { icon });
+                if (tip) {
+                    // Pino com dica de ouro → abre a folha estilada (sem popup nativo)
+                    m.on('click', () => openPlaceSheet(wp.name));
+                    m.on('keypress', () => openPlaceSheet(wp.name));
+                } else {
+                    m.bindPopup(
+                        `<div style="font-family:Inter;font-size:12px;color:#1c1814;padding:2px 4px;"><div style="color:#a8632f;font-weight:600;margin-bottom:2px;">${wp.name}</div><div style="color:#4a3d2e;font-size:11px;">${wp.desc}</div></div>`
+                    );
+                }
                 dayLayerGroup.addLayer(m);
                 currentMarkers.push(m);
-                if (!prefersReducedMotion && m._icon) {
-                    m._icon.style.animationDelay = (i * 70) + 'ms';
-                    m._icon.classList.add('pin-drop');
+                // Queda do pino aplicada ao elemento interno (o ícone do Leaflet é
+                // posicionado por transform — animá-lo empilharia os pinos na origem).
+                // Os pinos dourados não caem: já chamam a atenção com o pulso.
+                if (!prefersReducedMotion && m._icon && !tip) {
+                    const inner = m._icon.firstElementChild;
+                    if (inner) {
+                        inner.style.animationDelay = (i * 70) + 'ms';
+                        inner.classList.add('pin-drop');
+                    }
                 }
             });
         }
