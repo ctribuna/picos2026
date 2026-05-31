@@ -552,6 +552,15 @@
             font-size: 9.5px; letter-spacing: 0.04em;
             color: var(--ink-mute);
         }
+        /* ── Chip de temperatura das termas (resumo do dia) ── */
+        .thermal-temp {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px; font-weight: 600;
+            padding: 2px 7px; border-radius: 999px;
+            border: 1px solid var(--copper); color: var(--copper);
+            background: var(--bg-elev);
+        }
 
         /* ── Folha de dica do lugar (bottom-sheet) ── */
         #place-sheet { position: fixed; inset: 0; z-index: 90; visibility: hidden; }
@@ -2068,6 +2077,36 @@
         }
         // Troços longos sem postos de combustível — atestar antes
         const DAY_FUEL = { 3: 'Atesta em Riaño — San Glorio sem postos', 5: 'Atesta antes do Desfiladero de los Beyos' };
+        // Termas & piscinas naturais ao longo do percurso — destaque no roteiro do dia
+        const DAY_THERMAL = {
+            3: { name: 'Pozas de La Hermida', temp: '60 °C', free: true, when: 'a meio do Desfiladero · 14:00', desc: 'Piscinas termais naturais e gratuitas no leito do Rio Deva, sob a ponte da N-621. Banho quente com a garganta calcária à volta.', maps: 'Pozas Termales de La Hermida' },
+            5: { name: 'Piscina Fluvial de Molinaseca', temp: null, free: true, when: 'após a Cruz de Ferro · 16:30', desc: 'Piscina natural no Rio Meruelo, junto à ponte medieval. Água fresca de montanha, esplanadas e tapas em redor — mergulho merecido após os portos.', maps: 'Piscina Fluvial de Molinaseca' },
+            6: { name: 'Termas de Chaves', temp: '73 °C', free: true, when: 'no Km 0 da N2 · 11:30', desc: 'Fonte do Povo a brotar a 73 °C — das águas mais quentes da Europa — e parque à beira-rio Tâmega. Paragem de pés de molho antes da reta da N2.', maps: 'Termas de Chaves' }
+        };
+        function thermalHtml(num) {
+            const t = DAY_THERMAL[num];
+            if (!t) return '';
+            const mapsHref = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(t.maps);
+            return `
+                <section class="card p-4 reveal">
+                    <div class="flex items-baseline justify-between mb-3">
+                        <div class="eyebrow">Termas &amp; piscinas</div>
+                        <span class="mono text-[10.5px] text-mute">${t.when}</span>
+                    </div>
+                    <div class="card-inset p-3">
+                        <div class="flex items-center gap-2 flex-wrap mb-1.5">
+                            <i class="fa-solid fa-hot-tub-person text-copper text-[14px]"></i>
+                            <span class="text-ink text-[13px] font-medium">${t.name}</span>
+                            ${t.temp ? `<span class="thermal-temp"><i class="fa-solid fa-temperature-half text-[9px]"></i>${t.temp}</span>` : ''}
+                            ${t.free ? `<span class="ps-tag">gratuito</span>` : ''}
+                        </div>
+                        <p class="text-[12.5px] text-dim leading-relaxed">${t.desc}</p>
+                        <div class="text-[11px] text-mute mt-2 flex items-center gap-1.5"><i class="fa-solid fa-suitcase-rolling text-[10px]"></i>Calções e toalha leve acessíveis na bagagem.</div>
+                        <a href="${mapsHref}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] text-copper mt-2"><i class="fa-solid fa-location-dot text-[10px]"></i>Direções</a>
+                    </div>
+                </section>
+            `;
+        }
         function tripIsoDate(d) {
             const p = (d.date || '').split(' ');
             if (p.length < 2 || !MONTHS_ISO[p[1]]) return null;
@@ -2314,6 +2353,7 @@
 
                     ${passesHtml}
                     ${gastronomyHtml}
+                    ${thermalHtml(num)}
 
                     <section class="card p-4 reveal" style="border-color:rgba(122,46,42,0.3);">
                         <div class="flex items-center gap-2 mb-2">
