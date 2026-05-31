@@ -607,7 +607,6 @@
             border: 1px solid var(--line); color: var(--ink-mute);
             background: var(--bg-elev);
         }
-        .ps-tag-gp { color: var(--copper); border-color: var(--copper); }
         @media (prefers-reduced-motion: reduce) {
             #place-sheet .ps-panel, #place-sheet .ps-backdrop { transition: none; }
             .wp-dot-gold { animation: none; }
@@ -645,6 +644,16 @@
         .tl-hl-body p {
             font-size: 12px; color: var(--ink-dim); line-height: 1.55;
             border-left: 2px solid rgba(168,99,47,0.4); padding-left: 10px;
+        }
+
+        /* Realce momentâneo da etapa para onde saltámos */
+        @keyframes justNow {
+            0%   { background: rgba(168,99,47,0.16); }
+            100% { background: transparent; }
+        }
+        .tl-justnow { animation: justNow 2.2s var(--ease-out) forwards; border-radius: 4px; }
+        @media (prefers-reduced-motion: reduce) {
+            .tl-justnow { animation: none; }
         }
     </style>
     <!-- Tailwind pré-compilado (estático, sem CDN) — gerado por `npm run build:css` -->
@@ -1474,22 +1483,21 @@
         //  DICAS DE OURO POR LUGAR / REGIÃO
         //  Abrem numa folha estilada ao clicar no pino do mapa.
         //  · gold   — melhor ponto de moto-turismo da zona
-        //  · eat    — tascas / comer bem (e GastroPiço nas paragens PT)
+        //  · eat    — tascas / comer bem da zona
         //  · gps    — coordenadas; o desvio à rota é calculado ao vivo
         // ─────────────────────────────────────────────────────────
-        const GASTROPICO_URL = "https://www.youtube.com/@gastropico";
         const placeTips = {
             coimbra: {
-                region: "Beira · Mondego", gps: [40.2033, -8.4101], gp: true, detour: 0,
+                region: "Beira · Mondego", gps: [40.2033, -8.4101], detour: 0,
                 gold: "Ponto de partida. Antes de arrancar, a subida à Universidade Velha e à Sé Velha vale a foto. Para mota: a saída pela margem do Mondego rumo a Anadia evita o trânsito do centro.",
                 eat: [
                     { name: "Zé Manel dos Ossos", type: "Tasca histórica", desc: "A tasca mais icónica de Coimbra — ossos da espinha estufados e feijoada de javali. Filas à porta, vale a pena.", maps: "Ze Manel dos Ossos Coimbra" },
-                    { name: "No Tacho", type: "GastroPiço", desc: "Nas recomendações de Coimbra do GastroPiço — comida portuguesa de tacho, porções honestas.", maps: "Restaurante No Tacho Coimbra" },
-                    { name: "Fogo e Tradição", type: "GastroPiço", desc: "Também na lista de Coimbra do GastroPiço — grelhados e cozinha tradicional.", maps: "Fogo e Tradicao Coimbra" }
+                    { name: "No Tacho", type: "Comer bem", desc: "Comida portuguesa de tacho no centro de Coimbra — porções honestas.", maps: "Restaurante No Tacho Coimbra" },
+                    { name: "Fogo e Tradição", type: "Tasca", desc: "Grelhados e cozinha tradicional, ambiente descontraído.", maps: "Fogo e Tradicao Coimbra" }
                 ]
             },
             pesodaregua: {
-                region: "Douro Vinhateiro", gps: [41.1729, -7.5080], gp: true,
+                region: "Douro Vinhateiro", gps: [41.1729, -7.5080],
                 gold: "A N222 Régua → Pinhão foi eleita a melhor estrada do mundo para conduzir (Avis, 2015): 27 km colados ao rio entre socalcos de vinha. Faz o troço de manhã cedo — sol rasante e quase sem autocarros.",
                 eat: [
                     { name: "Castas e Pratos", type: "Comer bem", desc: "Cozinha duriense num antigo armazém da estação. Reserva aconselhada.", maps: "Castas e Pratos Peso da Regua" },
@@ -1497,7 +1505,7 @@
                 ]
             },
             pinhao: {
-                region: "Douro Vinhateiro", gps: [41.1903, -7.5407], gp: true,
+                region: "Douro Vinhateiro", gps: [41.1903, -7.5407],
                 gold: "Coração do Douro. Sobe a N323 até ao Miradouro de Casal de Loivos — uma das vistas mais fotografadas de Portugal sobre a curva do rio. A estação tem painéis de azulejos imperdíveis.",
                 eat: [
                     { name: "Veladouro", type: "Tasca", desc: "Petiscos e pratos do dia à beira-rio, sem pretensões. Polvo e bola de carne.", maps: "Restaurante Veladouro Pinhao" },
@@ -1505,14 +1513,14 @@
                 ]
             },
             vilanovadefozcoa: {
-                region: "Vale do Côa", gps: [41.0827, -7.1354], gp: true,
+                region: "Vale do Côa", gps: [41.0827, -7.1354],
                 gold: "Miradouro de São Salvador do Mundo: capelas no topo de um penhasco sobre a foz do Côa. A estrada de acesso é estreita e sinuosa — puro prazer de mota. Em redor, o Parque Arqueológico do Côa (gravuras rupestres, Património Mundial).",
                 eat: [
                     { name: "A Marisqueira", type: "Tasca", desc: "Casa de confiança em Foz Côa para um almoço regional sólido.", maps: "A Marisqueira Vila Nova de Foz Coa" }
                 ]
             },
             braganca: {
-                region: "Trás-os-Montes", gps: [41.8061, -6.7567], gp: true,
+                region: "Trás-os-Montes", gps: [41.8061, -6.7567],
                 gold: "Base da Serra de Montesinho. Sobe à Cidadela medieval (Domus Municipalis, raríssima românica civil). Para mota: a estrada para Montesinho e a fronteira do Portelo, e o troço para Rio de Onor (aldeia comunitária a cavalo na fronteira).",
                 eat: [
                     { name: "Solar Bragançano", type: "Comer bem", desc: "Referência transmontana num solar na praça — caça, posta mirandesa e javali.", maps: "Solar Bragancano Braganca" },
@@ -1655,7 +1663,7 @@
                 ]
             },
             chaves: {
-                region: "Alto Tâmega · N2", gps: [41.7161, -7.4819], gp: true,
+                region: "Alto Tâmega · N2", gps: [41.7161, -7.4819],
                 gold: "Km 0 da mítica N2. Ponte romana de Trajano, castelo e o Forte de São Francisco. Águas termais a 73 °C a brotar no parque à beira-rio — a foto obrigatória do marco da N2.",
                 eat: [
                     { name: "Restaurante Carvalho", type: "Comer bem", desc: "Paragem clássica de motards portugueses — cozinha transmontana farta.", maps: "Restaurante Carvalho Chaves", tel: "+351 276 321 727" },
@@ -1663,7 +1671,7 @@
                 ]
             },
             viseu: {
-                region: "Beira Alta · N2", gps: [40.6566, -7.9125], gp: true,
+                region: "Beira Alta · N2", gps: [40.6566, -7.9125],
                 gold: "Capital do Dão. Centro histórico em volta da Sé e do Cava de Viriato. Bom ponto para café e descanso na longa etapa de regresso pela N2.",
                 eat: [
                     { name: "Muralha da Sé", type: "Tasca", desc: "Vitela à Lafões e rojões num casarão junto à catedral.", maps: "Muralha da Se Viseu" }
@@ -1726,7 +1734,7 @@
                                     <div class="min-w-0">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <span class="text-ink text-[13px] font-medium">${e.name}</span>
-                                            <span class="ps-tag ${e.type === 'GastroPiço' ? 'ps-tag-gp' : ''}">${e.type}</span>
+                                            <span class="ps-tag">${e.type}</span>
                                         </div>
                                         <p class="text-mute text-[11.5px] mt-1 leading-relaxed">${e.desc}</p>
                                     </div>
@@ -1737,15 +1745,6 @@
                         `).join('')}
                     </div>
                 </div>` : '';
-
-            const gpHtml = tip.gp ? `
-                <a href="${GASTROPICO_URL}" target="_blank" rel="noopener noreferrer" class="mt-4 flex items-center justify-between gap-3 card-inset p-3 transition active:bg-[var(--bg-elev-2)]">
-                    <span class="flex items-center gap-2.5">
-                        <i class="fa-brands fa-youtube text-[color:var(--danger)]"></i>
-                        <span class="text-[12px] text-ink">Mais tascas no canal do <span class="text-copper font-medium">GastroPiço</span></span>
-                    </span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-mute text-[10px]"></i>
-                </a>` : '';
 
             document.getElementById('place-sheet-body').innerHTML = `
                 <div class="flex items-start justify-between gap-3 mb-1">
@@ -1775,7 +1774,6 @@
                 </div>
 
                 ${eatHtml}
-                ${gpHtml}
             `;
 
             const sheet = document.getElementById('place-sheet');
@@ -1865,7 +1863,7 @@
                 { t: 'moto',  x: "A N2 enrola-se aqui pelo Dão — é a parte mais sinuosa do regresso. Ritmo calmo, a viagem está quase a fechar." },
                 { t: 'hist',  x: "Viseu, capital do Dão, é a cidade de Viriato — o líder lusitano que fez frente a Roma." },
                 { t: 'curio', x: "Fim do troço N2 em Santa Comba Dão; daqui o IP3 leva-vos rápido a Coimbra." },
-                { t: 'food',  x: "Brinde final! Em Coimbra, o GastroPiço recomenda o No Tacho e o Fogo e Tradição — ou os ossos do Zé Manel." }
+                { t: 'food',  x: "Brinde final! Em Coimbra, fecha em grande com os ossos do Zé Manel, um tacho no No Tacho ou os grelhados do Fogo e Tradição." }
             ]
         };
         function toggleHl(btn) {
@@ -2373,7 +2371,7 @@
             withViewTransition(paint);
 
             // Day pill active state + carimbo postal + badge "HOJE"
-            const today = todayDayNum();
+            const today = currentTripDay();
             document.querySelectorAll('.day-btn').forEach((btn, idx) => {
                 const dayN = idx + 1;
                 const base = "day-btn day-pill px-3.5 py-2 rounded-md flex flex-col items-center min-w-[58px]";
@@ -2603,29 +2601,12 @@
             }
         }
 
-        // ─── Auto-scroll: etapa da timeline mais próxima da hora atual ───
+        // ─── Auto-scroll: etapa da timeline da hora atual (delega em scrollToStep) ───
         function scrollToCurrentStep() {
-            const run = () => {
-                const steps = document.querySelectorAll('#scrolly .tl-step');
-                if (!steps.length) return;
-                const now = new Date();
-                const nowMin = now.getHours() * 60 + now.getMinutes();
-                let best = null, bestDiff = Infinity;
-                steps.forEach(s => {
-                    // hora da etapa: usa o texto "HH:MM" da própria etapa
-                    const mono = s.querySelector('.mono.text-copper');
-                    const m = mono && /(\d{1,2}):(\d{2})/.exec(mono.textContent);
-                    if (!m) return;
-                    const stepMin = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
-                    const diff = Math.abs(stepMin - nowMin);
-                    if (diff < bestDiff) { bestDiff = diff; best = s; }
-                });
-                if (best) {
-                    best.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
-                }
-            };
+            const day = days[currentDayNum];
+            if (!day) return;
             // espera a pintura da timeline (após a View Transition)
-            setTimeout(run, prefersReducedMotion ? 60 : 420);
+            setTimeout(() => scrollToStep(stepIndexForNow(day), true), prefersReducedMotion ? 60 : 420);
         }
 
         // ─── Modo Sol (alto contraste) ───────────────────────────
@@ -2877,6 +2858,43 @@
             });
         }
 
+        // ─── "Estás aqui": posicionar-se na etapa (hora + GPS) ───
+        const MONTHS_PT = { JAN:0, FEV:1, MAR:2, ABR:3, MAI:4, JUN:5, JUL:6, AGO:7, SET:8, OUT:9, NOV:10, DEZ:11 };
+
+        // Número do dia se hoje for um dia da viagem; senão null
+        function currentTripDay() {
+            try {
+                const now = new Date();
+                for (const k in days) {
+                    const [dd, mon] = days[k].date.split(' ');
+                    if (MONTHS_PT[mon] === now.getMonth() && parseInt(dd, 10) === now.getDate()) return parseInt(k, 10);
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        // Índice da etapa correspondente à hora atual (última etapa já começada)
+        function stepIndexForNow(day) {
+            const now = new Date(), mins = now.getHours()*60 + now.getMinutes();
+            let best = 0;
+            (day.timeline || []).forEach((it, i) => {
+                const p = (it.time || '').split(':');
+                const t = (+p[0]) * 60 + (+(p[1] || 0));
+                if (!isNaN(t) && t <= mins) best = i;
+            });
+            return best;
+        }
+
+        function scrollToStep(idx, smooth) {
+            const steps = document.querySelectorAll('#scrolly .tl-step');
+            const el = steps[idx];
+            if (!el) return false;
+            el.scrollIntoView({ behavior: (smooth && !prefersReducedMotion) ? 'smooth' : 'auto', block: 'center' });
+            highlightWaypoint(parseInt(el.dataset.wp, 10) || 0);
+            el.classList.remove('tl-justnow'); void el.offsetWidth; el.classList.add('tl-justnow');
+            return true;
+        }
+
         // ─── Checklist ───────────────────────────────────────────
         function loadChecklist() {
             const render = (categoryKey, targetId) => {
@@ -3094,21 +3112,7 @@
         }
 
         // ─── Dia inicial: hoje, se estivermos em viagem ──────────
-        // Devolve o número do dia cuja data coincide com a data atual do dispositivo, ou null.
-        function todayDayNum() {
-            try {
-                const now = new Date();
-                const months = { JAN:0, FEV:1, MAR:2, ABR:3, MAI:4, JUN:5, JUL:6, AGO:7, SET:8, OUT:9, NOV:10, DEZ:11 };
-                for (const k in days) {
-                    const [dd, mon] = days[k].date.split(' ');
-                    if (months[mon] === now.getMonth() && parseInt(dd, 10) === now.getDate()) return parseInt(k, 10);
-                }
-            } catch (e) {}
-            return null;
-        }
-        function pickInitialDay() {
-            return todayDayNum() || 1;
-        }
+        function pickInitialDay() { return currentTripDay() || 1; }
 
         // ─── Init ────────────────────────────────────────────────
         window.addEventListener('DOMContentLoaded', () => {
@@ -3117,6 +3121,12 @@
             showDay(pickInitialDay());
             loadChecklist();
             observeReveals();                 // revela o conteúdo estático já visível
+
+            // Dia da viagem? showDay() já posiciona o roteiro na etapa da hora atual;
+            // aqui mostramos a posição GPS ao vivo no mapa (pede permissão).
+            if (currentTripDay()) {
+                setTimeout(() => toggleLocation(), 1400);
+            }
 
             const placeIndicator = () => moveTabIndicator(currentTab);
             placeIndicator();
