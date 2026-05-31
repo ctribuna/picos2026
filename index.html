@@ -580,6 +580,32 @@
             font-size: 12px; color: var(--ink-dim); line-height: 1.55;
             border-left: 2px solid rgba(168,99,47,0.4); padding-left: 10px;
         }
+
+        /* ── "Estás aqui" (GPS) ── */
+        .me-dot {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #2f6f8a; border: 2px solid #f5edd9;
+            box-shadow: 0 0 0 2px rgba(47,111,138,0.45);
+            animation: mePulse 2s ease-out infinite;
+        }
+        @keyframes mePulse {
+            0%   { box-shadow: 0 0 0 2px rgba(47,111,138,0.5); }
+            70%  { box-shadow: 0 0 0 12px rgba(47,111,138,0); }
+            100% { box-shadow: 0 0 0 2px rgba(47,111,138,0); }
+        }
+        #locate-btn.locating i { animation: wxSpin 0.9s linear infinite; }
+        #locate-btn.locating { color: var(--copper); }
+
+        /* Realce momentâneo da etapa para onde saltámos */
+        @keyframes justNow {
+            0%   { background: rgba(168,99,47,0.16); }
+            100% { background: transparent; }
+        }
+        .tl-justnow { animation: justNow 2.2s var(--ease-out) forwards; border-radius: 4px; }
+        @media (prefers-reduced-motion: reduce) {
+            .me-dot { animation: none; }
+            .tl-justnow { animation: none; }
+        }
     </style>
     <!-- Tailwind pré-compilado (estático, sem CDN) — gerado por `npm run build:css` -->
     <link rel="stylesheet" href="styles.css">
@@ -2184,7 +2210,10 @@
                         <div class="map-sticky card p-3">
                             <div class="flex items-baseline justify-between mb-2">
                                 <div class="eyebrow">Mapa do percurso</div>
-                                <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-earth-europe text-[9px]"></i>Voo 3D</a>
+                                <div class="flex items-center gap-3">
+                                    <button id="locate-btn" type="button" onclick="locateMe(false)" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1" title="Localizar-me na etapa" aria-label="Localizar-me na etapa"><i class="fa-solid fa-location-crosshairs text-[9px]"></i>Onde estou</button>
+                                    <a href="https://earth.google.com/earth/d/1W-qA0yoM7gPBPCdGNWiY2ok9MfW5CRe5?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-[10.5px] text-mute hover:text-copper transition inline-flex items-center gap-1"><i class="fa-solid fa-earth-europe text-[9px]"></i>Voo 3D</a>
+                                </div>
                             </div>
                             <div id="map-slot" class="w-full h-56 rounded-md border border-[var(--line)] overflow-hidden relative"></div>
                             <div class="mono text-[9.5px] text-mute mt-2 flex items-center gap-1.5"><i class="fa-solid fa-star text-copper text-[8px]"></i>Toca nos pinos com estrela para a dica de ouro do lugar.</div>
@@ -2335,6 +2364,108 @@
             currentMarkers.forEach((m, i) => {
                 if (m._icon) m._icon.classList.toggle('wp-active', i === idx);
             });
+        }
+
+        // ─── "Estás aqui": posicionar-se na etapa (hora + GPS) ───
+        const MONTHS_PT = { JAN:0, FEV:1, MAR:2, ABR:3, MAI:4, JUN:5, JUL:6, AGO:7, SET:8, OUT:9, NOV:10, DEZ:11 };
+        let meMarker = null;
+
+        // Distância em km entre dois pontos [lat, lon]
+        function haversineKm(a, b) {
+            const R = 6371, toR = x => x * Math.PI / 180;
+            const dLat = toR(b[0] - a[0]), dLon = toR(b[1] - a[1]);
+            const la1 = toR(a[0]), la2 = toR(b[0]);
+            const h = Math.sin(dLat/2)**2 + Math.cos(la1)*Math.cos(la2)*Math.sin(dLon/2)**2;
+            return 2 * R * Math.asin(Math.sqrt(h));
+        }
+
+        // Número do dia se hoje for um dia da viagem; senão null
+        function currentTripDay() {
+            try {
+                const now = new Date();
+                for (const k in days) {
+                    const [dd, mon] = days[k].date.split(' ');
+                    if (MONTHS_PT[mon] === now.getMonth() && parseInt(dd, 10) === now.getDate()) return parseInt(k, 10);
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        // Índice da etapa correspondente à hora atual (última etapa já começada)
+        function stepIndexForNow(day) {
+            const now = new Date(), mins = now.getHours()*60 + now.getMinutes();
+            let best = 0;
+            (day.timeline || []).forEach((it, i) => {
+                const p = (it.time || '').split(':');
+                const t = (+p[0]) * 60 + (+(p[1] || 0));
+                if (!isNaN(t) && t <= mins) best = i;
+            });
+            return best;
+        }
+
+        // Etapa cujo waypoint associado está mais próximo do índice de waypoint dado
+        function stepIndexForWaypoint(day, wpIdx) {
+            const steps = (day.timeline || []).length, wpCount = (day.waypoints || []).length || 1;
+            let best = 0, bestD = Infinity;
+            for (let i = 0; i < steps; i++) {
+                const w = Math.round((i / Math.max(1, steps - 1)) * (wpCount - 1));
+                const d = Math.abs(w - wpIdx);
+                if (d < bestD) { bestD = d; best = i; }
+            }
+            return best;
+        }
+
+        function scrollToStep(idx, smooth) {
+            const steps = document.querySelectorAll('#scrolly .tl-step');
+            const el = steps[idx];
+            if (!el) return false;
+            el.scrollIntoView({ behavior: (smooth && !prefersReducedMotion) ? 'smooth' : 'auto', block: 'center' });
+            highlightWaypoint(parseInt(el.dataset.wp, 10) || 0);
+            el.classList.remove('tl-justnow'); void el.offsetWidth; el.classList.add('tl-justnow');
+            return true;
+        }
+
+        function placeMeMarker(me) {
+            if (!activeMapInstance) return;
+            if (meMarker) { meMarker.setLatLng(me); return; }
+            const icon = L.divIcon({ className: 'custom-div-icon', html: '<div class="me-dot"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
+            meMarker = L.marker(me, { icon, zIndexOffset: 1000, interactive: false }).addTo(activeMapInstance);
+        }
+
+        // Pede a localização e posiciona o roteiro na etapa mais próxima.
+        // auto=true → chamada silenciosa no arranque (dias da viagem).
+        function locateMe(auto) {
+            const btn = document.getElementById('locate-btn');
+            if (!navigator.geolocation) { if (!auto && btn) flashLocateState(btn, 'fa-location-slash'); return; }
+            if (btn) btn.classList.add('locating');
+            navigator.geolocation.getCurrentPosition(pos => {
+                if (btn) btn.classList.remove('locating');
+                const me = [pos.coords.latitude, pos.coords.longitude];
+                const d = days[currentDayNum];
+                placeMeMarker(me);
+                // waypoint mais próximo
+                let bi = 0, bd = Infinity;
+                (d.waypoints || []).forEach((w, i) => { const dd = haversineKm(me, w.coords); if (dd < bd) { bd = dd; bi = i; } });
+                if (bd <= 60) {            // perto da rota → salta para a etapa
+                    scrollToStep(stepIndexForWaypoint(d, bi), true);
+                } else if (activeMapInstance) {
+                    activeMapInstance.setView(me, Math.max(activeMapInstance.getZoom(), 9), { animate: true });
+                }
+                if (activeMapInstance && bd <= 60) {
+                    activeMapInstance.setView(me, Math.max(activeMapInstance.getZoom(), 11), { animate: true });
+                }
+                haptic(10);
+            }, err => {
+                if (btn) { btn.classList.remove('locating'); if (!auto) flashLocateState(btn, 'fa-location-slash'); }
+                if (!auto) console.warn('geolocalização:', err && err.message);
+            }, { enableHighAccuracy: true, timeout: 9000, maximumAge: 30000 });
+        }
+        function flashLocateState(btn, icon) {
+            const ic = btn.querySelector('i');
+            if (!ic) return;
+            const prev = ic.className;
+            ic.className = 'fa-solid ' + icon + ' text-[9px]';
+            setTimeout(() => { ic.className = prev; }, 1800);
         }
 
         // ─── Checklist ───────────────────────────────────────────
@@ -2554,24 +2685,22 @@
         }
 
         // ─── Dia inicial: hoje, se estivermos em viagem ──────────
-        function pickInitialDay() {
-            try {
-                const now = new Date();
-                const months = { JAN:0, FEV:1, MAR:2, ABR:3, MAI:4, JUN:5, JUL:6, AGO:7, SET:8, OUT:9, NOV:10, DEZ:11 };
-                for (const k in days) {
-                    const [dd, mon] = days[k].date.split(' ');
-                    if (months[mon] === now.getMonth() && parseInt(dd, 10) === now.getDate()) return parseInt(k, 10);
-                }
-            } catch (e) {}
-            return 1;
-        }
+        function pickInitialDay() { return currentTripDay() || 1; }
 
         // ─── Init ────────────────────────────────────────────────
         window.addEventListener('DOMContentLoaded', () => {
             setupRevealObserver();
-            showDay(pickInitialDay());
+            const initialDay = pickInitialDay();
+            showDay(initialDay);
             loadChecklist();
             observeReveals();                 // revela o conteúdo estático já visível
+
+            // Dia da viagem? Posiciona o roteiro na etapa atual (hora) e tenta
+            // refinar pela localização GPS (pede permissão).
+            if (currentTripDay()) {
+                setTimeout(() => scrollToStep(stepIndexForNow(days[currentDayNum]), true), 750);
+                setTimeout(() => locateMe(true), 1400);
+            }
 
             const placeIndicator = () => moveTabIndicator(currentTab);
             placeIndicator();
